@@ -1,2 +1,4 @@
 # Punto de venta
-Nada
+
+## Actividades lista
+**- Script de la base de datos**

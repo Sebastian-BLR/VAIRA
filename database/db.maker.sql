@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS datos_factura(
 
 CREATE TABLE IF NOT EXISTS info_venta(
     idInfo          INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
-    fkProducto       INT         NOT NULL,
+    fkProducto      INT         NOT NULL,
     fkVenta         INT         NOT NULL,
     cantidad        INT         NOT NULL,
     iva             DECIMAL(5,2) NOT NULL,
