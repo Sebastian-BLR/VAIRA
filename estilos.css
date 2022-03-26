@@ -96,7 +96,46 @@
         width: 100%;
         padding: 10px;
     }
-    
+     /* Fixed sidenav, full height */
+    .sidenav {
+        height: 100%;
+        width: 200px;
+        position: left;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #fc8942;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+  
+  /* Style the sidenav links and the dropdown button */
+    .sidenav a {
+        padding: 10px 10px 10px 10px;
+        text-decoration: none;
+        font-size: 19px;
+        color: #000000;
+        display: block;
+        border: none;
+        background: none;
+        width:100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+     }
+  
+  /* On mouse-over */
+    .sidenav a:hover {
+        color: #f1f1f1;
+    }
+  
+  /* Main content */
+    .main {
+        margin-left: 200px; /* Same as the width of the sidenav */
+        font-size: 20px; /* Increased text to enable scrolling */
+        padding: 0px 10px;
+    }
+
     @media screen and (max-width: 425px) {
         .my-login-page .card-wrapper {
             width: 90%;
@@ -112,4 +151,5 @@
         .my-login-page .card.fat .card-body {
             padding: 15px;
         }
+
     }
