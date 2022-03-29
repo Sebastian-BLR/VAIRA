@@ -35,11 +35,82 @@
                     <a href="ayudaSoportevendedor.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
                   </div>
                 </div>
-                <div class="col ">
-                  Columna 2
-                </div>
-                <div class="col">
-                  Columna 3
+                <div class="col" style="font-size: 20px;  margin-top: 10px;">
+                  Recibos
+                  <div class="row-1" style="margin-top: 10px;">
+                    <input type="date" id="eligeFecha" name="eligeFecha">
+                    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;">Hacer corte de caja</button>
+                    <button type="button" class="btn btn-outline-dark" style="float: right;">Hacer devolución</button>
+                  </div>
+                  <div class="row-1" style="margin-top: 30px;">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">No.Venta</th>
+                          <th scope="col">Fecha</th>
+                          <th scope="col">Sucursal</th>
+                          <th scope="col">Monto</th>
+                          <th scope="col">Detalle</th>
+                          <th scope="col">Factura</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">1</th>
+                          <td>06/03/2022</td>
+                          <td>Cuernavaca</td>
+                          <td>$250</td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;"><i class="fa fa-search-plus"></i></button></td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">2</th>
+                          <td>06/03/2022</td>
+                          <td>Cuernavaca</td>
+                          <td>$500</td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;"><i class="fa fa-search-plus"></i></button></td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">3</th>
+                          <td>06/03/2022</td>
+                          <td>Cuernavaca</td>
+                          <td>$1000</td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;"><i class="fa fa-search-plus"></i></button></td>
+                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+<!-- Modal -->
+<div class="modal fade" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Generar Factura</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">Recipient:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+                  </div>
                 </div>
         </div>
       </div>
