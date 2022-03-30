@@ -2,7 +2,7 @@
     require 'config.php';
 
     try {
-        $connection = new PDO("mysql:host=$server_name;dbname=$db_name",$user_name,$password);
+        $connection = new PDO("mysql:host=$serverName;dbname=$dbName",$userName,$password);
         // set the PDO error mode to exception
         $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $msg = "'Connected successfully'";
