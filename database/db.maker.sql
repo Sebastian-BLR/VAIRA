@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS tipo(
     fkPermisos  INT         NOT NULL,
     tipo        VARCHAR(20) NOT NULL,
 
-    FOREIGN KEY (fkPermisos) REFERENCES permiso(idPermisos)   ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkPermisos) REFERENCES permisos(idPermisos)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS usuario(
@@ -54,9 +54,9 @@ CREATE TABLE IF NOT EXISTS log_usuario(
     fkUsuario   INT         NOT NULL,
     crear       DATE,
     modificar   DATE,
-    desactivar  DATE
+    desactivar  DATE,
 
-    FOREIGN KEY (fkTipo) REFERENCES usuario(fkUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(fkTipo)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS persona(
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS persona(
     apellidoP   VARCHAR(50)  NOT NULL,
     apellidoM   VARCHAR(50)  NOT NULL,
     correo      VARCHAR(50)  NOT NULL,
-    telefono    VARCHAR(10)  NOT NULL
+    telefono    VARCHAR(10)  NOT NULL,
 
     FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
@@ -79,15 +79,15 @@ CREATE TABLE IF NOT EXISTS pais(
 CREATE TABLE IF NOT EXISTS ciudad(
     idCiudad    INT          NOT NULL       PRIMARY KEY     AUTO_INCREMENT,
     fkPais      INT          NOT NULL,
-    nombre      VARCHAR(50)  NOT NULL
-    
-    FOREIGN KEY (fkPais) REFERENCES ciudad(idPais)   ON UPDATE CASCADE ON DELETE RESTRICT
+    nombre      VARCHAR(50)  NOT NULL,
+
+    FOREIGN KEY (fkPais) REFERENCES pais(idPais)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS region_iva(
     idRegion    INT          NOT NULL       PRIMARY KEY     AUTO_INCREMENT,
     fkCiudad    INT          NOT NULL,
-    iva         DECIMAL(5,2)  NOT NULL
+    iva         DECIMAL(5,2)  NOT NULL,
 
     FOREIGN KEY (fkCiudad) REFERENCES ciudad(idCiudad)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS sucursal(
     calle       VARCHAR(100) NOT NULL,
     colonia     VARCHAR(100) NOT NULL,
     CP          VARCHAR(10)  NOT NULL,
-    telefono    VARCHAR(15)  NOT NULL
-     
+    telefono    VARCHAR(15)  NOT NULL,
+
     FOREIGN KEY (fkRegion) REFERENCES region_iva(idRegion)   ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE = INNODB;
 
@@ -108,15 +108,15 @@ CREATE TABLE IF NOT EXISTS punto_venta(
     idUsuario   INT          NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkSucursal  INT          NOT NULL,
     fkUsuario   INT          NOT NULL,
-    nombre      VARCHAR(50)  NOT NULL
+    nombre      VARCHAR(50)  NOT NULL,
 
     FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT  
+    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS sucursal_usuario(
     fkSucursal  INT          NOT NULL,
-    fkUsuario   INT          NOT NULL
+    fkUsuario   INT          NOT NULL,
 
     FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS producto (
     precio          DECIMAL (10,2)   NOT NULL,
     imagen          BLOB,
     activo          TINYINT,
-    servicio        TINYINT
+    servicio        TINYINT,
 
     FOREIGN KEY (fkCategoria) REFERENCES categoria(idCategoria)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkCategoriaImp) REFERENCES categoria_impuestos(idCategoriaIm)   ON UPDATE CASCADE ON DELETE RESTRICT
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS log_producto(
     fkProducto  INT         NOT NULL,
     crear       DATE,
     modificar   DATE,
-    desactivar  DATE
+    desactivar  DATE,
 
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS existencia(
     idExistencia    INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkProducto      INT         NOT NULL,
     fkSucursal      INT         NOT NULL,
-    cantidad        INT         NOT NULL
+    cantidad        INT         NOT NULL,
 
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS existencia(
 
 CREATE TABLE IF NOT EXISTS proveedor_producto(
     fkProveedor  INT          NOT NULL,
-    fkProducto   INT          NOT NULL
+    fkProducto   INT          NOT NULL,
 
     FOREIGN KEY (fkProveedor) REFERENCES proveedor(idProveedor)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkProducto)  REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT
@@ -197,8 +197,8 @@ CREATE TABLE IF NOT EXISTS venta (
     fkUsuario   INT,
     fkTipoPago  INT,
     total       DECIMAL(12, 2),
-    fecha       TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
-    
+    fecha       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (fkUsuario)  REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkTipoPago)  REFERENCES tipo_pago(idTipo) ON UPDATE CASCADE ON DELETE RESTRICT
 
@@ -224,9 +224,9 @@ CREATE TABLE IF NOT EXISTS info_venta(
     iva             DECIMAL(5,2) NOT NULL,
     ieps            DECIMAL(5,2) NOT NULL,
     isr             DECIMAL(5,2) NOT NULL,
-    subtotal        DECIMAL(5,2) NOT NULL
-    
+    subtotal        DECIMAL(5,2) NOT NULL,
+
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkVenta)  REFERENCES venta(idVenta)   ON UPDATE CASCADE ON DELETE RESTRICT
-    
+
 )ENGINE = INNODB;
