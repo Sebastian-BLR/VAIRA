@@ -1,6 +1,6 @@
 <?php session_start();
 
-require "functions.php";
+require "connection.php";
 
 if(isset($_SESSION['user'])){
     // header("Location: index.php");
@@ -15,12 +15,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $password = hash('sha512', $password);
 
     echo "User: $usuario - Pass: $password";
-
-    try {
-        $conexion = connect();
-    } catch (PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
-    }
+    
+    if(!$connection)
+        die();
 
     $statement = $conexion->prepare(
         'SELECT * FROM usuarios WHERE usuario = :usuario AND password = :password'

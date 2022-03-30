@@ -2,7 +2,7 @@
 
 function connect(){
     // * Connect to LOCAL database
-    require "dataConnection.php";
+    require "config.php";
     
     try {
         // * Create connection

@@ -17,12 +17,13 @@ DROP TABLE IF EXISTS categoria_impuestos;
 DROP TABLE IF EXISTS proveedor;
 DROP TABLE IF EXISTS producto;
 DROP TABLE IF EXISTS log_producto;
-DROP TABLE IF EXISTS existencias;
+DROP TABLE IF EXISTS existencia;
 DROP TABLE IF EXISTS proveedor_producto;
 DROP TABLE IF EXISTS tipo_pago;
 DROP TABLE IF EXISTS venta;
 DROP TABLE IF EXISTS datos_factura;
 DROP TABLE IF EXISTS info_venta;
+
 
 CREATE TABLE IF NOT EXISTS permisos(
     idPermisos  INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
@@ -230,3 +231,5 @@ CREATE TABLE IF NOT EXISTS info_venta(
     FOREIGN KEY (fkVenta)  REFERENCES venta(idVenta)   ON UPDATE CASCADE ON DELETE RESTRICT
 
 )ENGINE = INNODB;
+
+# SHOW TABLES;
