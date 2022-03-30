@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $password = hash('sha512', $password);
 
     echo "User: $usuario - Pass: $password";
-    
+
     if(!$connection)
         die();
 
