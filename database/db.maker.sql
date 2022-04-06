@@ -1,29 +1,28 @@
 # CREATE SCHEMA db_vaira;
 USE db_vaira;
 
-DROP TABLE IF EXISTS permisos;
-DROP TABLE IF EXISTS tipo;
-DROP TABLE IF EXISTS usuario;
-DROP TABLE IF EXISTS log_usuario;
-DROP TABLE IF EXISTS persona;
-DROP TABLE IF EXISTS pais;
-DROP TABLE IF EXISTS ciudad;
-DROP TABLE IF EXISTS region_iva;
-DROP TABLE IF EXISTS sucursal;
-DROP TABLE IF EXISTS punto_venta;
-DROP TABLE IF EXISTS sucursal_usuario;
-DROP TABLE IF EXISTS categoria;
-DROP TABLE IF EXISTS categoria_impuestos;
-DROP TABLE IF EXISTS proveedor;
-DROP TABLE IF EXISTS producto;
-DROP TABLE IF EXISTS log_producto;
-DROP TABLE IF EXISTS existencia;
-DROP TABLE IF EXISTS proveedor_producto;
-DROP TABLE IF EXISTS tipo_pago;
-DROP TABLE IF EXISTS venta;
-DROP TABLE IF EXISTS datos_factura;
 DROP TABLE IF EXISTS info_venta;
-
+DROP TABLE IF EXISTS datos_factura;
+DROP TABLE IF EXISTS venta;
+DROP TABLE IF EXISTS tipo_pago;
+DROP TABLE IF EXISTS proveedor_producto;
+DROP TABLE IF EXISTS existencia;
+DROP TABLE IF EXISTS log_producto;
+DROP TABLE IF EXISTS producto;
+DROP TABLE IF EXISTS proveedor;
+DROP TABLE IF EXISTS categoria_impuestos;
+DROP TABLE IF EXISTS categoria;
+DROP TABLE IF EXISTS sucursal_usuario;
+DROP TABLE IF EXISTS punto_venta;
+DROP TABLE IF EXISTS sucursal;
+DROP TABLE IF EXISTS region_iva;
+DROP TABLE IF EXISTS ciudad;
+DROP TABLE IF EXISTS pais;
+DROP TABLE IF EXISTS persona;
+DROP TABLE IF EXISTS log_usuario;
+DROP TABLE IF EXISTS usuario;
+DROP TABLE IF EXISTS tipo;
+DROP TABLE IF EXISTS permisos;
 
 CREATE TABLE IF NOT EXISTS permisos(
     idPermisos  INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
