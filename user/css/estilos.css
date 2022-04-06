@@ -271,7 +271,12 @@
   
   .cerrarSesionBtn:hover a{
     color: #FFF;
-}
+  }
+
+  .active_menu {
+    background-color: #e65d08 !important;
+    color: #FFF !important;
+  }
 
 
   /* Main content */
