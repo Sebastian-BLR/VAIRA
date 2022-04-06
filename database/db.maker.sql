@@ -204,16 +204,22 @@ CREATE TABLE IF NOT EXISTS venta (
 
 )ENGINE = INNODB;
 
+CREATE TABLE IF NOT EXISTS regimen_fiscal (
+    idRegimen   INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
+    nombre      VARCHAR(50) NOT NULL
+) ENGINE = INNODB;
+
 CREATE TABLE IF NOT EXISTS datos_factura(
     idExistencia    INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkPersona       INT         NOT NULL,
     fkVenta         INT         NOT NULL,
+    fkRegimen       INT         NOT NULL,
     rfc             VARCHAR(13) NOT NULL,
     cp_persona      VARCHAR(10) NOT NULL,
-    regimen         VARCHAR(10) NOT NULL,
 
     FOREIGN KEY (fkPersona) REFERENCES persona(idPersona)   ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkVenta)  REFERENCES venta(idVenta)   ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkVenta)  REFERENCES venta(idVenta)   ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkRegimen)  REFERENCES regimen_fiscal(idRegimen)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS info_venta(

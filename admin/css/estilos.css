@@ -269,6 +269,10 @@
     text-decoration: none;
   }
 
+  .cerrarSesionBtn:hover a{
+      color: #FFF;
+  }
+
   /* Main content */
     .main {
         margin-left: 200px; /* Same as the width of the sidenav */

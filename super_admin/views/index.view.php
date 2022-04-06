@@ -16,7 +16,7 @@
         <?php require ("../services/views/header.php") ?>
         
         <div class="row" >
-          <?php require ("menu.php") ?>
+          <?php require ("../services/views/menu.php") ?>
         <div class="col ">
           Columna 2
         </div>
