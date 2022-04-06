@@ -13,27 +13,10 @@
   </head>
   <body >
     <div class="container-fluid" >
-        <div class="row" >
-          <nav class="navbar" style="background-color: #ff7e2f;">
-            <a class="navbar-brand" href="indexsuperadmin.html">
-                <img src="imagenes/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="d-flex" action="indexlogin.html">
-                <button class="btn btn-outline-dark" type="submit">Cerrar Sesión</button>
-              </form>
-          </nav>
-        </div>
+    <?php require ("../services/views/header.php") ?>
 
         <div class="row" >
-                <div class="col-2" style="height: 100vh; ">
-                  <div class="sidenav">
-                    <a href="recibossuperadmin.html"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportessuperadmin.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="inventariosuperadmin.html"><i class="fa fa-archive"></i>Inventario</a>
-                    <a href="configuracionsuperadmin.html"><i class="fa fa-cogs"></i>Configuración</a>
-                    <a href="ayudaSoportesuperadmin.html" style="background-color: #e65d08"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
-                  </div>
-                </div>
+                <?php require ("menu.php") ?>
                 <div class="col ">
                   Columna 2
                 </div>
