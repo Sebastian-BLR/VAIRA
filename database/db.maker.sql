@@ -1,4 +1,4 @@
-CREATE SCHEMA db_vaira;
+# CREATE SCHEMA db_vaira;
 USE db_vaira;
 
 DROP TABLE IF EXISTS permisos;
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     idUsuario   INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkTipo      INT         NOT NULL,
     usuario     VARCHAR(50) NOT NULL,
-    password    VARCHAR(56) NOT NULL,
+    password    VARCHAR(128) NOT NULL,
 
     FOREIGN KEY (fkTipo) REFERENCES tipo(idTipo)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;

@@ -24,7 +24,7 @@
                     <div class="card fat">
                         <div class="card-body">
                             <h4 class="card-title">Iniciar sesi&oacute;n</h4>
-                            <form method="POST" action="http://localhost/Punto%20de%20venta/login.php" class="my-login-validation" novalidate="">
+                            <form method="POST" action="login.php" class="my-login-validation" novalidate="">
                                 <div class="form-group">
                                     <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
                                     <input id="user" type="text" class="form-control" name="user" value="" required autofocus>

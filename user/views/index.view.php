@@ -15,33 +15,17 @@
   </head>
   <body >
     <div class="container-fluid" >
-        <div class="row" >
-          <nav class="navbar" style="background-color: #ff7e2f;">
-            <a class="navbar-brand" href="indexvendedor.html">
-                <img src="imagenes/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="d-flex" action="indexlogin.html">
-            <button class="btn btn-outline-dark"><a href="../services/cerrar.php">Cerrar Sesion</a></button>
-              </form>
-          </nav>
+      <?php require ("../services/views/header.php") ?>
+      
+      <div class="row" >
+        <?php require ("../services/views/menu.php") ?>
+        <div class="col ">
+          Columna 2
         </div>
-
-        <div class="row" >
-                <div class="col-2" style="height: 100vh; ">
-                  <div class="sidenav">
-                    <a href="nuevaVentavendedor.html"><i class="fa fa-cart-arrow-down"></i>Nueva Venta</a>
-                    <a href="recibosvendedor.html"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportesvendedor.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="ayudaSoportevendedor.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
-                  </div>
-                </div>
-                <div class="col ">
-                  Columna 2
-                </div>
-                <div class="col">
-                  Columna 3
-                </div>
+        <div class="col">
+          Columna 3
         </div>
       </div>
+    </div>
   </body>
 </html>
