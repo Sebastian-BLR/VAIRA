@@ -167,7 +167,7 @@
       }
 
       .wrapper{
-        overflow: scroll;
+        overflow-x: hidden;
         height: 600px;
       }
 
