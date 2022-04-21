@@ -1,34 +1,7 @@
-<?php session_start();
-    if (!isset($_SESSION['user']) || $_SESSION['userType'] != 1)
-        header("Location: ../login.php");
-        
-    require '../services/connection.php';
-
+<?php 
+    require ('../services/connection.php');
     $errores = '';
     $enviado = '';
-
-    // ! ====================================================
-    // !                OBTENCION DE USUARIOS              //
-    // ! ====================================================
-    
-    $statement = $connection->prepare(
-        'SELECT nombre, correo, usuario, tipo FROM persona JOIN usuario ON fkUsuario = usuario.idUsuario JOIN tipo ON fkTipo = tipo.idTipo;'
-    );
-    $statement->execute();
-    $usuarios = $statement->fetchAll();
-    
-    
-    // ! ====================================================
-    // !                OBTENCION DE TIPOS                 //
-    // ! ====================================================
-
-    $statement = $connection->prepare("SELECT * FROM tipo");
-    $statement->execute();
-    $tipos = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-    // ! ====================================================
-    // !                REGISTRO DE USUARIOS               //
-    // ! ====================================================
 
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         // * GET data from form and store in variables
@@ -56,7 +29,7 @@
             $resultado = $statement->fetch();
 
             if($resultado != false){
-                $errores .= '<li>El nombre de usuario ya existe</li>';
+                $errores .= '<li>El nombre de usuario</li>';
             }
 
             if($password != $password2){
@@ -82,12 +55,10 @@
             $resultado = $statement->execute(array(':myJSON' => $myJSON));
 
             if($resultado){
+                // echo '<script>alert("Usuario registrado con éxito")</script>';
                 $enviado = true;
-                // header("Location: configuracion.php");
+                header("Location: configuracion.php");
             }
         }
     }
-
-
-    require 'views/configuracion.view.php';
 ?>

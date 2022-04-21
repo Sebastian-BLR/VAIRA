@@ -69,6 +69,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 require "views/index_login.view.php";
 
-// TODO: QUITAR EL DESTROY!!!
+// ! QUITAR EL DESTROY!!!
 // session_destroy();
 ?>
