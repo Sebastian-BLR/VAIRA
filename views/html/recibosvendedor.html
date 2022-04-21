@@ -41,7 +41,7 @@
                   <div class="row-1" style="margin-top: 10px;">
                     <input type="date" id="eligeFecha" name="eligeFecha">
                     <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-                    <button type="button" class="btn btn-outline-dark" style="float: right;">Hacer devolución</button>
+                    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
                   </div>
                   <div class="row-1" style="margin-top: 30px;">
                     <table class="table">
@@ -95,15 +95,15 @@
         <form>
           <div class="mb-3">
             <label for="rfc" class="col-form-label">Capture su RFC:</label>
-            <input type="text" class="form-control" id="rfc">
+            <input type="text" class="form-control" id="rfc" maxlength="13">
           </div>
           <div class="mb-3">
             <label for="nombre" class="col-form-label">Nombre Completo:</label>
             <input type="text" class="form-control" id="nombre">
           </div>
           <div class="mb-3">
-            <label for="codigopostal" class="col-form-label">Código Postal:</label>
-            <input type="number" class="form-control" id="codigopostal">
+            <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
+            <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
           </div>
           <div class="mb-3">
             <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
@@ -121,10 +121,10 @@
               <option value="opcion11">Demás ingresos</option>
             </select>
             <div class="mb-3">
-              <label for="metodopago" class="col-form-label">Método de Pago:</label>
+              <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
               <select name="cars" id="cars" form="carform">
                 <option value="efectivo">Efectivo</option>
-                <option value="tarjeta">Tarjet Crédito o Débito</option>
+                <option value="tarjeta">Tarjet Cr&eacute;dito o D&eacute;bito</option>
               </select>
             </div>
           </div>
@@ -149,9 +149,39 @@
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label for="vendedor" class="col-form-label">Selecciona el día en la que deseas hacer el corte de caja</label>
+            <label for="vendedor" class="col-form-label">Selecciona el d&iacute;a en la que deseas hacer el corte de caja</label>
             <br>
             <input type="date" id="eligeFechaCorte" name="eligeFechaCorte">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Hacer una devolución -->
+<div class="modal fade bd-example-modal-xl" id="hacerDevolucion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Devoluci&oacute;n</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="fechaCompra" class="col-form-label">Fecha de compra</label>
+            <br>
+            <input type="date" id="fechaDeCompra" name="fechaDeCompra">
+          </div>
+          <div class="mb-3">
+            <label for="noCompra" class="col-form-label">N&uacute;mero de compra</label>
+            <br>
+            <input type="text" id="noCompra" name="noCompra">
           </div>
         </form>
       </div>

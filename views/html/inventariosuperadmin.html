@@ -36,7 +36,7 @@
                 </div>
                 <div class="col ">
                   <button type="button" class="btn btn-secondary"><i class="fa fa-filter"></i>Filtrar</button>
-                  <button type="button" class="btn btn-outline-dark" style="float: right; margin-top: 10px;"></i>Modificar</button>
+                  <button type="button" class="btn btn-outline-dark" style="float: right; margin-top: 10px;" data-bs-toggle="modal" data-bs-target="#modificar"></i>Modificar</button>
                   <div class="btn-group">
                     <div class="btn-group">
                       <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -216,5 +216,41 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Detalle Producto-->
+<div class="modal fade bd-example-modal-sm" id="modificar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modificar producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="vendedor" class="col-form-label">Nombre de producto</label>
+            <input type="text" class="form-control" id="nombreproducto">
+          </div>
+          <div class="mb-3">
+            <label for="hora" class="col-form-label">Precio</label>
+            <input type="text" class="form-control" id="precio">
+          </div>
+          <div class="mb-3">
+            <label for="productos" class="col-form-label">Categoria</label>
+            <input type="text" class="form-control" id="categoria">
+          </div>
+          <div class="mb-3">
+            <label for="total" class="col-form-label">En existencia</label>
+            <input type="text" class="form-control" id="existencia">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   </body>
 </html>
