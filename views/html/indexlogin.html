@@ -26,7 +26,7 @@
                             <form method="POST" action="indexvendedor.html" class="my-login-validation" novalidate="">
                                 <div class="form-group">
                                     <label for="email"><i class="fa fa-fw fa-user"></i>Usuario</label>
-                                    <input id="email" type="text" class="form-control" name="email" value="" required autofocus>
+                                    <input id="email" type="text" class="form-control" name="email" value="" required autofocus maxlength="30">
                                 </div>
     
                                 <div class="form-group">
