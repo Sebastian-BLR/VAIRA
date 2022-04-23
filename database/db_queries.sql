@@ -59,6 +59,18 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                     COMMIT;
                 END //
 
+DROP PROCEDURE IF EXISTS eliminar_usuario;
+
+CREATE PROCEDURE eliminar_usuario(IN id INT)
+                BEGIN
+                    START TRANSACTION;
+                        DELETE FROM persona WHERE fkUsuario = id;
+                        DELETE FROM log_usuario WHERE fkUsuario = id;
+                        DELETE FROM usuario WHERE idUsuario = id;
+                        SELECT * FROM usuario WHERE idUsuario = id;
+                    COMMIT;
+                END //
+
 DELIMITER ;
 
 CALL insertar_usuario('{"nombre":"Rodrigo Sebastian","apellidoP":"de la Rosa","apellidoM":"Andres","usuario":"roy22","password":"roy456","correo":"a@a.com","telefono":"1234567890","rol":"1"}');

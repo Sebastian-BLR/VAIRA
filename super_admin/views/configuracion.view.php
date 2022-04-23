@@ -38,18 +38,27 @@
                   <th scope="col">Correo</th>
                   <th scope="col">Usuario</th>
                   <th scope="col">Rol</th>
-              <th scope="col">Eliminar</th>
-            </tr>
-          </thead>
-          <tbody>
+                  <th scope="col">Estatus</th>
+                  <th scope="col">Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
             <?php foreach ($usuarios as $usuario): ?>
             <tr>
               <td><?php echo $usuario['nombre'] ?></td>
               <td><?php echo $usuario['correo'] ?></td>
               <td><?php echo $usuario['usuario'] ?></td>
               <td><?php echo $usuario['tipo'] ?></td>
-              <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"
-              style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+              <td><?php 
+                      if($usuario['activo'] == 1) 
+                        echo 'Activo';
+                      else
+                        echo 'Inactivo';
+                  ?></td>
+              <td>
+              <!--                                                                                    onclick="alertEliminarUsuario(this.id)" -->
+                  <button type="button" class="btn btn-danger" id=<?php echo $usuario['idUsuario'] ?> onclick="alertEliminarUsuario(this.id)" style="float: center;" name="eliminar"><i class="fa fa-minus-circle"></i></button>
+              </td>
             </tr>
             <?php endforeach; ?>
             <!-- <tr>
@@ -178,23 +187,44 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-success" onclick="alertAgregarUsuario()"> Agregar </button>
+                <button type="submit" class="btn btn-success" onclick="alertAgregarUsuario()" name="agregar"> Agregar </button>
               </div>
               <?php if(!empty($errores)): ?>
-                <div class="alert alert-danger">
-                  <?php echo $errores; ?>
-                </div>
-              <?php elseif($enviado): ?>
                 <?php 
                 echo "<script>Swal.fire({
-                    title: 'Usuario agregado!',
-                    icon: 'success',
+                  title: 'Error',
+                  html: '$errores',
+                  icon: 'error',
                     confirmButtonText: 'Ok'
                   }).then((result)=>{
                     if(result.isConfirmed){
                       window.location.href='configuracion.php';
                     }
                   }) </script>";
+                  ?>
+              <?php elseif($enviado): ?>
+                <?php 
+                echo "<script>Swal.fire({
+                  title: 'Usuario agregado!',
+                  icon: 'success',
+                    confirmButtonText: 'Ok'
+                  }).then((result)=>{
+                    if(result.isConfirmed){
+                      window.location.href='configuracion.php';
+                    }
+                  }) </script>";
+                  ?>
+              <?php elseif($eliminado): ?>
+                <?php 
+                  echo "<script>Swal.fire({
+                    title: 'Usuario eliminado!',
+                    icon: 'success',
+                      confirmButtonText: 'Ok'
+                    }).then((result)=>{
+                      if(result.isConfirmed){
+                        window.location.href='configuracion.php';
+                      }
+                    }) </script>";
                 ?>
               <?php endif; ?>
               </form>
