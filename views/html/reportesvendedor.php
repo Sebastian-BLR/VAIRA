@@ -5,49 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" >
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="estilos.css">
+    
   </head>
   <body >
     <div class="container-fluid" >
-        <div class="row" >
-          <nav class="navbar" style="background-color: #ff7e2f;">
-            <a class="navbar-brand" href="indexsuperadmin.html">
-                <img src="imagenes/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="d-flex" action="indexlogin.html">
-                <button class="btn btn-outline-dark" type="submit">Cerrar Sesión</button>
-              </form>
-          </nav>
-        </div>
+        <?php include './header.php' ?>
+
 
         <div class="row" >
                 <div class="col-2" style="height: 100vh; ">
                   <div class="sidenav">
-                    <a href="recibossuperadmin.html"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportessuperadmin.html" style="background-color: #e65d08"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="inventariosuperadmin.html"><i class="fa fa-archive"></i>Inventario</a>
-                    <a href="configuracionsuperadmin.html"><i class="fa fa-cogs"></i>Configuración</a>
-                    <a href="ayudaSoportesuperadmin.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
+                    <a href="nuevaVentavendedor.html"><i class="fa fa-cart-arrow-down"></i>Nueva Venta</a>
+                    <a href="recibosvendedor.html"><i class="fa fa-ticket"></i>Recibos</a>
+                    <a href="reportesvendedor.html" style="background-color: #e65d08"><i class="fa fa-line-chart"></i>Reportes</a>
+                    <a href="ayudaSoportevendedor.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
                   </div>
                 </div>
                 <div class="col" style="font-size: 20px;  margin-top: 10px;">
                   Resumen
-                  <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                      Sucursal
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Separated link</a>
-                    </div>
-                  </div>
                   <div class="row-1" style="margin-top: 10px;">
                     <label class="toggle">
                       <input type="checkbox">

@@ -5,50 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibos</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" >
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="estilos.css">
     <script src="js/javascript.js"></script>
+    
   </head>
   <body >
     <div class="container-fluid" >
-        <div class="row" >
-          <nav class="navbar" style="background-color: #ff7e2f;">
-            <a class="navbar-brand" href="indexsuperadmin.html">
-                <img src="imagenes/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="d-flex" action="indexlogin.html">
-                <button class="btn btn-outline-dark" type="submit">Cerrar Sesión</button>
-              </form>
-          </nav>
-        </div>
+        <?php include './header.php' ?>
+
 
         <div class="row" >
                 <div class="col-2" style="height: 100vh; ">
                   <div class="sidenav">
-                    <a href="recibossuperadmin.html" style="background-color: #e65d08"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportessuperadmin.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="inventariosuperadmin.html"><i class="fa fa-archive"></i>Inventario</a>
-                    <a href="configuracionsuperadmin.html"><i class="fa fa-cogs"></i>Configuración</a>
-                    <a href="ayudaSoportesuperadmin.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
+                    <a href="nuevaVentavendedor.html"><i class="fa fa-cart-arrow-down"></i>Nueva Venta</a>
+                    <a href="recibosvendedor.html" style="background-color: #e65d08"><i class="fa fa-ticket"></i>Recibos</a>
+                    <a href="reportesvendedor.html"><i class="fa fa-line-chart"></i>Reportes</a>
+                    <a href="ayudaSoportevendedor.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
                   </div>
                 </div>
                 <div class="col" style="font-size: 20px;  margin-top: 10px;">
                   Recibos
-                  <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sucursal
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-                        <li><a class="dropdown-item" href="#">Temixco</a></li>
-                        <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-                      </ul>
-                    </div>
-                  </div>
                   <div class="row-1" style="margin-top: 10px;">
                     <input type="date" id="eligeFecha" name="eligeFecha">
                     <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
@@ -113,7 +94,7 @@
             <input type="text" class="form-control" id="nombre">
           </div>
           <div class="mb-3">
-            <label for="codigopostal" class="col-form-label">Código Postal:</label>
+            <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
             <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
           </div>
           <div class="mb-3">
@@ -124,7 +105,7 @@
               <option value="opcion3">Régimen de Actividades Empresariales y Profesionales</option>
               <option value="opcion4">Régimen de Incorporación Fiscal</option>
               <option value="opcion5">Enajenación de bienes</option>
-              <option value="opcion6">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
+              <option value="opcion5">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
               <option value="opcion7">Régimen de Arrendamiento</option>
               <option value="opcion8">Intereses</option>
               <option value="opcion9">Obtención de premios</option>
@@ -132,10 +113,10 @@
               <option value="opcion11">Demás ingresos</option>
             </select>
             <div class="mb-3">
-              <label for="metodopago" class="col-form-label">Método de Pago:</label>
+              <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
               <select name="cars" id="cars" form="carform">
                 <option value="efectivo">Efectivo</option>
-                <option value="tarjeta">Tarjet Crédito o Débito</option>
+                <option value="tarjeta">Tarjet Cr&eacute;dito o D&eacute;bito</option>
               </select>
             </div>
           </div>
@@ -149,36 +130,26 @@
   </div>
 </div>
 
-<!-- Modal Detalle Venta-->
-<div class="modal fade bd-example-modal-xl" id="mostrarDetalle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<!-- Modal Corte de Caja -->
+<div class="modal fade bd-example-modal-xl" id="corteCaja" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Corte de caja</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label for="vendedor" class="col-form-label">Vendedor</label>
-            <input type="text" readonly class="form-control" id="vendedor">
-          </div>
-          <div class="mb-3">
-            <label for="hora" class="col-form-label">Hora</label>
-            <input type="text" readonly class="form-control" id="hora">
-          </div>
-          <div class="mb-3">
-            <label for="productos" class="col-form-label">Productos</label>
-            <input type="text" readonly class="form-control" id="Productos">
-          </div>
-          <div class="mb-3">
-            <label for="total" class="col-form-label">Total</label>
-            <input type="text" readonly class="form-control" id="total">
+            <label for="vendedor" class="col-form-label">Selecciona el d&iacute;a en la que deseas hacer el corte de caja</label>
+            <br>
+            <input type="date" id="eligeFechaCorte" name="eligeFechaCorte">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
@@ -208,48 +179,42 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Corte de Caja -->
-<div class="modal fade bd-example-modal-xl" id="corteCaja" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<!-- Modal Detalle Venta-->
+<div class="modal fade bd-example-modal-xl" id="mostrarDetalle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Corte de caja</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label for="vendedor" class="col-form-label">Selecciona el día en la que deseas hacer el corte de caja</label>
-            <br>
-            <input type="date" id="eligeFechaCorte" name="eligeFechaCorte">
+            <label for="vendedor" class="col-form-label">Vendedor</label>
+            <input type="text" class="form-control" id="vendedor">
           </div>
           <div class="mb-3">
-            <label for="hora" class="col-form-label">Selecciona la sucursal</label>
-            <br>
-            <div class="btn-group">
-              <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  Sucursal
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-                  <li><a class="dropdown-item" href="#">Temixco</a></li>
-                  <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-                </ul>
-              </div>
-            </div>
+            <label for="hora" class="col-form-label">Hora</label>
+            <input type="text" class="form-control" id="hora">
+          </div>
+          <div class="mb-3">
+            <label for="productos" class="col-form-label">Productos</label>
+            <input type="text" class="form-control" id="Productos">
+          </div>
+          <div class="mb-3">
+            <label for="total" class="col-form-label">Total</label>
+            <input type="text" class="form-control" id="total">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCaja()" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
@@ -259,6 +224,7 @@
                 </div>
         </div>
       </div>
+      
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>
 </html>
