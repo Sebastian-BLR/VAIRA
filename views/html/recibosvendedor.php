@@ -21,12 +21,8 @@
 
         <div class="row" >
                 <div class="col-2" style="height: 100vh; ">
-                  <div class="sidenav">
-                    <a href="nuevaVentavendedor.html"><i class="fa fa-cart-arrow-down"></i>Nueva Venta</a>
-                    <a href="recibosvendedor.html" style="background-color: #e65d08"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportesvendedor.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="ayudaSoportevendedor.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
-                  </div>
+                  <?php include './sidenavbar.php' ?>
+
                 </div>
                 <div class="col" style="font-size: 20px;  margin-top: 10px;">
                   Recibos
