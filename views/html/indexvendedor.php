@@ -17,18 +17,27 @@
     <div class="container-fluid" >
         <?php include './header.php' ?>
 
-
         <div class="row" >
-          <div class="col-2" style="height: 100vh; ">
-            <?php include './sidenavbar.php' ?>
+          <div class="col-2" style="height: 90vh; ">
+            <?php 
+              $user_type = 'vendedor';
+              include './sidenavbar.php' 
+            ?>
           </div>
           <div class="col ">
-            Columna 2
-          </div>
-          <div class="col">
-            Columna 3
+            <?php
+              if (isset($_GET['nueva_venta'])){
+                include './vendedor_inc/nueva_venta.php';
+              }else if (isset($_GET['recibos'])){
+                include './vendedor_inc/recibos.php';
+              }else if (isset($_GET['reportes'])){
+                include './vendedor_inc/reportes.php';
+              }else if (isset($_GET['ayuda_y_soporte'])){
+                include './vendedor_inc/ayuda_y_soporte.php';
+              }
+            ?>
           </div>
         </div>
-      </div>
+    </div>
   </body>
 </html>
