@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibos</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" >
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
@@ -14,41 +15,21 @@
   </head>
   <body >
     <div class="container-fluid" >
-        <div class="row" >
-          <nav class="navbar" style="background-color: #ff7e2f;">
-            <a class="navbar-brand" href="indexsuperadmin.html">
-                <img src="imagenes/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="d-flex" action="indexlogin.html">
-                <button class="btn btn-outline-dark" type="submit">Cerrar Sesión</button>
-              </form>
-          </nav>
-        </div>
+        <?php include './header.php' ?>
+
 
         <div class="row" >
                 <div class="col-2" style="height: 100vh; ">
                   <div class="sidenav">
-                    <a href="recibossuperadmin.html" style="background-color: #e65d08"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportessuperadmin.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="inventariosuperadmin.html"><i class="fa fa-archive"></i>Inventario</a>
-                    <a href="configuracionsuperadmin.html"><i class="fa fa-cogs"></i>Configuración</a>
-                    <a href="ayudaSoportesuperadmin.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
+                    <a href="recibosadministrador.html"  style="background-color: #ff7e2f;"><i class="fa fa-ticket"></i>Recibos</a>
+                    <a href="reportesadministrador.html"><i class="fa fa-line-chart"></i>Reportes</a>
+                    <a href="inventarioadministrador.html"><i class="fa fa-archive"></i>Inventario</a>
+                    <a href="configuracionadministrador.html"><i class="fa fa-cogs"></i>Configuración</a>
+                    <a href="ayudaSoporteadministrador.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
                   </div>
                 </div>
                 <div class="col" style="font-size: 20px;  margin-top: 10px;">
                   Recibos
-                  <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sucursal
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-                        <li><a class="dropdown-item" href="#">Temixco</a></li>
-                        <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-                      </ul>
-                    </div>
-                  </div>
                   <div class="row-1" style="margin-top: 10px;">
                     <input type="date" id="eligeFecha" name="eligeFecha">
                     <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
@@ -106,7 +87,7 @@
         <form>
           <div class="mb-3">
             <label for="rfc" class="col-form-label">Capture su RFC:</label>
-            <input type="text" class="form-control" id="rfc" maxlength="13">
+            <input type="text" class="form-control" id="rfc" maxlength="13"> 
           </div>
           <div class="mb-3">
             <label for="nombre" class="col-form-label">Nombre Completo:</label>
@@ -124,7 +105,7 @@
               <option value="opcion3">Régimen de Actividades Empresariales y Profesionales</option>
               <option value="opcion4">Régimen de Incorporación Fiscal</option>
               <option value="opcion5">Enajenación de bienes</option>
-              <option value="opcion6">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
+              <option value="opcion5">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
               <option value="opcion7">Régimen de Arrendamiento</option>
               <option value="opcion8">Intereses</option>
               <option value="opcion9">Obtención de premios</option>
@@ -229,27 +210,11 @@
             <br>
             <input type="date" id="eligeFechaCorte" name="eligeFechaCorte">
           </div>
-          <div class="mb-3">
-            <label for="hora" class="col-form-label">Selecciona la sucursal</label>
-            <br>
-            <div class="btn-group">
-              <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  Sucursal
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-                  <li><a class="dropdown-item" href="#">Temixco</a></li>
-                  <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCaja()" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
