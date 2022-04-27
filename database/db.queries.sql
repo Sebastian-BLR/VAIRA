@@ -122,7 +122,6 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                 END //
 
 DROP PROCEDURE IF EXISTS agregar_producto_carrito;
-
 CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                 BEGIN
                     DECLARE _json JSON;
@@ -157,12 +156,30 @@ CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
 
                 END //
 
+DROP PROCEDURE IF EXISTS obtener_productos;
+CREATE PROCEDURE obtener_productos(IN sucursalId INT)
+                BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+
+                    START TRANSACTION ;
+                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
+                            JOIN existencia e on producto.idProducto = e.fkProducto
+                            JOIN sucursal s on e.fkSucursal = s.idSucursal
+                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = sucursalId;
+                    COMMIT ;
+                END //
+
 DELIMITER ;
 
-SELECT * FROM punto_venta;
-SELECT * FROM existencia;
-SELECT * FROM sucursal;
-SELECT * FROM carrito;
+
+# SELECT * FROM punto_venta;
+# SELECT * FROM existencia;
+# SELECT * FROM sucursal;
+# SELECT * FROM carrito;
 
 CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
@@ -196,8 +213,6 @@ INSERT INTO region_iva VALUES (0, 1, 0.16),
                               (0, 1, 0.16),
                               (0, 4, 0.08);
 
-SELECT * FROM  producto;
-
 INSERT INTO sucursal VALUES (0, 1, 1, 'Sucursal Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
                             (0, 2, 1, 'Sucursal Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
                             (0, 3, 1, 'Sucursal Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
@@ -209,24 +224,19 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 4, 2, 25),
                               (0, 1, 3, 15),
                               (0, 2, 3, 7),
+                              (0, 1, 4, 17),
+                              (0, 4, 4, 27),
                               (0, 2, 4, 10);
 
 INSERT INTO tipo_pago VALUES (0,'Credito'),(0,'Debito'),(0,'Efectivo');
 
-SELECT idUsuario, nombre, correo, usuario, tipo, activo FROM usuario JOIN tipo ON fkTipo = tipo.idTipo;
-
-
-SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
-    JOIN existencia e on producto.idProducto = e.fkProducto
-    JOIN sucursal s on e.fkSucursal = s.idSucursal
-    JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = 4;
 
 INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, 3, 'Mesa 2'),
                                (0, 1, NULL, 'Mesa 3'),
                                (0, 1, NULL, 'Mesa 4');
 
-SELECT * FROM punto_venta;
+SELECT * FROM existencia;
 
 # la cuarta query sería pasar cada producto del carrito como una venta realizada,
 # esto incluye borrar del carrito de compra y popular las tablas que correspondan
@@ -242,7 +252,7 @@ SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto
 # INSERT INTO  carrito VALUES (0,1,2,1,12);
 # INSERT INTO  carrito VALUES (0,2,2,1,2);
 # INSERT INTO  carrito VALUES (0,3,2,1,5);
-SELECT * FROM tipo_pago;
+# SELECT * FROM tipo_pago;
 
 DROP PROCEDURE IF EXISTS vender_carrito;
 
@@ -279,12 +289,12 @@ BEGIN
         END IF;
 END //
 
-CALL vender_carrito(3,1,3);
-DELETE FROM venta WHERE idVenta > 0;
-DELETE FROM info_venta WHERE idInfo > 0;
-SELECT * FROM venta;
-SELECT * FROM carrito;
-SELECT * FROM  info_venta;
+# CALL vender_carrito(3,1,3);
+# DELETE FROM venta WHERE idVenta > 0;
+# DELETE FROM info_venta WHERE idInfo > 0;
+# SELECT * FROM venta;
+# SELECT * FROM carrito;
+# SELECT * FROM  info_venta;
 
 SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = 2 && fkPunto = 1;
 
