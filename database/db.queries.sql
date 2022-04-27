@@ -157,19 +157,23 @@ CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                 END //
 
 DROP PROCEDURE IF EXISTS obtener_productos;
-CREATE PROCEDURE obtener_productos(IN sucursalId INT)
+CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
                 BEGIN
+                    DECLARE _json JSON;
+                    DECLARE jIdSucursal JSON;
                     DECLARE exit handler for sqlexception
                     BEGIN
                         -- ERROR
                         ROLLBACK;
                     END;
 
+                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+                    SET jIdSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
                     START TRANSACTION ;
                         SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
                             JOIN existencia e on producto.idProducto = e.fkProducto
                             JOIN sucursal s on e.fkSucursal = s.idSucursal
-                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = sucursalId;
+                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = jIdSucursal;
                     COMMIT ;
                 END //
 
@@ -195,12 +199,6 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
                     COMMIT ;
                 END //
 DELIMITER ;
-
-
-# SELECT * FROM punto_venta;
-# SELECT * FROM existencia;
-# SELECT * FROM sucursal;
-# SELECT * FROM carrito;
 
 CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
@@ -257,12 +255,6 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, NULL, 'Mesa 3'),
                                (0, 1, NULL, 'Mesa 4');
 
-SELECT * FROM existencia;
-
-# la cuarta query sería pasar cada producto del carrito como una venta realizada,
-# esto incluye borrar del carrito de compra y popular las tablas que correspondan
-# a la venta con los campos que estén en las tablas del diagrama relacional.
-
 
 # DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
 # INSERT INTO  carrito VALUES (0,1,3,1,12);
@@ -273,9 +265,8 @@ SELECT * FROM existencia;
 # INSERT INTO  carrito VALUES (0,3,2,1,5);
 # SELECT * FROM tipo_pago;
 
-DROP PROCEDURE IF EXISTS vender_carrito;
-
 DELIMITER //
+DROP PROCEDURE IF EXISTS vender_carrito;
 CREATE PROCEDURE vender_carrito(IN _fkUsuario INT, IN _fkPunto INT, IN _fkTipoPago INT)
 BEGIN
     DECLARE _idVenta INT;
@@ -307,15 +298,6 @@ BEGIN
             ROLLBACK;
         END IF;
 END //
-
-# CALL vender_carrito(3,1,3);
-# DELETE FROM venta WHERE idVenta > 0;
-# DELETE FROM info_venta WHERE idInfo > 0;
-# SELECT * FROM venta;
-# SELECT * FROM carrito;
-# SELECT * FROM  info_venta;
-
-SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = 2 && fkPunto = 1;
 
 # Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
 # Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
