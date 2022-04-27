@@ -12,18 +12,12 @@ INSERT INTO tipo VALUES
                     (0, 3, 'USER')
                     ;
 
-DROP PROCEDURE IF EXISTS insertar_usuario;
 
 DELIMITER //
 
+DROP PROCEDURE IF EXISTS insertar_usuario;
 CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                 BEGIN
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
-
                     DECLARE _json JSON;
                     DECLARE _fkTipo VARCHAR(10);
                     DECLARE jNombre VARCHAR(50);
@@ -34,6 +28,12 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                     DECLARE jUsuario VARCHAR(50);
                     DECLARE jPassword VARCHAR(50);
                     DECLARE _fkUsuario INT;
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+
 
                     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
                     SET jNombre = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'));
@@ -87,11 +87,6 @@ CREATE PROCEDURE eliminar_usuario_fisico(IN id INT)
 DROP PROCEDURE IF EXISTS insertar_producto;
 CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                 BEGIN
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
                     DECLARE _json JSON;
                     DECLARE jFkCategoria INT;
                     DECLARE jFkProveedor INT;
@@ -102,6 +97,11 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                     DECLARE jActivo TINYINT;
                     DECLARE jServicio TINYINT;
                     DECLARE _idProducto INT;
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
 
                     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
                     SET jFkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
@@ -121,20 +121,20 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                     COMMIT;
                 END //
 
-DROP PROCEDURE IF EXISTS agregar_carrito;
+DROP PROCEDURE IF EXISTS agregar_producto_carrito;
 
 CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                 BEGIN
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
                     DECLARE _json JSON;
                     DECLARE jFkProducto INT;
                     DECLARE jFkUsuario INT;
                     DECLARE jFkPunto INT;
                     DECLARE jCantidad INT;
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
 
                     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
                     SET jFkProducto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.producto'));
@@ -234,6 +234,7 @@ SELECT * FROM punto_venta;
 
 # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
 SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = ? && fkPunto = ?;
+
 # DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
 # INSERT INTO  carrito VALUES (0,1,3,1,12);
 # INSERT INTO  carrito VALUES (0,2,3,1,2);
