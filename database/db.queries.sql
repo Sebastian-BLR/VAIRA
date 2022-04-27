@@ -18,6 +18,12 @@ DELIMITER //
 
 CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                 BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+
                     DECLARE _json JSON;
                     DECLARE _fkTipo VARCHAR(10);
                     DECLARE jNombre VARCHAR(50);
@@ -42,15 +48,35 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                     START TRANSACTION;
                         INSERT INTO usuario VALUES (0, _fkTipo, jUsuario, sha2(jPassword, 512), jNombre, jApellidoP, jApellidoM, jCorreo, jTelefono, 1);
                         SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = jUsuario;
-                        INSERT INTO log_usuario VALUES (0, _fkUsuario, NOW(), NULL, NULL);
+                        INSERT INTO log_usuario VALUES (0, _fkUsuario, NOW(), NOW(), NULL);
                         SELECT * from usuario WHERE nombre = @nombre LIMIT 1;
                     COMMIT;
                 END //
 
 DROP PROCEDURE IF EXISTS eliminar_usuario;
-
 CREATE PROCEDURE eliminar_usuario(IN id INT)
                 BEGIN
+                DECLARE exit handler for sqlexception
+                BEGIN
+                    -- ERROR
+                    ROLLBACK;
+                END;
+                    START TRANSACTION;
+                        UPDATE log_usuario SET desactivar = 1 WHERE fkUsuario = id;
+                        UPDATE usuario SET activo = 0 WHERE idUsuario = id;
+
+                        SELECT * FROM usuario WHERE idUsuario = id;
+                    COMMIT;
+                END //
+
+DROP PROCEDURE IF EXISTS eliminar_usuario_fisico;
+CREATE PROCEDURE eliminar_usuario_fisico(IN id INT)
+                BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
                     START TRANSACTION;
                         DELETE FROM log_usuario WHERE fkUsuario = id;
                         DELETE FROM usuario WHERE idUsuario = id;
@@ -61,6 +87,12 @@ CREATE PROCEDURE eliminar_usuario(IN id INT)
 DROP PROCEDURE IF EXISTS insertar_producto;
 CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                 BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+
                     DECLARE _json JSON;
                     DECLARE jFkCategoria INT;
                     DECLARE jFkProveedor INT;
@@ -94,6 +126,11 @@ DROP PROCEDURE IF EXISTS agregar_carrito;
 
 CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                 BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
                     DECLARE _json JSON;
                     DECLARE jFkProducto INT;
                     DECLARE jFkUsuario INT;
@@ -164,6 +201,8 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 2, 3, 7),
                               (0, 2, 4, 10);
 
+INSERT INTO tipo_pago VALUES (0,'Credito'),(0,'Debito'),(0,'Efectivo');
+
 SELECT idUsuario, nombre, correo, usuario, tipo, activo FROM usuario JOIN tipo ON fkTipo = tipo.idTipo;
 
 
@@ -177,6 +216,67 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, NULL, 'Mesa 3'),
                                (0, 1, NULL, 'Mesa 4');
 
-
-
 SELECT * FROM punto_venta;
+
+# la cuarta query sería pasar cada producto del carrito como una venta realizada,
+# esto incluye borrar del carrito de compra y popular las tablas que correspondan
+# a la venta con los campos que estén en las tablas del diagrama relacional.
+
+# DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
+# INSERT INTO  carrito VALUES (0,1,3,1,12);
+# INSERT INTO  carrito VALUES (0,2,3,1,2);
+# INSERT INTO  carrito VALUES (0,3,3,1,5);
+# INSERT INTO  carrito VALUES (0,1,2,1,12);
+# INSERT INTO  carrito VALUES (0,2,2,1,2);
+# INSERT INTO  carrito VALUES (0,3,2,1,5);
+SELECT * FROM tipo_pago;
+
+DROP PROCEDURE IF EXISTS vender_carrito;
+
+DELIMITER //
+CREATE PROCEDURE vender_carrito(IN _fkUsuario INT, IN _fkPunto INT, IN _fkTipoPago INT)
+BEGIN
+    DECLARE _idVenta INT;
+    DECLARE _total DECIMAL(12,2);
+    DECLARE _iva DECIMAL(5,2);
+
+    DECLARE exit handler for sqlexception
+    BEGIN
+        SELECT 'Hubo un error';
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+        IF ((SELECT COUNT(*) FROM carrito WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto) > 0)
+        THEN
+            SELECT SUM(cantidad * precio) INTO _total FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
+            INSERT INTO venta VALUES (0,_fkUsuario,_fkTipoPago,_total,NOW());
+            SELECT idVenta into _idVenta FROM venta WHERE fkUsuario = _fkUsuario && fkTipoPago = _fkTipoPago && fecha = NOW() && total = _total;
+            SELECT iva INTO _iva FROM sucursal INNER JOIN punto_venta on sucursal.idSucursal = punto_venta.fkSucursal INNER JOIN region_iva ri on sucursal.fkRegion = ri.idRegion WHERE idPunto = _fkPunto;
+
+            INSERT INTO info_venta(fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal)
+            SELECT idProducto, _idVenta, cantidad, _iva, ieps, isr, (cantidad * (precio + (precio * _iva)))
+            FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto INNER JOIN categoria c on p.fkCategoria = c.idCategoria WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
+
+            DELETE FROM carrito WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
+            COMMIT;
+        ELSE
+            SELECT 'El carrito está vacio' as 'Resultado';
+            ROLLBACK;
+        END IF;
+END //
+
+CALL vender_carrito(3,1,3);
+DELETE FROM venta WHERE idVenta > 0;
+DELETE FROM info_venta WHERE idInfo > 0;
+SELECT * FROM venta;
+SELECT * FROM carrito;
+SELECT * FROM  info_venta;
+
+SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = 2 && fkPunto = 1;
+
+# Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
+# Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
+# las tres letras 'vod' para encontrar 'vodka'.
+
+# SELECT * FROM producto;
