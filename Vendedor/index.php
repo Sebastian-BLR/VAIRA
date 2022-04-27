@@ -1,6 +1,6 @@
 
 <?php
-  include 'services/helper.php';
+  include_once 'services/helper.php';
 
   $id_usuario = 3;
   $id_punto_de_venta = 2;

@@ -3,7 +3,6 @@
     <?php 
     // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
 
-    include '../services/helper.php';
     $data = [
       "sucursal" => "1"
     ];
@@ -54,8 +53,7 @@
 <div class="col-4">
   <h1>Carrito de compra</h1>
       <h4>Sucursal</h4>
-      <?php>
-        include '../services/helper.php';
+      <?php
         $data = [
           "usuario" => $id_usuario,
           "punto" => $id_punto_de_venta
