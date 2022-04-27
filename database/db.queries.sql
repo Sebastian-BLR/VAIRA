@@ -279,4 +279,4 @@ SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto
 # Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
 # las tres letras 'vod' para encontrar 'vodka'.
 
-# SELECT * FROM producto;
+SELECT * FROM producto WHERE nombre REGEXP CONCAT('^',?);
