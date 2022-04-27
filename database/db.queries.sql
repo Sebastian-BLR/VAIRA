@@ -61,6 +61,11 @@ CREATE PROCEDURE eliminar_usuario(IN id INT)
 DROP PROCEDURE IF EXISTS insertar_producto;
 CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                 BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
                     DECLARE _json JSON;
                     DECLARE jFkCategoria INT;
                     DECLARE jFkProveedor INT;
@@ -94,6 +99,11 @@ DROP PROCEDURE IF EXISTS agregar_carrito;
 
 CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                 BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
                     DECLARE _json JSON;
                     DECLARE jFkProducto INT;
                     DECLARE jFkUsuario INT;
@@ -106,14 +116,27 @@ CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
                     SET jFkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.punto'));
                     SET jCantidad = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cantidad'));
 
-                    START TRANSACTION;
-                        INSERT INTO carrito VALUES (0, jFkProducto, jFkUsuario, jFkPunto, jCantidad);
+                    IF( (SELECT cantidad FROM existencia WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario) > 0) OR
+                        (SELECT cantidad - jCantidad FROM existencia WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario)) < 0)
+                    THEN
+                        START TRANSACTION;
+                            INSERT INTO carrito VALUES (0, jFkProducto, jFkUsuario, jFkPunto, jCantidad);
+                            UPDATE existencia SET cantidad = cantidad - jCantidad WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario);
+                            SELECT * FROM existencia WHERE fkProducto = jFkProducto LIMIT 1;
+                        COMMIT ;
+                    ELSE
+                        SELECT 'No hay items suficientes en inventario' AS 'RESULTADO';
+                        ROLLBACK ;
+                    END IF;
 
                 END //
 
 DELIMITER ;
 
-DESCRIBE carrito;
+SELECT * FROM punto_venta;
+SELECT * FROM existencia;
+SELECT * FROM sucursal;
+SELECT * FROM carrito;
 
 CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
@@ -129,10 +152,6 @@ INSERT INTO proveedor VALUES (0, 'Coca-Cola', '1234567890', 'coca@cola.mx'),
                              (0, 'Modelo', '5432109876', 'modelo@cervecera.mx'),
                              (0, 'Vinomex SA de CV', '6789012345', 'contacto@vinomex.mx');
 
-# INSERT INTO producto VALUES (0, 1, 2, 'Papas jalapeño 350g', 12.0, 15.0, 'PAP-JAL-350G', NULL, 1, 0),
-#                             (0, 1, 2, 'Papas fuego 150g', 12.0, 15.0, 'PAP-FUE-150G', NULL, 1, 0),
-#                             (0, 1, 1, 'Chaparrita Piña 255ml', 15.0, 18.0, 'CHA-PIÑ-350G', NULL, 1, 0),
-#                             (0, 2, 3, 'Modelo Clara 355ml', 12.0, 25.0, 'CER-CLA-355ML', NULL, 1, 0);
 
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Jalapeño 350g","costo":"18.0","precio":"22.0","sku":"PAP-JAL-350","activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Fuego 150g","costo":"12.0","precio":"15.0","sku":"PAP-FUE-150G","activo":"1","servicio":"0"}');
@@ -151,6 +170,8 @@ INSERT INTO region_iva VALUES (0, 1, 0.16),
                               (0, 1, 0.16),
                               (0, 4, 0.08);
 
+SELECT * FROM  producto;
+
 INSERT INTO sucursal VALUES (0, 1, 1, 'Sucursal Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
                             (0, 2, 1, 'Sucursal Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
                             (0, 3, 1, 'Sucursal Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
@@ -164,8 +185,6 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 2, 3, 7),
                               (0, 2, 4, 10);
 
-SELECT idUsuario, nombre, correo, usuario, tipo, activo FROM usuario JOIN tipo ON fkTipo = tipo.idTipo;
-
 
 SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
     JOIN existencia e on producto.idProducto = e.fkProducto
@@ -178,5 +197,5 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, NULL, 'Mesa 4');
 
 
-
-SELECT * FROM punto_venta;
+# la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
+SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = ? && fkPunto = ?;
