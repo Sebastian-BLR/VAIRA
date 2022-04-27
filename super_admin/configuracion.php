@@ -14,7 +14,7 @@
     // ! ====================================================
     
     $statement = $connection->prepare(
-        'SELECT idUsuario, nombre, correo, usuario, tipo, activo FROM persona JOIN usuario ON fkUsuario = usuario.idUsuario JOIN tipo ON fkTipo = tipo.idTipo;'
+        'SELECT idUsuario, nombre, correo, usuario, tipo, activo FROM usuario JOIN tipo ON fkTipo = tipo.idTipo;'
     );
     $statement->execute();
     $usuarios = $statement->fetchAll();

@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS log_usuario(
     modificar   DATE,
     desactivar  DATE,
 
-    FOREIGN KEY (fkUsuario) REFERENCES usuario(fkTipo)   ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS pais(
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS ciudad(
 CREATE TABLE IF NOT EXISTS region_iva(
     idRegion    INT          NOT NULL       PRIMARY KEY     AUTO_INCREMENT,
     fkCiudad    INT          NOT NULL,
-    iva         DECIMAL(5,2)  NOT NULL,
+    iva         DECIMAL(5,3)  NOT NULL,
 
     FOREIGN KEY (fkCiudad) REFERENCES ciudad(idCiudad)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS sucursal(
 CREATE TABLE IF NOT EXISTS punto_venta(
     idPunto   INT          NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkSucursal  INT          NOT NULL,
-    fkUsuario   INT          NOT NULL,
+    fkUsuario   INT,
     nombre      VARCHAR(50)  NOT NULL,
 
     FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario)   ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -115,8 +115,8 @@ CREATE TABLE IF NOT EXISTS categoria(
     nombre      VARCHAR(25)  NOT NULL,
     descripcion TEXT,
     impuestoIVA TINYINT,
-    ieps        DECIMAL(10,2) NOT NULL,
-    isr         DECIMAL(10,2) NOT NULL
+    ieps        DECIMAL(10,8) NOT NULL,
+    isr         DECIMAL(10,8) NOT NULL
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS proveedor(
@@ -133,7 +133,8 @@ CREATE TABLE IF NOT EXISTS producto (
     nombre          VARCHAR(50)     NOT NULL,
     costo           DECIMAL (10,2)   NOT NULL,
     precio          DECIMAL (10,2)   NOT NULL,
-    imagen          BLOB,
+    sku             VARCHAR(20),
+    imagen          LONGBLOB,
     activo          TINYINT,
     servicio        TINYINT,
 
@@ -145,10 +146,12 @@ CREATE TABLE IF NOT EXISTS carrito (
     idCarrito   INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkProducto  INT         NOT NULL,
     fkUsuario   INT         NOT NULL,
+    fkPunto     INT         NOT NULL,
     cantidad    INT,
 
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkPunto) REFERENCES punto_venta(idPunto) ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS log_producto(
@@ -234,3 +237,4 @@ CREATE TABLE IF NOT EXISTS info_venta(
 )ENGINE = INNODB;
 
 # SHOW TABLES;
+DESCRIBE producto;
