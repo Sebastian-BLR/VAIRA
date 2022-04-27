@@ -173,6 +173,27 @@ CREATE PROCEDURE obtener_productos(IN sucursalId INT)
                     COMMIT ;
                 END //
 
+DROP PROCEDURE IF EXISTS obtener_carrito;
+CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
+                BEGIN
+                    DECLARE _json JSON;
+                    DECLARE jFkUsuario INT;
+                    DECLARE jFkPunto INT;
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+                    SET jFkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'));
+                    SET jFkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.punto'));
+
+
+                    START TRANSACTION ;
+                        # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
+                        SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
+                    COMMIT ;
+                END //
 DELIMITER ;
 
 
@@ -242,8 +263,6 @@ SELECT * FROM existencia;
 # esto incluye borrar del carrito de compra y popular las tablas que correspondan
 # a la venta con los campos que estén en las tablas del diagrama relacional.
 
-# la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = ? && fkPunto = ?;
 
 # DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
 # INSERT INTO  carrito VALUES (0,1,3,1,12);
@@ -302,4 +321,4 @@ SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto
 # Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
 # las tres letras 'vod' para encontrar 'vodka'.
 
-SELECT * FROM producto WHERE nombre REGEXP CONCAT('^',?);
+#SELECT * FROM producto WHERE nombre REGEXP CONCAT('^',?);
