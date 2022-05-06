@@ -32,7 +32,7 @@
     
                                 <div class="form-group">
                                     <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
-                                    <input id="password" type="password" class="form-control" name="password" required data-eye>
+                                    <input id="password" type="password" class="form-control" name="password" maxlength="16" required data-eye>
                                 </div>    
                                 <div class="form-group m-0" >
                                     <button type="submit" class="btn btn-outline-purple btn-block"> Login </button>

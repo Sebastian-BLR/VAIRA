@@ -37,8 +37,8 @@
               <td>'.'06/03/2022'.'</td>
               <td>'.'Cuernavaca'.'</td>
               <td>'.'$250'.'</td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
             </tr>
             ');
           }
@@ -113,9 +113,8 @@
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label for="vendedor" class="col-form-label">Selecciona el d&iacute;a en la que deseas hacer el corte de caja</label>
+                <label for="vendedor" class="col-form-label">¿Deseas realizar el corte de caja?</label>
                 <br>
-                <input type="date" id="eligeFechaCorte" name="eligeFechaCorte">
               </div>
             </form>
           </div>
