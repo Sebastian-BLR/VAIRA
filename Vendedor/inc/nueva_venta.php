@@ -52,7 +52,6 @@
 
 <div class="col-4">
   <h1>Carrito de compra</h1>
-      <h4>Sucursal</h4>
       <?php
         $data = [
           "usuario" => $id_usuario,
@@ -60,6 +59,18 @@
         ];
         $input_from_db = json_decode(Post("services/getShoppingCart.php",$data), true);
         $index = 0;
+        echo('
+          <div class="btn-group">
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> Punto de venta </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">1</a></li>
+                <li><a class="dropdown-item" href="#">2</a></li>
+                <li><a class="dropdown-item" href="#">3</a></li>
+              </ul>
+            </div> 
+          </div>
+        ');
         echo("<br><br><br>");
         foreach($input_from_db as $value){
           echo('
@@ -75,14 +86,5 @@
 
         }
       ?>
-  <!-- <div class="btn-group">
-    <div class="btn-group">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> Punto de venta </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">1</a></li>
-        <li><a class="dropdown-item" href="#">2</a></li>
-        <li><a class="dropdown-item" href="#">3</a></li>
-      </ul>
-    </div> 
-  </div>-->
+      
 <!-- The first div closes in the next php file   -->

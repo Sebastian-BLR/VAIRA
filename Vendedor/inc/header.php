@@ -1,4 +1,3 @@
-
 <div class="row" >
     <nav class="navbar" style="background-color: #ff7e2f; height: 10vh;">
     <a class="navbar-brand" href="index.php">
