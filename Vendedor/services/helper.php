@@ -1,5 +1,7 @@
 <?php
-    $server = "http://localhost:81/Vendedor";
+    // * Local SERVER routes
+    // $server = "http://localhost:81/Vendedor";
+    $server = "http://localhost/Punto%20de%20venta/Vendedor";
 
     function Post($route, $data){
         global $server;

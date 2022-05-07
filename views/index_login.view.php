@@ -23,7 +23,7 @@
                     </div>
                     <div class="card fat">
                         <div class="card-body">
-                            <h4 class="card-title">Iniciar sesi&oacute;n</h4>
+                            <h4 class="card-title text-center">Iniciar sesi&oacute;n</h4>
                             <form method="POST" action="login.php" class="my-login-validation" novalidate="">
                                 <div class="form-group">
                                     <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
@@ -37,6 +37,11 @@
                                 <div class="form-group m-0" >
                                     <button type="submit" class="btn btn-outline-purple btn-block"> Login </button>
                                 </div>
+                                <?php if($errores != ''): ?>
+                                    <?php
+                                        echo $errores;
+                                    ?>
+                                <?php endif; ?>
                             </form>
                         </div>
                     </div>

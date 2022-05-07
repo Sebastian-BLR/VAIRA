@@ -1,55 +1,55 @@
 
-    <div class="container-fluid" >
 
 
-        <div class="row" >
               
-                <div class="col" style="font-size: 20px;  margin-top: 10px;">
-                  Recibos
-                  <div class="row-1" style="margin-top: 10px;">
-                    <input type="date" id="eligeFecha" name="eligeFecha">
-                    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-                    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
-                  </div>
-                  <div class="row-1" style="margin-top: 30px;">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col">No.Venta</th>
-                          <th scope="col">Fecha</th>
-                          <th scope="col">Sucursal</th>
-                          <th scope="col">Monto</th>
-                          <th scope="col">Detalle</th>
-                          <th scope="col">Factura</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">1</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$250</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                        <tr>
-                          <th scope="row">2</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$500</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                        <tr>
-                          <th scope="row">3</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$1000</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                      </tbody>
-                    </table>
+<div style="font-size: 20px;  margin-top: 10px;">
+  <div class="row-1" style="margin-top: 10px;">
+    <input type="date" id="eligeFecha" name="eligeFecha">
+    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
+    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+  </div>
+  <div class="row-1" style="margin-top: 30px;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">No.Venta</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Sucursal</th>
+          <th scope="col">Monto</th>
+          <th scope="col">Detalle</th>
+          <th scope="col">Factura</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$250</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$500</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$1000</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 <!-- Modal Factura-->
 <div class="modal fade bd-example-modal-xl" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -195,9 +195,3 @@
     </div>
   </div>
 </div>
-
-                  </div>
-                </div>
-        </div>
-      </div>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

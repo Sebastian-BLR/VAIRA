@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         die();
 
     $statement = $connection->prepare(
-        'SELECT tipo.idTipo FROM usuario INNER JOIN tipo WHERE usuario.fkTipo = tipo.idTipo AND usuario = :usuario AND password = SHA2(:password,512)'
+        'SELECT tipo.idTipo FROM usuario INNER JOIN tipo WHERE usuario.fkTipo = tipo.idTipo AND usuario = :usuario AND password = SHA2(:password,512) AND activo = 1'
         // 'SELECT * FROM usuario WHERE usuario = :usuario AND password = SHA2(:password,512)'
         // 'SELECT * FROM usuario INNER JOIN tipo WHERE usuario.fkTipo = tipo.idTipo &&
     );
@@ -62,13 +62,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 break;
         }
     } else {
-        $errores .= '<li>Datos incorrectos</li>';
+        $statement = $connection->prepare(
+            'SELECT * FROM usuario WHERE usuario = :usuario AND activo = 1'
+        );
+        $statement->execute(array(
+            ':usuario' => $usuario
+        ));
+        $result = $statement->fetch();
+        
+        if($result !== false)
+            $errores .= '<li>Usuario y/o contrase&ntilde;a incorrecta</li>';
+        else
+            $errores .= '<li>El usuario no existe</li>';
     }
 
 }
 
 require "views/index_login.view.php";
-
-// TODO: QUITAR EL DESTROY!!!
-// session_destroy();
 ?>
