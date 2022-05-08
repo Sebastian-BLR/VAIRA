@@ -1,7 +1,9 @@
 
 <?php
-  session_start();
+  if( !isset($_SESSION['idUsuario']) )
+    header("Location: ../index.php");
 
+  session_start();
   include '../services/helper.php';
 
   $id_usuario = $_SESSION['idUsuario'];
