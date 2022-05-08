@@ -1,10 +1,12 @@
 
 <?php
-  include_once 'services/helper.php';
+  session_start();
 
-  $id_usuario = 3;
+  include '../services/helper.php';
+
+  $id_usuario = $_SESSION['idUsuario'];
+  $user_type = $_SESSION['userType'];
   $id_punto_de_venta = 2;
-
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
       $data = [

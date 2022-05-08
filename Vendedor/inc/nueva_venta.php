@@ -6,7 +6,7 @@
     $data = [
       "sucursal" => "1"
     ];
-    $input_from_db = json_decode(Post("services/getAllProducts.php",$data), true);
+    $input_from_db = json_decode(Post("Vendedor/services/getAllProducts.php",$data), true);
     $index = 0;
       foreach($input_from_db as $value){
         if($index % 4 == 0){
@@ -57,7 +57,7 @@
           "usuario" => $id_usuario,
           "punto" => $id_punto_de_venta
         ];
-        $input_from_db = json_decode(Post("services/getShoppingCart.php",$data), true);
+        $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
         $index = 0;
         echo('
           <div class="btn-group">

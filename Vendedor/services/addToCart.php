@@ -1,5 +1,5 @@
 <?php 
-    require "connection.php";
+    require "../../services/connection.php";
     $bindings = [];
     $data=[];
     if($pdo!=null){

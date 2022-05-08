@@ -4,7 +4,7 @@
         <img src="src/image/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
     </a>
     <form class="d-flex" >
-        <button class="btn btn-outline-dark" type="submit">Cerrar Sesión</button>
+        <button class="btn btn-outline-dark cerrarSesionBtn"><a href="../services/cerrar.php" >Cerrar Sesion</a></button>
         </form>
     </nav>
 </div>
