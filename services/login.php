@@ -2,7 +2,7 @@
 session_start();
 include 'services/connection.php';
 
-if(isset($_SESSION['user'])){
+if(isset($_SESSION['userType'])){
     switch($_SESSION['userType']) {
         case 1:
             header("Location: super_admin/index.php");

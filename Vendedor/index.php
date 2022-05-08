@@ -6,7 +6,7 @@
 
   include '../services/helper.php';
 
-  $id_usuario = $_SESSION['idUsuario'];
+  $id_usuario = $_SESSION['user'];
   $user_type = $_SESSION['userType'];
   $id_punto_de_venta = 2;
   if($_SERVER["REQUEST_METHOD"] == "POST"){
