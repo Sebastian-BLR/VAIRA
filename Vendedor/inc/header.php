@@ -3,8 +3,8 @@
     <a class="navbar-brand" href="index.php">
         <img src="src/image/vairaNav.png"  width="50" height="50" class="d-inline-block align-top" alt="">
     </a>
-    <form class="d-flex" >
-        <button class="btn btn-outline-dark cerrarSesionBtn"><a href="../services/cerrar.php" >Cerrar Sesion</a></button>
-        </form>
+    <form class="d-flex"  action="../services/cerrar.php">
+        <button class="btn btn-outline-dark cerrarSesionBtn" type="submit">Cerrar Sesion</button>
+    </form>
     </nav>
 </div>
