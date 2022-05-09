@@ -53,7 +53,7 @@
 </div> <!-- This div closes 'col' for 'indexvendedor.php' to start a new one below -->
 
 
-<div class="col-4" style="height:90vh;">
+<div class="col-4" style="height:90vh; overflow-y: scroll;" >
   <h1>Carrito de compra</h1>
 
       
@@ -77,31 +77,75 @@
             </div> 
           </div>
         ');
-        echo("<br><br><br>");
+        echo('<br><br><br>
+        <script>
+        var subtotal_acumulado = 0
+        </script>
+        ');
+
         foreach($input_from_db as $value){
           echo('
           <div class="row justify-content-md-center">
             <div class="col-sm-2" >
-              <input type="number" min="1" value="'.$value[2].'" style="width:100%;">
+              <input id="ticket_product_'.$index.'_cant" type="number" min="1" value="'.$value[2].'" style="width:100%;">
             </div>
             <div class="col-sm-5">
               <h4>'.$value[0].'</h4>
             </div>
-            <div class="col-sm-4">
-              <h4>$'.$value[1].'</h4>
+            <div  class="col-sm-4">
+              <h4 id="ticket_product_'.$index.'_cost">$</h4>
             </div>
+            <input hidden id="ticket_product_'.$index.'_price" value="'.$value[1].'">
           </div>
+          <script>
+            
+            let ticket_product_'.$index.'_cant = document.getElementById("ticket_product_'.$index.'_cant")
+            var product_cost_'.$index.'  = 0
+            ticket_product_'.$index.'_cant.addEventListener("change", function() {
+              product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
+              document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ product_cost_'.$index.'
+            })
+            product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
+            document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ product_cost_'.$index.'
+          </script>
           ');
-
           $index++;
+        }
+        if(count($input_from_db ) > 0){
+          echo('
+            <br>
+            <div class="row justify-content-md-center">
+              <div class="col-sm-6" >
+                <h4 id="ticket_subtotal">$ 60</h4>
+                <h4 id="ticket_IVA">$ 60</h4>
+                <h4 id="ticket_total">$ 60</h4>
+              </div>
+            </div>
+            <script>
+              let ticket_subtotal = document.getElementById("ticket_subtotal")
+              let ticket_IVA = document.getElementById("ticket_IVA")
+              let ticket_total = document.getElementById("ticket_total")
 
+              var subtotal = 0
+              var IVA = 0
+              for(var i = 0; i < '.$index.'; i++){
+                subtotal += eval("product_cost_" + i)
+              }
+              ticket_subtotal.innerHTML = "Subtotal $" + subtotal
+              ticket_IVA.innerHTML = "IVA $" + 0
+              ticket_total.innerHTML = "Total $" + (subtotal + IVA)
+              
+            </script>
+
+            <br><br>
+            <div class="row justify-content-md-center">
+              <div class="col-sm-6" >
+              <button type="button" class="btn btn-primary">Generar ticket</button>
+              </div>
+            </div>
+          ');
         }
       ?>
-      <br><br>
-      <div class="row justify-content-md-center">
-        <div class="col-sm-6" >
-        <button type="button" class="btn btn-primary">Generar ticket</button>
-        </div>
-      </div>
+     
       
 <!-- The first div closes in the next php file   -->

@@ -1,5 +1,4 @@
 
-
 function alertElimarUsuario(){
     Swal.fire({
         title: 'Alerta',
