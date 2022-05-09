@@ -61,9 +61,6 @@
               include 'inc/sidenavbar.php' 
             ?>
           </div>
-          <script>
-            document.getElementById("navbar_id").style.height = "90vh"
-          </script>
           <div class="col ">
             <?php
               if (isset($_GET['nueva_venta'])){
