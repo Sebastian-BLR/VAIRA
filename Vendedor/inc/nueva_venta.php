@@ -104,6 +104,7 @@
             ticket_product_'.$index.'_cant.addEventListener("change", function() {
               product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
               document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ product_cost_'.$index.'
+              updateTicket()
             })
             product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
             document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ product_cost_'.$index.'
@@ -126,14 +127,19 @@
               let ticket_IVA = document.getElementById("ticket_IVA")
               let ticket_total = document.getElementById("ticket_total")
 
-              var subtotal = 0
-              var IVA = 0
-              for(var i = 0; i < '.$index.'; i++){
-                subtotal += eval("product_cost_" + i)
+           
+              let updateTicket= () =>{
+                var subtotal = 0
+                var IVA = 0
+  
+                for(var i = 0; i < '.$index.'; i++){
+                  subtotal += eval("product_cost_" + i)
+                }
+                ticket_subtotal.innerHTML = "Subtotal $" + subtotal
+                ticket_IVA.innerHTML = "IVA $" + 0
+                ticket_total.innerHTML = "Total $" + (subtotal + IVA)
               }
-              ticket_subtotal.innerHTML = "Subtotal $" + subtotal
-              ticket_IVA.innerHTML = "IVA $" + 0
-              ticket_total.innerHTML = "Total $" + (subtotal + IVA)
+              updateTicket()
               
             </script>
 
