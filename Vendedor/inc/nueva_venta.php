@@ -1,4 +1,7 @@
-  <button type="button" class="btn btn-secondary"><i class="fa fa-filter"></i>Filtrar</button>
+
+  <button style="margin-left: 1.4%" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
+  <input style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
+  <button type="button" class="btn btn-secondary"  style="margin-left: 29%"><i class="fa fa-filter"></i>Filtrar</button>
   <div class="wrapper">
     <?php 
     // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)

@@ -103,24 +103,19 @@
     </div>
 
     <!-- Modal Corte de Caja -->
-    <div class="modal fade bd-example-modal-xl" id="corteCaja" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
+    <div class="modal fade" id="corteCaja" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Corte de caja</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Corte de caja</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label for="vendedor" class="col-form-label">¿Deseas realizar el corte de caja?</label>
-                <br>
-              </div>
-            </form>
+          ¿Deseas realizar el corte de caja?
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Si</button>
           </div>
         </div>
       </div>
@@ -150,7 +145,63 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDevolucion" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Devolución-->
+    <div class="modal fade" id="modalDevolucion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Selecciona los productos que se desean devolver</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <input type="checkbox"> Agua
+          <input type="number" min="1" style="width: 3em;height: 2em; margin-bottom:10px;display: inline-block">
+          <br>
+          <input type="checkbox"> Cigarros
+          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
+          <br>
+          <input type="checkbox"> Jugo
+          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
+          <br>
+          <input type="checkbox"> Paleta
+          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#llaveAdmin" data-bs-dismiss="modal">Hacer devolución</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal llave administrador-->
+    <div class="modal fade" id="llaveAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Ingresar claves de acceso de administrador</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <div class="form-group">
+              <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
+              <input id="user" type="text" class="form-control"  name="user" value="">
+          </div>
+          <div class="form-group">
+              <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
+              <input id="password" type="password" class="form-control" name="password"  maxlength="16">
+              <input type="checkbox" onclick="myFunction()"> Mostrar contraseña
+          </div>   
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" onclick="alertDevolucion()" data-bs-dismiss="modal">Hacer devolución</button>
           </div>
         </div>
       </div>

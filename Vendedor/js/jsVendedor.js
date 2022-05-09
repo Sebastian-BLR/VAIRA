@@ -1,3 +1,4 @@
+
 function alertElimarUsuario(){
     Swal.fire({
         title: 'Alerta',
@@ -32,12 +33,12 @@ function alertGeneraDocCorteCaja(){
 
 function alertGeneraDocCorteCajaAdmin(){
   Swal.fire({
-      position: 'top-end',
-      icon: 'success',
-      title: 'Se ha generado el documento PDF con los datos de la fecha que seleccionaste',
-      showConfirmButton: false,
-      timer: 4500
-    })
+    position: 'top-end',
+    icon: 'success',
+    title: 'Se ha generado el documento PDF satisfactoriamente',
+    showConfirmButton: false,
+    timer: 1500
+  })
 }
 
 function alertAgregarUsuario(){
@@ -46,6 +47,16 @@ function alertAgregarUsuario(){
         'Se ha agregado satisfactoriamente un nuevo usuario',
         'success',
       )
+}
+
+function alertDevolucion(){ 
+  Swal.fire({
+    icon: 'success',
+    title: 'Devolución de compra',
+    text: 'Se ha realizado la devolución satisfactoriamente',
+    showConfirmButton: false,
+    timer: 3000
+  })
 }
 
 function alertConfigImpuesto(){
