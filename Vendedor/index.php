@@ -55,12 +55,15 @@
         <?php include 'inc/header.php' ?>
 
         <div class="row" >
-          <div class="col-2" style="height: 90vh; ">
+          <div id="navbar_id" class="col-2" style="height: 90vh; ">
             <?php 
               $user_type = 'vendedor';
               include 'inc/sidenavbar.php' 
             ?>
           </div>
+          <script>
+            document.getElementById("navbar_id").style.height = "90vh"
+          </script>
           <div class="col ">
             <?php
               if (isset($_GET['nueva_venta'])){
@@ -70,7 +73,13 @@
               }else if (isset($_GET['reportes'])){
                 include 'inc/reportes.php';
               }else if (isset($_GET['ayuda_y_soporte'])){
+                echo('
+                  <script>
+                    document.getElementById("navbar_id").style.height = "83vh"
+                  </script>
+                ');
                 include 'inc/ayuda_y_soporte.php';
+                include 'inc/footer.php';
               }
             ?>
           </div>

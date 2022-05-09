@@ -1,17 +1,20 @@
 <?php 
 session_start();
 include 'services/connection.php';
+$go_to_super_admin="Location: ./Vendedor/index.php";
+$go_to_administrador="Location: ./Vendedor/index.php";
+$go_to_vendedor="Location: ./Vendedor/index.php?nueva_venta=true";
 
 if(isset($_SESSION['userType'])){
     switch($_SESSION['userType']) {
         case 1:
-            header("Location: super_admin/index.php");
+            header($go_to_super_admin);
             break;
         case 2:
-            header("Location: ./Administrador/index.php");
+            header($go_to_administrador);
             break;
         case 3:
-            header("Location: ./Vendedor/index.php");
+            header($go_to_vendedor);
             break;
     }
 }
@@ -41,13 +44,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         // 3.- User
         switch($_SESSION['userType']) {
             case 1:
-                header("Location: super_admin/index.php");
+                header($go_to_super_admin);
                 break;
             case 2:
-                header("Location: ./Administrador/index.php");
+                header($go_to_administrador);
                 break;
             case 3:
-                header("Location: ./Vendedor/index.php");
+                header($go_to_vendedor);
                 break;
         }
     } else {
