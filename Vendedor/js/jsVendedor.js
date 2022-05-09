@@ -59,6 +59,16 @@ function alertDevolucion(){
   })
 }
 
+function alertFactura(){ 
+  Swal.fire({
+    icon: 'success',
+    title: 'Facturación',
+    text: 'Se han almacenado los datos de facturación satisfactoriamente',
+    showConfirmButton: false,
+    timer: 3000
+  })
+}
+
 function alertConfigImpuesto(){
   Swal.fire(
       'Impuesto configurado',

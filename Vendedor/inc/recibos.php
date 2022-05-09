@@ -96,7 +96,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success">Generar</button>
+            <button type="button" class="btn btn-success" onclick="alertFactura()" data-bs-dismiss="modal">Generar</button>
           </div>
         </div>
       </div>
