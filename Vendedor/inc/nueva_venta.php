@@ -122,33 +122,53 @@
                 <h4 id="ticket_total">$ 60</h4>
               </div>
             </div>
-            <script>
-              let ticket_subtotal = document.getElementById("ticket_subtotal")
-              let ticket_IVA = document.getElementById("ticket_IVA")
-              let ticket_total = document.getElementById("ticket_total")
-
            
-              let updateTicket= () =>{
-                var subtotal = 0
-                var IVA = 0
-  
-                for(var i = 0; i < '.$index.'; i++){
-                  subtotal += eval("product_cost_" + i)
-                }
-                ticket_subtotal.innerHTML = "Subtotal $" + subtotal
-                ticket_IVA.innerHTML = "IVA $" + 0
-                ticket_total.innerHTML = "Total $" + (subtotal + IVA)
-              }
-              updateTicket()
-              
-            </script>
 
             <br><br>
             <div class="row justify-content-md-center">
               <div class="col-sm-6" >
-              <button type="button" class="btn btn-primary">Generar ticket</button>
+              <button id="generate_ticket_button" type="button" class="btn btn-primary">Generar ticket</button>
               </div>
             </div>
+            
+
+            <script>
+            let ticket_subtotal = document.getElementById("ticket_subtotal")
+            let ticket_IVA = document.getElementById("ticket_IVA")
+            let ticket_total = document.getElementById("ticket_total")
+
+         
+            let updateTicket= () =>{
+              var subtotal = 0
+              var IVA = 0
+
+              for(var i = 0; i < '.$index.'; i++){
+                subtotal += eval("product_cost_" + i)
+              }
+              ticket_subtotal.innerHTML = "Subtotal $" + subtotal
+              ticket_IVA.innerHTML = "IVA $" + 0
+              ticket_total.innerHTML = "Total $" + (subtotal + IVA)
+            }
+            updateTicket()
+
+            let generate_ticket_button = document.getElementById("generate_ticket_button")
+            generate_ticket_button.addEventListener("click",()=>{
+              Swal.fire({
+                title: "¿Deseas imprimir el ticket?",
+                showDenyButton: true,
+                confirmButtonText: "Imprimir",
+                denyButtonText: "Cancelar",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
+                } else if (result.isDenied) {
+                  Swal.fire("Cancelando compra...", "", "info")
+                }
+              })
+            })
+           
+            
+          </script>
           ');
         }
       ?>

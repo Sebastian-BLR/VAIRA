@@ -46,6 +46,7 @@
     <link rel="stylesheet" href="css/estilos.css">
     <script src="./js/jsVendedor.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     
