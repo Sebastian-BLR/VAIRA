@@ -5,6 +5,7 @@
   <div class="wrapper"  style="height:82vh;">
     <?php 
     // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
+    
 
     $data = [
       "sucursal" => "1"
@@ -103,6 +104,7 @@
             var product_cost_'.$index.'  = 0
             ticket_product_'.$index.'_cant.addEventListener("change", function() {
               product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
+              product_cost_'.$index.' = Math.round(product_cost_'.$index.' * 100) / 100
               document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ product_cost_'.$index.'
               updateTicket()
             })
@@ -145,6 +147,7 @@
               for(var i = 0; i < '.$index.'; i++){
                 subtotal += eval("product_cost_" + i)
               }
+              subtotal = Math.round(subtotal * 100) / 100
               ticket_subtotal.innerHTML = "Subtotal $" + subtotal
               ticket_IVA.innerHTML = "IVA $" + 0
               ticket_total.innerHTML = "Total $" + (subtotal + IVA)
