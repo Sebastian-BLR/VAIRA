@@ -1,4 +1,4 @@
-# CREATE SCHEMA db_vaira;
+CREATE SCHEMA db_vaira;
 USE db_vaira;
 
 DROP TABLE IF EXISTS info_venta;
