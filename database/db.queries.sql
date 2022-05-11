@@ -195,7 +195,7 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
 
                     START TRANSACTION ;
                         # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-                        SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
+                        SELECT p.nombre, p.precio, cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
                     COMMIT ;
                 END //
 DELIMITER ;
@@ -299,8 +299,87 @@ BEGIN
         END IF;
 END //
 
+SELECT * FROM carrito;
+CALL vender_carrito(3,1,3);
+SELECT * FROM venta;
+
 # Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
 # Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
 # las tres letras 'vod' para encontrar 'vodka'.
 
 #SELECT * FROM producto WHERE nombre REGEXP CONCAT('^',?);
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_detalles_compra;
+CREATE PROCEDURE obtener_detalles_compra(IN _idVenta INT)
+BEGIN
+    SELECT u.usuario, venta.fecha, p.nombre, iv.subtotal ,venta.total FROM venta 
+    INNER JOIN usuario u on venta.fkUsuario = u.idUsuario 
+    INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta 
+    INNER JOIN producto p on iv.fkProducto = p.idProducto
+    WHERE _idVenta = idVenta;
+END //
+
+CALL obtener_detalles_compra(2);
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS generar_factura;
+CREATE PROCEDURE generar_factura(IN _jsonA JSON)
+BEGIN
+    DECLARE _json          JSON;
+    DECLARE _fkVenta       INT;
+    DECLARE _fkRegimen     INT;
+    DECLARE _rfc           VARCHAR(13);
+    DECLARE _cp_persona    VARCHAR(10);
+    DECLARE _nombre        VARCHAR(50);
+    DECLARE _apellidoP     VARCHAR(50);
+    DECLARE _apellidoM     VARCHAR(50);
+    DECLARE _correo        VARCHAR(50);
+
+    DECLARE exit handler for sqlexception
+    BEGIN
+        -- ERROR
+        ROLLBACK;
+    END;
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _fkVenta = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkVenta'));
+    SET _fkRegimen = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkRegimen'));
+    SET _rfc = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rfc'));
+    SET _cp_persona = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cp_persona'));
+    SET _nombre = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'));
+    SET _apellidoP = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.apellidoP'));
+    SET _apellidoM = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.apellidoM'));
+    SET _correo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'));
+
+    START TRANSACTION;
+        INSERT INTO datos_factura VALUES (0,_fkVenta,_fkRegimen,_rfc,_cp_persona,_nombre,_apellidoP,_apellidoM,_correo);
+    COMMIT;
+END //
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS generar_devolucion;
+CREATE PROCEDURE generar_devolucion(IN _date VARCHAR(10), IN _idVenta INT, _usuario VARCHAR(50), IN _password VARCHAR(128))
+BEGIN
+    DECLARE _fkVenta INT;
+    DECLARE _fkUsuario INT;
+    DECLARE exit handler for sqlexception
+    BEGIN
+        -- ERROR
+        ROLLBACK;
+    END;
+    START TRANSACTION;
+        IF (SELECT COUNT(*) FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512)) = 1
+            THEN
+                SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512);
+                SELECT idVenta INTO _fkVenta FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario;
+                DELETE FROM info_venta WHERE fkVenta = _fkVenta;
+                DELETE FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario;
+                SELECT 'Devolución autorizada' as 'Status';
+            ELSE
+                SELECT 'Devolución no autorizada' as 'Status';
+        END IF;
+    COMMIT;
+END //
+
+CALL generar_devolucion('2022-05-10',3,'user',789);
+SELECT * FROM venta;
