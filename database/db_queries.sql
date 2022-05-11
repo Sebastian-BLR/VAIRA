@@ -195,7 +195,7 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
 
                     START TRANSACTION ;
                         # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-                        SELECT * FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
+                        SELECT p.nombre, p.precio, cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
                     COMMIT ;
                 END //
 DELIMITER ;

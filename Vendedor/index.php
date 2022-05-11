@@ -17,7 +17,7 @@
         "punto" => $id_punto_de_venta,
         "cantidad" => trim($_POST["cantidad"])
       ];
-      $result = json_decode(Post("services/addToCart.php",$data), true);
+      $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);
       unset($_POST['add_to_cart']);
     }
    

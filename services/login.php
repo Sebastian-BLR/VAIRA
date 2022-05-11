@@ -2,7 +2,7 @@
 session_start();
 include 'services/connection.php';
 $go_to_super_admin="Location: ./Vendedor/index.php";
-$go_to_administrador="Location: ./Vendedor/index.php";
+$go_to_administrador="Location: ./Administrador/index.php";
 $go_to_vendedor="Location: ./Vendedor/index.php?nueva_venta=true";
 
 if(isset($_SESSION['userType'])){
@@ -25,7 +25,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     // * GET data from form and store in variables
     $usuario = filter_var( $_POST['user'] , FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
-    $sql = 'SELECT tipo.idTipo, usuario.idUsuario FROM usuario INNER JOIN tipo WHERE usuario.fkTipo = tipo.idTipo AND usuario = ? AND password = SHA2(?,512) AND activo = 1;';
+    $sql = 'SELECT tipo.idTipo, usuario.idUsuario, usuario.usuario FROM usuario INNER JOIN tipo WHERE usuario.fkTipo = tipo.idTipo AND usuario = ? AND password = SHA2(?,512) AND activo = 1;';
     $bindings = [];
     $bindings[] = $usuario;
     $bindings[] = $password;
@@ -37,6 +37,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($result !== false){
         $_SESSION['userType'] = $result['idTipo'];
         $_SESSION['user'] = $result['idUsuario'];
+        $_SESSION['userName'] = $result['usuario'];
 
         // User types:
         // 1.- Super Admin
