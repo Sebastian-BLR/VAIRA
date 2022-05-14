@@ -1,4 +1,11 @@
 
+  <div class="row" style="margin-top: 5px;font-size: 19px;">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
+    </ol>
+    </nav>
+</div>
   <button style="margin-left: 1.4%" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
   <input style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
   <button type="button" class="btn btn-secondary"  style="margin-left: 29%"><i class="fa fa-filter"></i>Filtrar</button>
@@ -94,6 +101,7 @@
             </div>
             <div  class="col-sm-4">
               <h4 id="ticket_product_'.$index.'_cost">$</h4>
+              <button type="button" class="btn btn-danger"><i class="fa fa-trash"></i></button>
             </div>
             <input hidden id="ticket_product_'.$index.'_price" value="'.$value[1].'">
           </div>
@@ -117,7 +125,6 @@
             <br>
             <div class="row justify-content-md-center">
               <div class="col-sm-6" >
-                <h4 id="ticket_subtotal">$ 60</h4>
                 <h4 id="ticket_IVA">$ 60</h4>
                 <h4 id="ticket_total">$ 60</h4>
               </div>
@@ -127,7 +134,7 @@
             <br><br>
             <div class="row justify-content-md-center">
               <div class="col-sm-6" >
-              <button id="generate_ticket_button" type="button" class="btn btn-primary">Generar ticket</button>
+              <button style="margin-bottom: 25px;" id="generate_ticket_button" type="button" class="btn btn-success">Generar venta</button>
               </div>
             </div>
             
@@ -145,8 +152,7 @@
               for(var i = 0; i < '.$index.'; i++){
                 subtotal += eval("product_cost_" + i)
               }
-              ticket_subtotal.innerHTML = "Subtotal $" + subtotal
-              ticket_IVA.innerHTML = "IVA $" + 0
+              ticket_IVA.innerHTML = "IVA $" + (subtotal*.16)
               ticket_total.innerHTML = "Total $" + (subtotal + IVA)
             }
             updateTicket()

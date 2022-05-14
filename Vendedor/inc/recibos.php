@@ -1,3 +1,11 @@
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="?nueva_venta=true">Nueva venta</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Recibos</li>
+    </ol>
+    </nav>
+</div>
 <div class="row" style="font-size: 20px;  margin-top: 10px;">
     Recibos
     <div class="row-1" style="margin-top: 10px;">
@@ -145,41 +153,13 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDevolucion" data-bs-dismiss="modal">Aceptar</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#llaveAdmin" data-bs-dismiss="modal">Aceptar</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal Devolución-->
-    <div class="modal fade" id="modalDevolucion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Selecciona los productos que se desean devolver</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-          <input type="checkbox"> Agua
-          <input type="number" min="1" style="width: 3em;height: 2em; margin-bottom:10px;display: inline-block">
-          <br>
-          <input type="checkbox"> Cigarros
-          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
-          <br>
-          <input type="checkbox"> Jugo
-          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
-          <br>
-          <input type="checkbox"> Paleta
-          <input type="number" min="1" style="width: 3em;height: 2em;margin-bottom:10px;display: inline-block">
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#llaveAdmin" data-bs-dismiss="modal">Hacer devolución</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  
     <!-- Modal llave administrador-->
     <div class="modal fade" id="llaveAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
