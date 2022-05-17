@@ -5,18 +5,45 @@
     header("Location: ../index.php");
 
   include '../services/helper.php';
+  include '../services/connection.php';
 
   $id_usuario = $_SESSION['user'];
   $user_type = $_SESSION['userType'];
-  $id_punto_de_venta = 2;
+  // $id_punto_de_venta = 2;
+  
+  $data = [
+    "idUsuario" => $id_usuario,
+  ];
+  
+  $id_punto_de_venta = json_decode(POST("Vendedor/services/getPuntosVenta.php",$data), true);
+  $data = [
+    "idUsuario" => $id_usuario,
+    "puntoVenta" => $id_punto_de_venta[0][0]
+  ];
+  // var_dump($id_punto_de_venta);
+  
+  // $sucursal = obtenerSucursalID($pdo, $id_usuario, $id_punto_de_venta[0]);
+  $sucursal = json_decode(POST("Vendedor/services/getSucursal.php",$data), true);
   if($_SERVER["REQUEST_METHOD"] == "POST"){
+    
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
+    
+      // if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true" && isset($_POST['id_punto'])){
+      
       $data = [
         "producto" => trim($_POST["id_producto"]),
         "usuario" => $id_usuario,
         "punto" => $id_punto_de_venta,
         "cantidad" => trim($_POST["cantidad"])
       ];
+
+      // TODO: Esta seria la estructura del punto dinamico
+      // $data = [
+      //   "producto" => trim($_POST["id_producto"]),
+      //   "usuario" => $id_usuario,
+      //   "punto" => trim($_POST["id_punto"]),
+      //   "cantidad" => trim($_POST["cantidad"])
+      // ];
       $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);
       unset($_POST['add_to_cart']);
     }

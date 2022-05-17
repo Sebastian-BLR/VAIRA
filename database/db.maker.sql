@@ -1,4 +1,4 @@
-CREATE SCHEMA db_vaira;
+# CREATE SCHEMA db_vaira;
 USE db_vaira;
 
 DROP TABLE IF EXISTS info_venta;
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS producto (
     costo           DECIMAL (10,2)   NOT NULL,
     precio          DECIMAL (10,2)   NOT NULL,
     sku             VARCHAR(20),
-    imagen          LONGBLOB,
+    imagen          VARCHAR(50),
     activo          TINYINT,
     servicio        TINYINT,
 

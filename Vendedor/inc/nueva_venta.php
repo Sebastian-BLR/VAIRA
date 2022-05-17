@@ -6,13 +6,22 @@
     </ol>
     </nav>
 </div>
-  <button style="margin-left: 1.4%" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
-  <input id="buscar_producto_entrada" style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
-  <button type="button" class="btn btn-secondary"  style="margin-left: 29%"><i class="fa fa-filter"></i>Filtrar</button>
+  <div class="row">
+    <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="GET">
+      <!-- <input id="buscar_producto_entrada" style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
+      <button style="margin: 1.4% 0 0 1.4%;" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
+       -->
+      <input id="buscar_producto_entrada" type="text" placeholder="Buscar producto">
+      <button type="submit" class="btn btn-primary fa fa-search" name="busqueda" value="true" style="padding: 5px 12px; margin-top:-.8%;"></button>
+    </form>
+    <form action="" class="col-3">
+      <button type="button" class="btn btn-secondary"  style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
+    </form>
+  </div>
   <div class="wrapper"  style="height:70vh;">
     <?php 
     $data = [
-      "sucursal" => "1"
+      "sucursal" => $sucursal[0][0]
     ];
     $input_from_db = json_decode(Post("Vendedor/services/getAllProducts.php",$data), true);
     $index = 0;
@@ -26,8 +35,9 @@
             <div class="card" style="width: 12rem;">
               <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST">
                   <input hidden name="id_producto" value='.$value[0].'> </input>
+                  <input hidden name="id_punto" value='.$data['sucursal'].'> </input>
                   <input hidden name="cantidad" value=1> </input>
-                  <img src="'.'./src/image/papas.png'.'" class="card-img-top" alt="...">
+                  <img src="'.'./src/image/'.$value[4].'" class="card-img-top" alt="...">
                   <div class="card-body">
                     <h5 class="card-title">'.$value[1].'</h5>
                     <h7 class="card-title">cantidad: '.$value[2].'</h7> <br>
@@ -64,9 +74,15 @@
       
 
       <?php
+      // TODO: CAMBIAR EL ID DEL PUNTO DE VENTA DE MANERA DINAMICA
+        // $data = [
+        //   "usuario" => $id_usuario,
+        //   "punto" => trim($_GET['punto'])
+        // ];  
+
         $data = [
           "usuario" => $id_usuario,
-          "punto" => $id_punto_de_venta
+          "punto" => $id_punto_de_venta[1][0]
         ];
         $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
         $index = 0;
@@ -74,11 +90,17 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> Punto de venta </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">1</a></li>
-                <li><a class="dropdown-item" href="#">2</a></li>
-                <li><a class="dropdown-item" href="#">3</a></li>
-              </ul>
+              <ul class="dropdown-menu">');
+              foreach($id_punto_de_venta as $punto){
+                echo(
+                  "<li><a class='dropdown-item' href='#'>$punto[1]</a></li>"
+                );
+                // '<li><a class="dropdown-item" href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true&punto='.$punto[0].'">'.$punto[1].'</a></li>'
+              }
+                // <li><a class="dropdown-item" href="#">1</a></li>
+                // <li><a class="dropdown-item" href="#">2</a></li>
+                // <li><a class="dropdown-item" href="#">3</a></li>
+              echo('</ul>
             </div> 
           </div>
         ');
