@@ -1,15 +1,39 @@
 
-  <button style="margin-left: 1.4%" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
-  <input style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
-  <button type="button" class="btn btn-secondary"  style="margin-left: 29%"><i class="fa fa-filter"></i>Filtrar</button>
-  <div class="wrapper"  style="height:82vh;">
-    <?php 
+<div class="row">
+    <div class="col">
+      <input style="float: left; width: 50%;" class="form-control mr-sm-2 mt-2" type="search" placeholder="Buscar producto" aria-label="Search">
+      <button style="margin-left: 1.4%" class="btn btn-primary mt-2"><i class="fa fa-search" aria-hidden="true"></i></button>
+      <!-- <button type="button" class="btn btn-secondary float-end"><i class="fa fa-filter"></i>Filtrar</button> -->
+      <div class="btn-group float-end">
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-filter"></i>Filtrar</button>
+          <ul class="dropdown-menu">
+            <!-- <li><a class="dropdown-item" href="#">1</a></li>
+            <li><a class="dropdown-item" href="#">2</a></li>
+            <li><a class="dropdown-item" href="#">3</a></li> -->
+            <?php
+              $data = [
+                "sucursal" => "1"
+              ];
+              $input_from_db = json_decode(Post("Vendedor/services/getAllCategories.php",$data), true);
+              // var_dump($input_from_db);
+              foreach($input_from_db as $key => $value){
+                // echo '<li><a class="dropdown-item" id='.$value[0].' href="#">'.$value[1].'</a></li>';
+                echo '<li><button type="submit" name="filtrar" style="background: none !important; border: none"  value="true">'.$value[1].'</li>';
+                
+              }
+            ?>
+          </ul>
+        </div> 
+      </div>
+    </div>
+  </div>
+    <div class="wrapper mt-3"  style="height:82vh;">
+      <?php 
     // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
     
 
-    $data = [
-      "sucursal" => "1"
-    ];
+
     $input_from_db = json_decode(Post("Vendedor/services/getAllProducts.php",$data), true);
     $index = 0;
       foreach($input_from_db as $value){

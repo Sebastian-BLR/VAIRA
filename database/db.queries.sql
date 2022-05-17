@@ -170,7 +170,7 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
                     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
                     SET jIdSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
                     START TRANSACTION ;
-                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
+                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
                             JOIN existencia e on producto.idProducto = e.fkProducto
                             JOIN sucursal s on e.fkSucursal = s.idSucursal
                             JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = jIdSucursal;
@@ -183,6 +183,7 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
                     DECLARE _json JSON;
                     DECLARE jFkUsuario INT;
                     DECLARE jFkPunto INT;
+                    DECLARE regionIVA DECIMAL(5,3);
                     DECLARE exit handler for sqlexception
                     BEGIN
                         -- ERROR
@@ -195,7 +196,10 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
 
                     START TRANSACTION ;
                         # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-                        SELECT p.nombre, p.precio, cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
+                        SELECT DISTINCT iva INTO regionIVA FROM carrito INNER JOIN punto_venta pv ON carrito.fkPunto = pv.idPunto
+                                 INNER JOIN sucursal s on pv.fkSucursal = s.idSucursal
+                                 INNER JOIN region_iva ri on s.fkRegion = ri.idRegion  WHERE carrito.fkUsuario = jFkUsuario && carrito.fkPunto = jFkPunto;
+                        SELECT nombre, (precio + (precio*regionIVA)), cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
                     COMMIT ;
                 END //
 DELIMITER ;
@@ -237,6 +241,8 @@ INSERT INTO sucursal VALUES (0, 1, 1, 'Sucursal Cuernavaca', 'Degollado', 'Centr
                             (0, 3, 1, 'Sucursal Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
                             (0, 4, 1, 'Sucursal Tijuana', 'Av. Negrete', 'Miguel Negrete', '09821', '1234567890');
 
+SELECT * FROM existencia;
+
 INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 4, 1, 22),
                               (0, 1, 2, 5),
@@ -246,6 +252,8 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 1, 4, 17),
                               (0, 4, 4, 27),
                               (0, 2, 4, 10);
+
+INSERT INTO existencia VALUE (0, 3, 1, 10);
 
 INSERT INTO tipo_pago VALUES (0,'Credito'),(0,'Debito'),(0,'Efectivo');
 
@@ -300,7 +308,7 @@ BEGIN
 END //
 
 SELECT * FROM carrito;
-CALL vender_carrito(3,1,3);
+CALL vender_carrito(3,2,3);
 SELECT * FROM venta;
 
 # Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
@@ -313,9 +321,9 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_detalles_compra;
 CREATE PROCEDURE obtener_detalles_compra(IN _idVenta INT)
 BEGIN
-    SELECT u.usuario, venta.fecha, p.nombre, iv.subtotal ,venta.total FROM venta 
-    INNER JOIN usuario u on venta.fkUsuario = u.idUsuario 
-    INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta 
+    SELECT u.usuario, venta.fecha, p.nombre, iv.subtotal ,venta.total FROM venta
+    INNER JOIN usuario u on venta.fkUsuario = u.idUsuario
+    INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
     INNER JOIN producto p on iv.fkProducto = p.idProducto
     WHERE _idVenta = idVenta;
 END //
@@ -383,3 +391,18 @@ END //
 
 CALL generar_devolucion('2022-05-10',3,'user',789);
 SELECT * FROM venta;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_productos;
+CREATE PROCEDURE filtrar_productos(IN _jsonA JSON)
+BEGIN
+    DECLARE _json JSON;
+END //
+
+DROP PROCEDURE IF EXISTS obtener_categorias;
+CREATE PROCEDURE obtener_categorias()
+BEGIN
+    SELECT idCategoria, nombre FROM categoria;
+END //
+
+DELIMITER ;
