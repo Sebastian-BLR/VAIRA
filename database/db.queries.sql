@@ -207,6 +207,7 @@ DELIMITER ;
 CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
 CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"user","password":"789","correo":"a@a.com","telefono":"1234567890","rol":"3"}');
+CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"torybolla","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"3"}');
 
 INSERT INTO categoria VALUES (0, 'Abarrotes', 'Conjunto de artículos comerciales, especialmente comidas, bebidas y conservas', 0, 0.0, 0.0),
                              (0, 'Bebidas alc. -14°', 'Bebidas que contienen etanol en su composición', 1, 0.265, 0.0),
@@ -275,8 +276,12 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS vender_carrito;
-CREATE PROCEDURE vender_carrito(IN _fkUsuario INT, IN _fkPunto INT, IN _fkTipoPago INT)
+CREATE PROCEDURE vender_carrito(IN _jsonA JSON)
 BEGIN
+    DECLARE _json JSON;
+    DECLARE _fkUsuario INT;
+    DECLARE _fkPunto INT;
+    DECLARE _fkTipoPago INT;
     DECLARE _idVenta INT;
     DECLARE _total DECIMAL(12,2);
     DECLARE _iva DECIMAL(5,2);
@@ -286,6 +291,11 @@ BEGIN
         SELECT 'Hubo un error';
         ROLLBACK;
     END;
+
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+    SET _fkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkPunto'));
+    SET _fkTipoPago = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkTipoPago'));
 
     START TRANSACTION;
         IF ((SELECT COUNT(*) FROM carrito WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto) > 0)
@@ -307,9 +317,9 @@ BEGIN
         END IF;
 END //
 
-SELECT * FROM carrito;
-CALL vender_carrito(3,2,3);
-SELECT * FROM venta;
+# SELECT * FROM carrito;
+# CALL vender_carrito(3,1,3);
+# SELECT * FROM venta;
 
 # Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
 # Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
@@ -366,15 +376,31 @@ END //
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS generar_devolucion;
-CREATE PROCEDURE generar_devolucion(IN _date VARCHAR(10), IN _idVenta INT, _usuario VARCHAR(50), IN _password VARCHAR(128))
+CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
 BEGIN
+
+    DECLARE _json JSON;
+    DECLARE _date VARCHAR(10);
+    DECLARE _idVenta INT;
+    DECLARE _usuario VARCHAR(50);
+    DECLARE _password VARCHAR(128);
     DECLARE _fkVenta INT;
     DECLARE _fkUsuario INT;
+
     DECLARE exit handler for sqlexception
     BEGIN
         -- ERROR
         ROLLBACK;
     END;
+
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _date = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.date'));
+    SET _idVenta = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idVenta'));
+    SET _usuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'));
+    SET _password = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'));
+    SET _fkVenta = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkVenta'));
+    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+
     START TRANSACTION;
         IF (SELECT COUNT(*) FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512)) = 1
             THEN
@@ -406,3 +432,5 @@ BEGIN
 END //
 
 DELIMITER ;
+# CALL generar_devolucion('2022-05-10',3,'user',789);
+SELECT * FROM carrito;
