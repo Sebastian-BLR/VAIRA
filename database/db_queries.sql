@@ -170,7 +170,7 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
                     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
                     SET jIdSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
                     START TRANSACTION ;
-                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  (precio + (precio * ri.iva)) AS TOTAL FROM producto
+                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
                             JOIN existencia e on producto.idProducto = e.fkProducto
                             JOIN sucursal s on e.fkSucursal = s.idSucursal
                             JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = jIdSucursal;
@@ -183,6 +183,7 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
                     DECLARE _json JSON;
                     DECLARE jFkUsuario INT;
                     DECLARE jFkPunto INT;
+                    DECLARE regionIVA DECIMAL(5,3);
                     DECLARE exit handler for sqlexception
                     BEGIN
                         -- ERROR
@@ -195,7 +196,10 @@ CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
 
                     START TRANSACTION ;
                         # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-                        SELECT p.nombre, p.precio, cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
+                        SELECT DISTINCT iva INTO regionIVA FROM carrito INNER JOIN punto_venta pv ON carrito.fkPunto = pv.idPunto
+                                 INNER JOIN sucursal s on pv.fkSucursal = s.idSucursal
+                                 INNER JOIN region_iva ri on s.fkRegion = ri.idRegion  WHERE carrito.fkUsuario = jFkUsuario && carrito.fkPunto = jFkPunto;
+                        SELECT nombre, (precio + (precio*regionIVA)), cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
                     COMMIT ;
                 END //
 DELIMITER ;
