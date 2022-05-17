@@ -34,9 +34,12 @@
         echo('
             <div class="card" style="width: 12rem;">
               <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST">
+
                   <input hidden name="id_producto" value='.$value[0].'> </input>
                   <input hidden name="id_punto" value='.$data['sucursal'].'> </input>
                   <input hidden name="cantidad" value=1> </input>
+                  <input hidden name="nombre_producto" value="'.$value[1].'"> </input>
+                  
                   <img src="'.'./src/image/'.$value[4].'" class="card-img-top" alt="...">
                   <div class="card-body">
                     <h5 class="card-title">'.$value[1].'</h5>

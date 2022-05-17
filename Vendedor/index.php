@@ -27,9 +27,21 @@
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
-    
+      if(!isset($_SESSION['cart']))
+        $_SESSION['cart'] = [];
+
+      $_SESSION['cart']->append(
+        array($_POST['id_producto'] =>
+          array(
+            "nombre_producto"=>$_POST['nombre_producto'],
+            "cantidad"=>$_POST['cantidad']
+          )
+        )
+      );
+
+      print_r($_SESSION['cart']);
       // if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true" && isset($_POST['id_punto'])){
-      
+      exit();
       $data = [
         "producto" => trim($_POST["id_producto"]),
         "usuario" => $id_usuario,
@@ -44,13 +56,11 @@
       //   "punto" => trim($_POST["id_punto"]),
       //   "cantidad" => trim($_POST["cantidad"])
       // ];
-      $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);
+
+      // $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);  //el carrito se guarda en la sesion
       unset($_POST['add_to_cart']);
     }
-   
-
   }
-
 ?>
 <!doctype html>
 <html lang="en">
