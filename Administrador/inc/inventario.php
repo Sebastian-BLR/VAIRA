@@ -23,9 +23,6 @@
 
 </div>
 <div class="row">
-
-
-
   <div class="card" style="width: 12rem;">
     <div class="card-body">
       <button type="button" class="btn btn-outline-info" style="margin-right: 50px;" data-bs-toggle="modal" data-bs-target="#actualizar"><i class="fa fa-pencil" aria-hidden="true"></i></button>
@@ -36,13 +33,63 @@
       <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mostrarDetalleProducto"><i class="fa fa-search-plus"></i></button>
     </div>
   </div>
-
-
-
 </div>
 
+<!-- Modal Actualizar producto-->
+<div class="modal fade bd-example-modal-sm" id="actualizar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Editar producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="producto" class="col-form-label">Nombre de producto</label>
+            <input type="text" class="form-control" id="nombreproducto">
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="col-form-label">Precio</label>
+            <input type="text" class="form-control" id="precio">
+          </div>
+          <div class="mb-3">
+            <label for="categoria" class="col-form-label">Categoria</label>
+            <input type="text" class="form-control" id="categoria">
+          </div>
+          <div class="mb-3">
+            <label for="existencia" class="col-form-label">En existencia</label>
+            <input type="text" class="form-control" id="existencia">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-
+<!-- Modal Eliminar producto-->
+<div class="modal fade bd-example-modal-sm" id="eliminar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <h5 class="modal-title" id="staticBackdropLabel">Eliminar producto del inventario</h5>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Modal Detalle Producto-->
 <div class="modal fade bd-example-modal-sm" id="mostrarDetalleProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
