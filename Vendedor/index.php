@@ -34,17 +34,17 @@
       if(!isset($_SESSION['cart']))
         $_SESSION['cart'] = [];
 
-      $_SESSION['cart']->append(
-        array($_POST['id_producto'] =>
-          array(
-            "nombre_producto"=>$_POST['nombre_producto'],
-            "cantidad"=>$_POST['cantidad']
-          )
-        )
-      );
+      // $_SESSION['cart']->append(
+      //   array($_POST['id_producto'] =>
+      //     array(
+      //       "nombre_producto"=>$_POST['nombre_producto'],
+      //       "cantidad"=>$_POST['cantidad']
+      //     )
+      //   )
+      // );
 
       print_r($_SESSION['cart']);
-      exit();
+      // exit();
       
       // $data = [
       //   "producto" => trim($_POST["id_producto"]),
