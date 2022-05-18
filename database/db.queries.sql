@@ -211,7 +211,7 @@ CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
                     COMMIT ;
                 END //
 
-
+# CALL obtener_busqueda('{"sucursal": "1", "busqueda":"pa"}');
 
 DROP PROCEDURE IF EXISTS obtener_carrito;
 CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)

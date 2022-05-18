@@ -7,12 +7,12 @@
     </nav>
 </div>
   <div class="row">
-    <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="GET">
+    <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="POST">
       <!-- <input id="buscar_producto_entrada" style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
       <button style="margin: 1.4% 0 0 1.4%;" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
        -->
-      <input id="buscar_producto_entrada" type="text" placeholder="Buscar producto">
-      <button type="submit" class="btn btn-primary fa fa-search" name="busqueda" value="true" style="padding: 5px 12px; margin-top:-.8%;"></button>
+      <input id="buscar_producto_entrada" name="busqueda" type="text" placeholder="Buscar producto">
+      <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
     </form>
     <form action="" class="col-3">
       <button type="button" class="btn btn-secondary"  style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
@@ -23,7 +23,14 @@
     $data = [
       "sucursal" => $sucursal[0][0]
     ];
-    $input_from_db = json_decode(Post("Vendedor/services/getAllProducts.php",$data), true);
+    if(isset($_POST['busqueda'])){
+      $data = [
+        "sucursal" => $sucursal[0][0],
+        "busqueda" => trim($_POST['busqueda'])
+      ];
+      $input_from_db = json_decode(Post("Vendedor/services/getSearch.php",$data),true);
+    } else
+      $input_from_db = json_decode(Post("Vendedor/services/getAllProducts.php",$data), true);
     $index = 0;
       foreach($input_from_db as $value){
         if($index % 4 == 0){
@@ -99,7 +106,7 @@
         
         // ');
         echo('
-        <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST">
+        <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST" style="min-height: 0px; max-height:0px;">
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> Punto de venta </button>
