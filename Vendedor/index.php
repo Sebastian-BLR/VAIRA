@@ -34,35 +34,33 @@
       if(!isset($_SESSION['cart']))
         $_SESSION['cart'] = [];
 
-      // $_SESSION['cart']->append(
-      //   array($_POST['id_producto'] =>
-      //     array(
-      //       "nombre_producto"=>$_POST['nombre_producto'],
-      //       "cantidad"=>$_POST['cantidad']
-      //     )
-      //   )
-      // );
-
-      print_r($_SESSION['cart']);
-      // exit();
-      
-      // $data = [
-      //   "producto" => trim($_POST["id_producto"]),
-      //   "usuario" => $id_usuario,
-      //   "punto" => $id_punto_de_venta,
-      //   "cantidad" => trim($_POST["cantidad"])
-      // ];
-
-      // TODO: Esta seria la estructura del punto dinamico
-      $data = [
-        "producto" => trim($_POST["id_producto"]),
-        "usuario" => $id_usuario,
-        "punto" => trim($_SESSION['id_punto_de_venta']),
-        "cantidad" => trim($_POST["cantidad"])
-      ];
-
-      // $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);  //! el carrito se guarda en la sesion
+      $do_exist = false;
+      foreach ($_SESSION["cart"] as $clave => $valor){
+        if($valor["id_producto"] == $_POST['id_producto']){
+          $_SESSION["cart"][$clave]["cantidad"]++;
+          $do_exist = true;
+        }
+      }
+      if(!$do_exist){
+        array_push($_SESSION['cart'], 
+          array(
+            "id_producto"=>$_POST['id_producto'],
+            "nombre_producto"=>$_POST['nombre_producto'],
+            "cantidad"=>$_POST['cantidad'],
+            "precio_unitario"=>$_POST['precio_unitario'],
+            "sku_producto"=>$_POST['sku_producto']
+          )
+        );
+      }
       unset($_POST['add_to_cart']);
+
+     
+
+
+      
+     
+   
+
     }
   }
 ?>

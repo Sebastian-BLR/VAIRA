@@ -38,6 +38,8 @@
                   <input hidden name="id_producto" value='.$value[0].'> </input>
                   <input hidden name="cantidad" value=1> </input>
                   <input hidden name="nombre_producto" value="'.$value[1].'"> </input>
+                  <input hidden name="precio_unitario" value="'.$value[5].'"> </input>
+                  <input hidden name="sku_producto" value="'.$value[3].'"> </input>
                   
                   <img src="'.'./src/image/'.$value[4].'" class="card-img-top" alt="...">
                   <div class="card-body">
@@ -86,7 +88,7 @@
         //   "punto" => $id_punto_de_venta[1][0]
         // ];
 
-        $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
+        // $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
         $index = 0;
         // echo ('
         //   <div class="row">
@@ -115,50 +117,38 @@
         echo('<br><br><br>
         <script>
           var subtotal_acumulado = 0
-          function removeProducto(id_producto){
-            let parameters = new FormData()
-            parameters.append("id_producto", id_producto)
-            var object = {};
-            parameters.forEach((value, key) => {object[key] = value});
-            var json_send = JSON.stringify(object);
-
-            fetch("./services/removeFromCart.php/", {
-                method: "POST",
-                body: json_send
-            }).then(
-                response => response.json()
-            ).then(
-                response => {
-                  console.log(response)
-                }
-            ).catch(
-                error => console.log(error)
-            )
-          
-          }
+         
         </script>
         ');
-        foreach($input_from_db as $value){
+        if(isset($_POST["remove_product_from_id"])){
+          foreach ($_SESSION["cart"] as $clave => $valor){
+            if($valor["id_producto"] == $_POST["remove_product_from_id"]){
+              unset($_SESSION["cart"][$clave]);
+              unset($_POST["remove_product_from_id"]);
+            }
+          }
+        
+        }
+        foreach($_SESSION['cart'] as $value){
           echo('
             <div class="row justify-content-md-center">
               <div class="col-sm-2" >
-                <input id="ticket_product_'.$index.'_cant" type="number" min="1" value="'.$value[2].'" style="width:100%;">
+                <input id="ticket_product_'.$index.'_cant" type="number" min="1" name="cantidad_actual_producto" value="'.$value["cantidad"].'" style="width:100%;">
               </div>
               <div class="col-sm-5">
-                <h4>'.$value[0].'</h4>
+                <h5>'.$value["nombre_producto"].'</h5>
               </div>
               <div  class="col-sm-4">
                 <h4 id="ticket_product_'.$index.'_cost">$</h4>
               </div>
               <div  class="col-sm-1">
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeProducto('.$value[0].')" ><i class="fa fa-trash"></i></button>
-                <input hidden id="ticket_product_'.$index.'_price" value="'.$value[1].'">
+              <form method="POST">
+                <button type="submit" class="btn btn-danger btn-sm" name=remove_product_from_id value='.$value["id_producto"].' ><i class="fa fa-trash"></i></button>
+              </form >
+                <input hidden id="ticket_product_'.$index.'_price" value="'.$value["precio_unitario"].'">
               </div>
-
             </div>
           <script>
-            
-            
             let ticket_product_'.$index.'_cant = document.getElementById("ticket_product_'.$index.'_cant")
             var product_cost_'.$index.'  = 0
             ticket_product_'.$index.'_cant.addEventListener("change", function() {
@@ -172,7 +162,7 @@
           ');
           $index++;
         }
-        if(count($input_from_db ) > 0){
+        if(count($_SESSION["cart"] ) > 0){
           echo('
             <br>
             <div class="row justify-content-md-center">
