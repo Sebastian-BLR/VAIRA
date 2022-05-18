@@ -9,7 +9,6 @@ DROP TABLE IF EXISTS tipo_pago;
 DROP TABLE IF EXISTS existencia;
 DROP TABLE IF EXISTS log_producto;
 DROP TABLE IF EXISTS impuesto_extra;
-DROP TABLE IF EXISTS carrito;
 DROP TABLE IF EXISTS producto;
 DROP TABLE IF EXISTS proveedor;
 DROP TABLE IF EXISTS categoria;
@@ -139,18 +138,6 @@ CREATE TABLE IF NOT EXISTS producto (
 
     FOREIGN KEY (fkCategoria) REFERENCES categoria(idCategoria)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkProveedor) REFERENCES proveedor(idProveedor)   ON UPDATE CASCADE ON DELETE RESTRICT
-)ENGINE = INNODB;
-
-CREATE TABLE IF NOT EXISTS carrito (
-    idCarrito   INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
-    fkProducto  INT         NOT NULL,
-    fkUsuario   INT         NOT NULL,
-    fkPunto     INT         NOT NULL,
-    cantidad    INT,
-
-    FOREIGN KEY (fkProducto) REFERENCES producto(idProducto) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkPunto) REFERENCES punto_venta(idPunto) ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS log_producto(
