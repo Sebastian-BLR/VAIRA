@@ -1,9 +1,9 @@
 
   <div class="row" style="margin-top: 5px;font-size: 19px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-    <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
-    </ol>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
+      </ol>
     </nav>
 </div>
   <div class="row">
@@ -15,7 +15,15 @@
       <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
     </form>
     <form action="" class="col-3">
-      <button type="button" class="btn btn-secondary"  style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
+    <button type="button" class="btn btn-secondary"  data-bs-toggle="dropdown" style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
+      <ul class="dropdown-menu">
+        <li><input type="checkbox" id="filtro1" name="filtro1">
+          <label for="filtro1">Menor precio</label></li>
+        <li><input type="checkbox" id="filtro2" name="filtro2">
+          <label for="filtro2">Mayor precio</label></li>
+        <li><input type="checkbox" id="filtro3" name="filtro3">
+          <label for="filtro3">Categoria</label></li>
+      </ul>
     </form>
   </div>
   <div class="wrapper"  style="height:70vh;">
