@@ -414,11 +414,6 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-CALL obtener_puntos_venta('{"idUsuario":"3"}');
-CALL obtener_sucursal('{"idUsuario":"3", "puntoVenta":"1"}');
-CALL obtener_productos('{"sucursal":"1"}');
-SELECT * FROM carrito;
-
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
 # ==============================================================
@@ -518,17 +513,3 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
 # CALL generar_devolucion('2022-05-10',3,'user',789);
 # CALL obtener_detalles_compra(2);
 # SELECT * FROM carrito;
-
-SET @busqueda = 'pap';
-SET @busqueda = CONCAT('%', @busqueda, '%');
-SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
-                            JOIN existencia e on producto.idProducto = e.fkProducto
-                            JOIN sucursal s on e.fkSucursal = s.idSucursal
-                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = 1 AND (producto.nombre LIKE @busqueda OR sku LIKE @busqueda);
-
-CALL obtener_busqueda('{"sucursal":"1", "busqueda" : "papas"}');
-
-SELECT * FROM usuario;
-SELECT idPunto, nombre FROM punto_venta WHERE fkUsuario = 2;
-SELECT idPunto FROM punto_venta WHERE fkUsuario = 3 LIMIT 1;
-SELECT fkSucursal FROM punto_venta WHERE fkUsuario = 3 AND idPunto = 1;
