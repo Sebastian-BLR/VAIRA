@@ -16,15 +16,19 @@
   ];
   
   $id_punto_de_venta = json_decode(POST("Vendedor/services/getPuntosVenta.php",$data), true);
+
+  $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
+  
   $data = [
     "idUsuario" => $id_usuario,
-    "puntoVenta" => $id_punto_de_venta[0][0]
+    "puntoVenta" => trim($_SESSION['id_punto_de_venta'])
   ];
-  // var_dump($id_punto_de_venta);
-  
-  // $sucursal = obtenerSucursalID($pdo, $id_usuario, $id_punto_de_venta[0]);
+
   $sucursal = json_decode(POST("Vendedor/services/getSucursal.php",$data), true);
   if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if(isset($_POST['punto_de_venta'])){
+      $_SESSION['id_punto_de_venta'] = $_POST['punto_de_venta'];
+    }
     
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
       if(!isset($_SESSION['cart']))
@@ -40,24 +44,24 @@
       );
 
       print_r($_SESSION['cart']);
-      // if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true" && isset($_POST['id_punto'])){
       exit();
-      $data = [
-        "producto" => trim($_POST["id_producto"]),
-        "usuario" => $id_usuario,
-        "punto" => $id_punto_de_venta,
-        "cantidad" => trim($_POST["cantidad"])
-      ];
-
-      // TODO: Esta seria la estructura del punto dinamico
+      
       // $data = [
       //   "producto" => trim($_POST["id_producto"]),
       //   "usuario" => $id_usuario,
-      //   "punto" => trim($_POST["id_punto"]),
+      //   "punto" => $id_punto_de_venta,
       //   "cantidad" => trim($_POST["cantidad"])
       // ];
 
-      // $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);  //el carrito se guarda en la sesion
+      // TODO: Esta seria la estructura del punto dinamico
+      $data = [
+        "producto" => trim($_POST["id_producto"]),
+        "usuario" => $id_usuario,
+        "punto" => trim($_SESSION['id_punto_de_venta']),
+        "cantidad" => trim($_POST["cantidad"])
+      ];
+
+      // $result = json_decode(Post("Vendedor/services/addToCart.php",$data), true);  //! el carrito se guarda en la sesion
       unset($_POST['add_to_cart']);
     }
   }

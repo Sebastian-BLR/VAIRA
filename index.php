@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
-                                    <input id="password" type="password" class="form-control" name="password"  minlength="8" required data-eye>
+                                    <input id="password" type="password" class="form-control" name="password"  required data-eye>
                                     <input type="checkbox" onclick="myFunction()"> Mostrar contraseña
                                 </div>    
                                 <div class="form-group m-0" >

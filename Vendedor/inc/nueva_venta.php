@@ -36,7 +36,6 @@
               <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST">
 
                   <input hidden name="id_producto" value='.$value[0].'> </input>
-                  <input hidden name="id_punto" value='.$data['sucursal'].'> </input>
                   <input hidden name="cantidad" value=1> </input>
                   <input hidden name="nombre_producto" value="'.$value[1].'"> </input>
                   
@@ -77,35 +76,41 @@
       
 
       <?php
-      // TODO: CAMBIAR EL ID DEL PUNTO DE VENTA DE MANERA DINAMICA
-        // $data = [
-        //   "usuario" => $id_usuario,
-        //   "punto" => trim($_GET['punto'])
-        // ];  
-
         $data = [
           "usuario" => $id_usuario,
-          "punto" => $id_punto_de_venta[1][0]
-        ];
+          "punto" => trim($_SESSION['id_punto_de_venta'])
+        ];  
+
+        // $data = [
+        //   "usuario" => $id_usuario,
+        //   "punto" => $id_punto_de_venta[1][0]
+        // ];
+
         $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
         $index = 0;
+        // echo ('
+        //   <div class="row">
+        //     <div class="col-12">
+        //       <p>'. $_SESSION['id_punto_de_venta'] .'</p>
+        //     </div>
+        //   </div>
+        
+        // ');
         echo('
+        <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST">
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> Punto de venta </button>
               <ul class="dropdown-menu">');
               foreach($id_punto_de_venta as $punto){
                 echo(
-                  "<li><a class='dropdown-item' href='#'>$punto[1]</a></li>"
+                  "<li><button type='submit' class='dropdown-item' name='punto_de_venta' value='$punto[0]'>$punto[1]</button></li>"
                 );
-                // '<li><a class="dropdown-item" href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true&punto='.$punto[0].'">'.$punto[1].'</a></li>'
               }
-                // <li><a class="dropdown-item" href="#">1</a></li>
-                // <li><a class="dropdown-item" href="#">2</a></li>
-                // <li><a class="dropdown-item" href="#">3</a></li>
               echo('</ul>
-            </div> 
-          </div>
+              </div> 
+            </div>
+          </form>
         ');
         echo('<br><br><br>
         <script>
