@@ -26,7 +26,7 @@
       </ul>
     </form>
   </div>
-  <div class="wrapper"  style="height:70vh;">
+  <div class="wrapper"  style="height:65vh;">
     <?php 
     $data = [
       "sucursal" => $sucursal[0][0]

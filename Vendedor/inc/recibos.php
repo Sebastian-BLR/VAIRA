@@ -176,7 +176,8 @@
           <div class="form-group">
               <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
               <input id="password" type="password" class="form-control" name="password"  maxlength="16">
-              <input type="checkbox" onclick="myFunction()"> Mostrar contraseña
+              <input id="showPass" type="checkbox" onclick="myFunction()">
+              <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button>
           </div>   
           </div>
           <div class="modal-footer">
@@ -199,19 +200,19 @@
             <form>
               <div class="mb-3">
                 <label for="vendedor" class="col-form-label">Vendedor</label>
-                <input type="text" class="form-control" id="vendedor">
+                <input type="text" class="form-control" id="vendedor" disabled>
               </div>
               <div class="mb-3">
                 <label for="hora" class="col-form-label">Hora</label>
-                <input type="text" class="form-control" id="hora">
+                <input type="text" class="form-control" id="hora" disabled>
               </div>
               <div class="mb-3">
                 <label for="productos" class="col-form-label">Productos</label>
-                <input type="text" class="form-control" id="Productos">
+                <input type="text" class="form-control" id="Productos" disabled>
               </div>
               <div class="mb-3">
                 <label for="total" class="col-form-label">Total</label>
-                <input type="text" class="form-control" id="total">
+                <input type="text" class="form-control" id="total" disabled>
               </div>
             </form>
           </div>
