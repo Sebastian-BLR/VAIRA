@@ -1,7 +1,10 @@
-
-
-
-              
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Recibos</li>
+    </ol>
+    </nav>
+</div>              
 <div style="font-size: 20px;  margin-top: 10px;">
   <div class="row-1" style="margin-top: 10px;">
     <input type="date" id="eligeFecha" name="eligeFecha">
@@ -26,24 +29,24 @@
           <td>06/03/2022</td>
           <td>Cuernavaca</td>
           <td>$250</td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
         </tr>
         <tr>
           <th scope="row">2</th>
           <td>06/03/2022</td>
           <td>Cuernavaca</td>
           <td>$500</td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
         </tr>
         <tr>
           <th scope="row">3</th>
           <td>06/03/2022</td>
           <td>Cuernavaca</td>
           <td>$1000</td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
         </tr>
       </tbody>
     </table>
@@ -165,7 +168,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#llaveAdmin" data-bs-dismiss="modal">Aceptar</button>
       </div>
     </div>
   </div>
@@ -194,4 +197,32 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal llave administrador-->
+<div class="modal fade" id="llaveAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Ingresar claves de acceso de administrador</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <div class="form-group">
+              <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
+              <input id="user" type="text" class="form-control"  name="user" value="">
+          </div>
+          <div class="form-group">
+              <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
+              <input id="password" type="password" class="form-control" name="password"  maxlength="16">
+              <input id="showPass" type="checkbox" onclick="myFunction()">
+              <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button>
+          </div>   
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" onclick="alertDevolucion()" data-bs-dismiss="modal">Hacer devolución</button>
+          </div>
+        </div>
+      </div>
 </div>
