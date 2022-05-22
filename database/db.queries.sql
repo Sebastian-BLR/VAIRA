@@ -164,9 +164,55 @@ CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
                     COMMIT ;
                 END //
 
-# CALL obtener_busqueda('{"sucursal": "1", "busqueda":"pa"}');
+DROP PROCEDURE IF EXISTS obtener_busqueda;
+CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
+                BEGIN
+                    DECLARE _json JSON;
+                    DECLARE jIdSucursal JSON;
+                    DECLARE busqueda VARCHAR(50);
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
 
-# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"PAP-JAL-350","cantidad":5},{"sku":"CER-CLA-355","cantidad":2},{"sku":"CHA-PIÑ-255","cantidad":10}]}]');
+                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+                    SET jIdSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
+                    SET busqueda = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.busqueda'));
+                    SET busqueda = CONCAT('%', busqueda, '%');
+                    START TRANSACTION ;
+                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+                            JOIN existencia e on producto.idProducto = e.fkProducto
+                            JOIN sucursal s on e.fkSucursal = s.idSucursal
+                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = jIdSucursal AND (producto.nombre LIKE busqueda OR sku LIKE busqueda);
+                    COMMIT ;
+                END //
+DROP PROCEDURE IF EXISTS obtener_filtro;
+CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
+                BEGIN
+                    DECLARE _json JSON;
+                    DECLARE jIdSucursal JSON;
+                    DECLARE categoria VARCHAR(50);
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+
+                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+                    SET jIdSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
+                    SET categoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
+
+                    START TRANSACTION ;
+                        SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+                            JOIN existencia e on producto.idProducto = e.fkProducto
+                            JOIN sucursal s on e.fkSucursal = s.idSucursal
+                            JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = jIdSucursal AND fkCategoria = categoria;
+                    COMMIT ;
+                END //
+
+
+# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
 
 DROP PROCEDURE IF EXISTS realizar_venta;
@@ -322,21 +368,6 @@ BEGIN
         END IF;
     COMMIT;
 END //
-
-
-DELIMITER //
-DROP PROCEDURE IF EXISTS filtrar_productos;
-CREATE PROCEDURE filtrar_productos(IN _jsonA JSON)
-BEGIN
-    DECLARE _json JSON;
-END //
-
-DROP PROCEDURE IF EXISTS obtener_categorias;
-CREATE PROCEDURE obtener_categorias()
-BEGIN
-    SELECT idCategoria, nombre FROM categoria;
-END //
-DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_puntos_venta;

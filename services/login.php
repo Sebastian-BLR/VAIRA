@@ -4,7 +4,7 @@ include 'services/connection.php';
 $go_to_super_admin="Location: ./Vendedor/index.php";
 $go_to_administrador="Location: ./Administrador/index.php";
 $go_to_vendedor="Location: ./Vendedor/index.php?nueva_venta=true";
-var_dump($pdo);
+// var_dump($pdo);
 
 if(isset($_SESSION['userType'])){
     switch($_SESSION['userType']) {

@@ -176,9 +176,12 @@
           <div class="form-group">
               <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
               <input id="password" type="password" class="form-control" name="password"  maxlength="16">
-              <input id="showPass" type="checkbox" onclick="myFunction()">
-              <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button>
-          </div>   
+            </div>   
+          <div class="d-flex justify-content-center">
+            <input id="showPass" type="checkbox" style = "margin: 10px 5px 0 0" onclick="myFunction()">
+            <label for="showPass">Mostrar contrase&ntilde;a</label>
+            <!-- <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button> -->
+          </div>
           </div>
           <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>

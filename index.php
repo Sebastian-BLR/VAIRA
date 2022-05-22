@@ -45,9 +45,12 @@
                                 <div class="form-group">
                                     <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
                                     <input id="password" type="password" class="form-control" name="password"  required data-eye>
-                                    <input id="showPass" type="checkbox" onclick="myFunction()">
-                                    <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button>
+                                    <!-- <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button> -->
                                 </div>    
+                                <div class="d-flex justify-content-center">
+                                    <input id="showPass" type="checkbox" class="mt-1" style="margin-right: 5px;" onclick="myFunction()">
+                                    <label for="showPass">Mostrar contrase&ntilde;a</label>
+                                </div>
                                 <div class="form-group m-0" >
                                     <button type="submit" class="btn btn-outline-purple btn-block"> Login </button>
                                 </div>

@@ -16,6 +16,7 @@
   ];
   
   $id_punto_de_venta = json_decode(POST("Vendedor/services/getPuntosVenta.php",$data), true);
+  $categorias = json_decode(POST("Vendedor/services/getCategories.php",$data), true);
 
   $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
   
@@ -28,6 +29,10 @@
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['punto_de_venta'])){
       $_SESSION['id_punto_de_venta'] = $_POST['punto_de_venta'];
+    }
+
+    if(isset($_POST['categoria'])){
+      $_SESSION['filtro'] = $_POST['categoria'];
     }
     
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
