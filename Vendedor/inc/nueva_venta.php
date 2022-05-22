@@ -209,65 +209,71 @@
                 </div>
                 
 
-                <script>
-              
+            <script>
+            let ticket_subtotal = document.getElementById("ticket_subtotal")
+            let ticket_IVA = document.getElementById("ticket_IVA")
+            let ticket_total = document.getElementById("ticket_total")
 
-                let ticket_subtotal = document.getElementById("ticket_subtotal")
-                let ticket_IVA = document.getElementById("ticket_IVA")
-                let ticket_total = document.getElementById("ticket_total")
+            var global_total = global_iva = 0
+            let updateTicket= () =>{
+              var subtotal = 0
 
-            
-                let updateTicket= () =>{
-                  var subtotal = 0
-
-                  for(var i = 0; i < '.$index.'; i++){
-                    subtotal += eval("product_cost_" + i)
-                  }
-                  ticket_IVA.innerHTML = "IVA $" + (subtotal*.16).toFixed(2)
-                  ticket_total.innerHTML = "Total $" + (subtotal).toFixed(2)
-                }
-                updateTicket()
-
-                let generate_ticket_button = document.getElementById("generate_ticket_button")
-                generate_ticket_button.addEventListener("click",() => {
-                  let parameters = new FormData()
-                  parameters.append("id_usuario", 1)          //hace falta agregar las variables que se necesiten
-                  var object = {};
-                  parameters.forEach((value, key) => {object[key] = value});
-                  var json_send = JSON.stringify(object);
-                  fetch("./services/generateSale.php/", {
-                    method: "POST",
-                    body: json_send
-                  }).then(
-                      response => response.json()
-                  ).then(
-                      response => console.log(response)
-                  ).catch(
-                      error => console.log(error)
-                  )
-                  Swal.fire({
-                    title: "¿Deseas imprimir el ticket?",
-                    showDenyButton: true,
-                    confirmButtonColor: "#198754",
-                    confirmButtonText: "Imprimir",
-                    denyButtonText: "Cancelar",
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      window.location.assign("./services/downloadTicket.php")
-                    
-                      Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
-                      
-                    } else if (result.isDenied) {
-                      Swal.fire("Cancelando compra...", "", "info")
-                    }
-                  })
-                })
-              
-                
-              </script>
-              ');
+              for(var i = 0; i < '.$index.'; i++){
+                subtotal += eval("product_cost_" + i)
+              }
+              global_total = (subtotal).toFixed(2)
+              global_iva = (subtotal*.16).toFixed(2)
+              ticket_IVA.innerHTML = "IVA $" + global_iva
+              ticket_total.innerHTML = "Total $" + global_total
             }
-          }
+            updateTicket()
+
+            let generate_ticket_button = document.getElementById("generate_ticket_button")
+            generate_ticket_button.addEventListener("click",() => {
+              let parameters = new FormData()
+              parameters.append("id_usuario", 1)          //hace falta agregar las variables que se necesiten
+              var object = {};
+              parameters.forEach((value, key) => {object[key] = value});
+              var json_send = JSON.stringify(object);
+              fetch("./services/generateSale.php/", {
+                method: "POST",
+                body: json_send
+              }).then(
+                  response => response.json()
+              ).then(
+                  response => console.log(response)
+              ).catch(
+                  error => console.log(error)
+              )
+              Swal.fire({
+                title: "¿Deseas imprimir el ticket?",
+                showDenyButton: true,
+                confirmButtonColor: "#198754",
+                confirmButtonText: "Imprimir",
+                denyButtonText: "Cancelar",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  
+                  window.location.assign(`./services/downloadTicket.php?productos=`+
+                  `'.urlencode( json_encode($_SESSION["cart"]) ).'`+
+                  `&nombre_tienda=`+`Tienda de Aaron`+
+                  `&direccion=`+`Calle villa de aaron xD`+
+                  `&total=`+String(global_total)+
+                  `&iva=`+String(global_iva)
+                  )
+
+
+                  Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
+                } else if (result.isDenied) {
+                  Swal.fire("Cancelando compra...", "", "info")
+                }
+              })
+            })
+           
+            
+          </script>
+          ');
+        }
       ?>
      
       
