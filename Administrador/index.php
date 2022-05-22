@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/estilos.css">
     <script src="js/jsAdmin.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 
   </head>
   <body >
