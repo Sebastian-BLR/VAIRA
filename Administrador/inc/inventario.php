@@ -105,8 +105,8 @@
 </div>
 
 <!-- Modal Confirmación editar -->
-<div class="modal fade bd-example-modal-xl" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+<div class="modal fade bd-example-modal-sm" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">¿Est&aacutes seguro que deseas editar el producto?</h5>
@@ -114,7 +114,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-dismiss="modal">S&iacute</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" onclick="alertEdicionSatisfactoria()" d data-bs-dismiss="modal">S&iacute</button>
       </div>
     </div>
   </div>
