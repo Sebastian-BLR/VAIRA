@@ -5,7 +5,7 @@
     if($pdo!=null){
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
-        $sql = 'CALL generar_nueva_venta(?);';
+        $sql = 'CALL realizar_venta(?);';
         $stmt = $pdo->prepare($sql);
         if($stmt->execute($bindings)){
             $data[] = "Success";

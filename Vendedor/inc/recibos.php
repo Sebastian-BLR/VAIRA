@@ -211,8 +211,7 @@
             $data = [
               'idVenta' => $value[0]
             ];
-            $input_from_db2 = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
-            // var_dump($input_from_db2);
+            $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
             echo('
             <!-- Modal Detalle Venta -->
             <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -226,27 +225,27 @@
                     <form>
                       <div class="mb-3">
                         <label for="vendedor" class="col-form-label">Vendedor</label>
-                        <input type="text" class="form-control" id="vendedor" value="'.$input_from_db2[0][0].'" disabled>
+                        <input type="text" class="form-control" id="vendedor" value="'.$infoSale[0][0].'" disabled>
                       </div>
                       <div class="mb-3">
                         <label for="hora" class="col-form-label">Hora</label>
-                        <input type="text" class="form-control" id="hora" value="'.hora($input_from_db2[0][1]).'" disabled>
+                        <input type="text" class="form-control" id="hora" value="'.hora($infoSale[0][1]).'" disabled>
                       </div>
                       <div class="mb-3">
                         <label for="productos" class="col-form-label">Productos</label>
                         <input type="text" class="form-control" id="Productos" value="');
-                        foreach($input_from_db2 as $value2){
-                          if($value2 === end($input_from_db2))
-                            echo($value2[3] . " " . $value2[2]);
+                        foreach($infoSale as $sale){
+                          if($sale === end($infoSale))
+                            echo($sale[3] . " " . $sale[2]);
                           else
-                            echo($value2[3] . " " . $value2[2] . ", ");
+                            echo($sale[3] . " " . $sale[2] . ", ");
                         }
                         
                         echo('" disabled>
                       </div>
                       <div class="mb-3">
                         <label for="total" class="col-form-label">Total</label>
-                        <input type="text" class="form-control" id="total" value="'. $input_from_db2[0][5] .'" disabled>
+                        <input type="text" class="form-control" id="total" value="'. $infoSale[0][5] .'" disabled>
                       </div>
                     </form>
                   </div>
@@ -260,40 +259,6 @@
           
           
           ?>
-    <!-- Modal Detalle Venta
-    <div class="modal fade bd-example-modal-xl" id="mostrarDetalle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label for="vendedor" class="col-form-label">Vendedor</label>
-                <input type="text" class="form-control" id="vendedor" disabled>
-              </div>
-              <div class="mb-3">
-                <label for="hora" class="col-form-label">Hora</label>
-                <input type="text" class="form-control" id="hora" disabled>
-              </div>
-              <div class="mb-3">
-                <label for="productos" class="col-form-label">Productos</label>
-                <input type="text" class="form-control" id="Productos" disabled>
-              </div>
-              <div class="mb-3">
-                <label for="total" class="col-form-label">Total</label>
-                <input type="text" class="form-control" id="total" disabled>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-          </div>
-        </div>
-      </div>
-    </div> -->
 
   </div>
 </div>

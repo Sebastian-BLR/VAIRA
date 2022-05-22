@@ -234,14 +234,35 @@
 
               let generate_ticket_button = document.getElementById("generate_ticket_button")
               generate_ticket_button.addEventListener("click",() => {
-                let parameters = new FormData()
-                parameters.append("id_usuario", 1)          //hace falta agregar las variables que se necesiten
-                var object = {};
-                parameters.forEach((value, key) => {object[key] = value});
-                var json_send = JSON.stringify(object);
+                let data = JSON.stringify({
+                  "fkUsuario":"'.$id_usuario.'",
+                  "fkPunto":"'.trim($_SESSION['id_punto_de_venta']).'",
+                  "fkTipoPago":"3", // Este parametro es estatico de momento, faltaria añadir el modulo para tarjetas de credito
+                  "productos":['); 
+                  
+                  foreach($_SESSION['cart'][$_SESSION['id_punto_de_venta']] as $value){
+                    if ($value === end($_SESSION['cart'][$_SESSION['id_punto_de_venta']])){
+                      echo('
+                        {
+                          "sku": "'.$value["sku_producto"].'",
+                          "cantidad": '.$value["cantidad"].'
+                        }
+                      ');
+                    } else{
+                        echo('
+                          {
+                            "sku":"'. $value["sku_producto"]. '",
+                            "cantidad":"'. $value["cantidad"]. '"
+                          },
+                        ');
+                    }
+                  };
+  
+                echo(']});
+
                 fetch("./services/generateSale.php/", {
                   method: "POST",
-                  body: json_send
+                  body: data
                 }).then(
                     response => response.json()
                 ).then(

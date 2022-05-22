@@ -212,8 +212,11 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                 END //
 
 
-CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
+# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
+CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
+# SELECT * FROM producto;
+# SELECT * FROM existencia;
 
 DROP PROCEDURE IF EXISTS realizar_venta;
 CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
@@ -249,7 +252,7 @@ BEGIN
     SET _fkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkPunto'));
     SET _fkTipoPago = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkTipoPago'));
 
-    SET _contador = JSON_DEPTH(_productosJson) - 1;
+    SET _contador = JSON_LENGTH(_productosJson) - 1;
     SET _total = 0;
 
     START TRANSACTION;
@@ -265,7 +268,8 @@ BEGIN
             SET _sku = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sku'));
             SET _cantidad = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cantidad'));
 
-            SELECT SUM(_cantidad * precio) INTO _subTotal FROM producto JOIN existencia ON producto.idProducto = existencia.fkProducto WHERE sku = _sku;
+#             SELECT SUM(_cantidad * precio) INTO _subTotal FROM producto JOIN existencia ON producto.idProducto = existencia.fkProducto WHERE sku = _sku AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
+            SELECT SUM(_cantidad * precio * (_iva + 1)) INTO _subTotal FROM producto JOIN existencia ON producto.idProducto = existencia.fkProducto WHERE sku = _sku AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
             SELECT idVenta into _idVenta FROM venta WHERE fkUsuario = _fkUsuario && fkTipoPago = _fkTipoPago && fecha = NOW() && total = _total;
 
             SET _total = _total + _subTotal;
@@ -276,10 +280,11 @@ BEGIN
             SELECT isr INTO _isr FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
 
             INSERT INTO info_venta VALUES (0,_fkProducto, _idVenta, _cantidad, _iva, _ieps, _isr, _subtotal);
-            UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto;
+            UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
         END WHILE;
 
             UPDATE venta SET total = _total WHERE idVenta = _idVenta;
+            SELECT 'Vendido!' AS 'RESULTADO';
     COMMIT;
 END //
 
@@ -442,7 +447,7 @@ CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Saladas
 CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
 
-SELECT * FROM producto;
+# SELECT * FROM producto;
 
 INSERT INTO pais VALUES (0, 'Mexico');
 
@@ -472,7 +477,9 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 2, 4, 10),
                               (0, 3, 1, 10);
 
-INSERT INTO tipo_pago VALUES (0,'Credito'),(0,'Debito'),(0,'Efectivo');
+INSERT INTO tipo_pago VALUES (0,'Credito'),
+                             (0,'Debito'),
+                             (0,'Efectivo');
 
 INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, 3, 'Mesa 2'),
