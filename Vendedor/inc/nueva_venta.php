@@ -27,10 +27,17 @@
     </form>
   </div>
   <div class="wrapper"  style="height:65vh;">
-    <?php 
-    $data = [
-      "sucursal" => $sucursal[0][0]
-    ];
+    <?php
+    // * Validamos que el usuario tenga un punto de venta asignado asi como una sucursal
+    if ($sucursal != null)
+      $data = [
+        "sucursal" => $sucursal[0][0]
+      ];
+    else
+      $data = [
+        "sucursal" => null
+      ];
+    
     if(isset($_POST['busqueda'])){
       $data = [
         "sucursal" => $sucursal[0][0],

@@ -212,7 +212,7 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                 END //
 
 
-# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
+CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
 
 DROP PROCEDURE IF EXISTS realizar_venta;
@@ -285,9 +285,15 @@ END //
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_detalles_compra;
-CREATE PROCEDURE obtener_detalles_compra(IN _idVenta INT)
+CREATE PROCEDURE obtener_detalles_compra(_jsonA JSON)
 BEGIN
-    SELECT u.usuario, venta.fecha, p.nombre, iv.subtotal ,venta.total FROM venta
+    DECLARE _json JSON;
+    DECLARE _idVenta INT;
+
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _idVenta = JSON_EXTRACT(_json, '$.idVenta');
+
+    SELECT u.usuario, venta.fecha, p.nombre, iv.cantidad, iv.subtotal ,venta.total FROM venta
     INNER JOIN usuario u on venta.fkUsuario = u.idUsuario
     INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
     INNER JOIN producto p on iv.fkProducto = p.idProducto
@@ -399,21 +405,6 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
-DROP PROCEDURE IF EXISTS obtener_ventas;
-CREATE PROCEDURE obtener_ventas(_jsonA JSON)
-    BEGIN
-       DECLARE _json JSON;
-       DECLARE _idUsuario INT;
-
-       SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-       SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idUsuario'));
-
-       SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
-                                        SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = _idUsuario);
-    END //
-DELIMITER ;
-
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
 # ==============================================================
@@ -489,6 +480,8 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, NULL, 'Mesa 4');
 
 
+
+
 # DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
 # INSERT INTO  carrito VALUES (0,1,3,1,12);
 # INSERT INTO  carrito VALUES (0,2,3,1,2);
@@ -513,5 +506,5 @@ INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
 
 
 # CALL generar_devolucion('2022-05-10',3,'user',789);
-# CALL obtener_detalles_compra(2);
+# CALL obtener_detalles_compra('{"idVenta":"3"}');
 # SELECT * FROM carrito;

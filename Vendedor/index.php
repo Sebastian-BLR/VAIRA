@@ -15,7 +15,8 @@
   $id_punto_de_venta = json_decode(POST("Vendedor/services/getPuntosVenta.php",$data), true);
   $categorias = json_decode(POST("Vendedor/services/getCategories.php",$data), true);
   
-  if(!isset($_SESSION['id_punto_de_venta'])){
+  // ! Validamos que el usuario tenga un punto de venta asignado
+  if(!isset($_SESSION['id_punto_de_venta']) && $id_punto_de_venta != null){
     $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
   }
 

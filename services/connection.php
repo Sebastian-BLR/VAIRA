@@ -1,8 +1,8 @@
 <?php 
     $servername = "localhost";
     $username = "root";
-    $password = "root";
-    // $password = "";
+    // $password = "root";
+    $password = "";
     $dbname = "db_vaira";
 
     try {

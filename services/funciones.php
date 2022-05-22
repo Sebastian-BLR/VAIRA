@@ -21,6 +21,12 @@ function fecha($fecha){
     return $fecha;
 }
 
+function hora($fecha){
+    $timestamp = strtotime($fecha);
+    $hora = date('H:i', $timestamp);
+    return $hora;
+}
+
 // function obtenerSucursalID($pdo, $userId, $punto_venta){
 //     $stm = $pdo->prepare("SELECT fkSucursal FROM punto_venta WHERE fkUsuario = $userId AND idPunto = $punto_venta[0];");
 //     $stm->execute();
