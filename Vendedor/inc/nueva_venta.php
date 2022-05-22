@@ -236,8 +236,6 @@
                   `&total=`+String(global_total)+
                   `&iva=`+String(global_iva)
                   )
-                  
-
 
                   Swal.fire({
                     icon: "success",
@@ -249,7 +247,29 @@
                   })
 
                 } else if (result.isDenied) {
-                  Swal.fire("Cancelando compra...", "", "info")
+                  Swal.fire({
+                    icon: "info",
+                    title: "Cancelando compra",
+                    showConfirmButton: false,
+                    timerProgressBar: true,
+                    timer: 1500,
+                    willClose: () => { 
+                      fetch("./services/doNotDownloadTicket.php", {
+                        method: "GET",
+                      }).then(
+                          response => response.json()
+                      ).then(
+                          response => location.reload()
+                      ).catch(
+                          error => console.log(error)
+                      ) 
+                    
+                    
+                    } 
+                  })
+                  
+
+
                 }
               })
             })
