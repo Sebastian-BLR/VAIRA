@@ -218,13 +218,18 @@
             <label for="password" class="col-form-label">Contraseña:</label>
             <input type="password" class="form-control" id="contrasena">
           </div>
-          <div class="mb-3">
-          <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
-            <select name="puntodeventa" id="puntodeventa">
-              <option value="puntoventa">Mesa 1</option>
-              <option value="puntoventa2">Mesa 2</option>
-            </select>
-          </div>
+          <div class="btn-group">
+            <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
+            <button type="button" class="btn btn-outline-secondary" style="margin-left: 5px;" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-arrow-down"></i></button>
+            <ul class="dropdown-menu">
+              <li><input type="checkbox" id="punto1" name="punto2">
+                <label for="filtro1">Mesa 1</label></li>
+              <li><input type="checkbox" id="punto2" name="punto2">
+                <label for="filtro2">Mesa 2</label></li>
+              <li><input type="checkbox" id="punto3" name="punto3">
+                <label for="filtro3">Mesa 3</label></li>
+            </ul>
+        </div>
         </form>
       </div>
       <div class="modal-footer">
