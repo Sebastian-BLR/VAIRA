@@ -197,21 +197,21 @@
             
 
             <script>
-          
-
             let ticket_subtotal = document.getElementById("ticket_subtotal")
             let ticket_IVA = document.getElementById("ticket_IVA")
             let ticket_total = document.getElementById("ticket_total")
 
-         
+            var global_total = global_iva = 0
             let updateTicket= () =>{
               var subtotal = 0
 
               for(var i = 0; i < '.$index.'; i++){
                 subtotal += eval("product_cost_" + i)
               }
-              ticket_IVA.innerHTML = "IVA $" + (subtotal*.16).toFixed(2)
-              ticket_total.innerHTML = "Total $" + (subtotal).toFixed(2)
+              global_total = (subtotal).toFixed(2)
+              global_iva = (subtotal*.16).toFixed(2)
+              ticket_IVA.innerHTML = "IVA $" + global_iva
+              ticket_total.innerHTML = "Total $" + global_total
             }
             updateTicket()
 
@@ -240,10 +240,17 @@
                 denyButtonText: "Cancelar",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  window.location.assign("./services/downloadTicket.php")
-                
-                  Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
                   
+                  window.location.assign(`./services/downloadTicket.php?productos=`+
+                  `'.urlencode( json_encode($_SESSION["cart"]) ).'`+
+                  `&nombre_tienda=`+`Tienda de Aaron`+
+                  `&direccion=`+`Calle villa de aaron xD`+
+                  `&total=`+String(global_total)+
+                  `&iva=`+String(global_iva)
+                  )
+
+
+                  Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
                 } else if (result.isDenied) {
                   Swal.fire("Cancelando compra...", "", "info")
                 }
