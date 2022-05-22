@@ -55,6 +55,7 @@
                   <input hidden name="nombre_producto" value="'.$value[1].'"> </input>
                   <input hidden name="precio_unitario" value="'.$value[5].'"> </input>
                   <input hidden name="sku_producto" value="'.$value[3].'"> </input>
+                  <input hidden name="id_punto_de_venta" value="'.$_SESSION['id_punto_de_venta'].'"> </input>
                   
                   <img src="'.'./src/image/'.$value[4].'" class="card-img-top" alt="...">
                   <div class="card-body">
@@ -98,21 +99,8 @@
           "punto" => trim($_SESSION['id_punto_de_venta'])
         ];  
 
-        // $data = [
-        //   "usuario" => $id_usuario,
-        //   "punto" => $id_punto_de_venta[1][0]
-        // ];
-
-        // $input_from_db = json_decode(Post("Vendedor/services/getShoppingCart.php",$data), true);
         $index = 0;
-        // echo ('
-        //   <div class="row">
-        //     <div class="col-12">
-        //       <p>'. $_SESSION['id_punto_de_venta'] .'</p>
-        //     </div>
-        //   </div>
-        
-        // ');
+        echo($_SESSION['id_punto_de_venta']);
         echo('
         <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST" style="min-height: 0px; max-height:0px;">
           <div class="btn-group">
@@ -136,15 +124,15 @@
         </script>
         ');
         if(isset($_POST["remove_product_from_id"])){
-          foreach ($_SESSION["cart"] as $clave => $valor){
+          foreach ($_SESSION["cart"][$_SESSION['id_punto_de_venta']] as $clave => $valor){
             if($valor["id_producto"] == $_POST["remove_product_from_id"]){
-              unset($_SESSION["cart"][$clave]);
+              unset($_SESSION["cart"][$_SESSION['id_punto_de_venta']][$clave]);
               unset($_POST["remove_product_from_id"]);
             }
           }
         
         }
-        foreach($_SESSION['cart'] as $value){
+        foreach($_SESSION['cart'][$_SESSION['id_punto_de_venta']] as $value){
           echo('
             <div class="row justify-content-md-center">
               <div class="col-sm-2" >
@@ -177,7 +165,7 @@
           ');
           $index++;
         }
-        if(count($_SESSION["cart"] ) > 0){
+        if(count($_SESSION["cart"][$_SESSION['id_punto_de_venta']] ) > 0){
           echo('
             <br>
             <div class="row justify-content-md-center">
@@ -242,21 +230,29 @@
                 if (result.isConfirmed) {
                   
                   window.location.assign(`./services/downloadTicket.php?productos=`+
-                  `'.urlencode( json_encode($_SESSION["cart"]) ).'`+
+                  `'.urlencode( json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]) ).'`+
                   `&nombre_tienda=`+`Tienda de Aaron`+
                   `&direccion=`+`Calle villa de aaron xD`+
                   `&total=`+String(global_total)+
                   `&iva=`+String(global_iva)
                   )
+                  
 
 
-                  Swal.fire("Compra registrada, imprimiendo ticket...", "", "success")
+                  Swal.fire({
+                    icon: "success",
+                    title: "Descargando ticket :)",
+                    showConfirmButton: false,
+                    timerProgressBar: true,
+                    timer: 1500,
+                    willClose: () => { location.reload()   } 
+                  })
+
                 } else if (result.isDenied) {
                   Swal.fire("Cancelando compra...", "", "info")
                 }
               })
             })
-           
             
           </script>
           ');

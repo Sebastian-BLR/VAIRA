@@ -1,4 +1,3 @@
-
 <?php
   session_start();
   if( !isset($_SESSION['user']) )
@@ -9,15 +8,16 @@
 
   $id_usuario = $_SESSION['user'];
   $user_type = $_SESSION['userType'];
-  // $id_punto_de_venta = 2;
   
   $data = [
     "idUsuario" => $id_usuario,
   ];
-  
   $id_punto_de_venta = json_decode(POST("Vendedor/services/getPuntosVenta.php",$data), true);
+  
+  if(!isset($_SESSION['id_punto_de_venta'])){
+    $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
+  }
 
-  $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
   
   $data = [
     "idUsuario" => $id_usuario,
@@ -28,21 +28,23 @@
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['punto_de_venta'])){
       $_SESSION['id_punto_de_venta'] = $_POST['punto_de_venta'];
+      unset($_POST['punto_de_venta']);
+
     }
     
     if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == "true"){
-      if(!isset($_SESSION['cart']))
-        $_SESSION['cart'] = [];
+      if(!isset($_SESSION['cart'][$_SESSION['id_punto_de_venta']]))
+        $_SESSION['cart'][$_SESSION['id_punto_de_venta']] = [];
 
       $do_exist = false;
-      foreach ($_SESSION["cart"] as $clave => $valor){
+      foreach ($_SESSION["cart"][$_SESSION['id_punto_de_venta']] as $clave => $valor){
         if($valor["id_producto"] == $_POST['id_producto']){
-          $_SESSION["cart"][$clave]["cantidad"]++;
+          $_SESSION["cart"][$_SESSION['id_punto_de_venta']][$clave]["cantidad"]++;
           $do_exist = true;
         }
       }
       if(!$do_exist){
-        array_push($_SESSION['cart'], 
+        array_push($_SESSION['cart'][$_SESSION['id_punto_de_venta']], 
           array(
             "id_producto"=>$_POST['id_producto'],
             "nombre_producto"=>$_POST['nombre_producto'],
@@ -53,14 +55,6 @@
         );
       }
       unset($_POST['add_to_cart']);
-
-     
-
-
-      
-     
-   
-
     }
   }
 ?>
