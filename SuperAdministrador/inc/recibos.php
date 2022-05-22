@@ -1,92 +1,68 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">                      
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recibos</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" >
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="estilos.css">
-    <script src="js/javascript.js"></script>
-  </head>
-  <body >
-    <div class="container-fluid" >
-        <?php include './header.php' ?>
+              
+<div style="font-size: 20px;  margin-top: 10px;">
+  Recibos
+  <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Sucursal
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
+        <li><a class="dropdown-item" href="#">Temixco</a></li>
+        <li><a class="dropdown-item" href="#">Xochitepec</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="row-1" style="margin-top: 10px;">
+    <input type="date" id="eligeFecha" name="eligeFecha">
+    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
+    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+  </div>
+  <div class="row-1" style="margin-top: 30px;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">No.Venta</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Sucursal</th>
+          <th scope="col">Monto</th>
+          <th scope="col">Detalle</th>
+          <th scope="col">Factura</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$250</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$500</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>06/03/2022</td>
+          <td>Cuernavaca</td>
+          <td>$1000</td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
+          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+   
 
-
-        <div class="row" >
-                <div class="col-2" style="height: 100vh; ">
-                  <div class="sidenav">
-                    <a href="recibossuperadmin.html" style="background-color: #e65d08"><i class="fa fa-ticket"></i>Recibos</a>
-                    <a href="reportessuperadmin.html"><i class="fa fa-line-chart"></i>Reportes</a>
-                    <a href="inventariosuperadmin.html"><i class="fa fa-archive"></i>Inventario</a>
-                    <a href="configuracionsuperadmin.html"><i class="fa fa-cogs"></i>Configuración</a>
-                    <a href="ayudaSoportesuperadmin.html"><i class="fa fa-info-circle"></i>Ayuda y Soporte</a>
-                  </div>
-                </div>
-                <div class="col" style="font-size: 20px;  margin-top: 10px;">
-                  Recibos
-                  <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sucursal
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-                        <li><a class="dropdown-item" href="#">Temixco</a></li>
-                        <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="row-1" style="margin-top: 10px;">
-                    <input type="date" id="eligeFecha" name="eligeFecha">
-                    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-                    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
-                  </div>
-                  <div class="row-1" style="margin-top: 30px;">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col">No.Venta</th>
-                          <th scope="col">Fecha</th>
-                          <th scope="col">Sucursal</th>
-                          <th scope="col">Monto</th>
-                          <th scope="col">Detalle</th>
-                          <th scope="col">Factura</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">1</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$250</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                        <tr>
-                          <th scope="row">2</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$500</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                        <tr>
-                          <th scope="row">3</th>
-                          <td>06/03/2022</td>
-                          <td>Cuernavaca</td>
-                          <td>$1000</td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
-                          <td><button type="button" class="btn btn-outline-dark" style="float: center;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-<!-- Modal Factura-->
+  <!-- Modal Factura-->
 <div class="modal fade bd-example-modal-xl" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -246,11 +222,3 @@
     </div>
   </div>
 </div>
-
-                  </div>
-                </div>
-        </div>
-      </div>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  </body>
-</html>

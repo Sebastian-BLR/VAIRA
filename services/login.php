@@ -1,8 +1,8 @@
 <?php 
 session_start();
 include 'services/connection.php';
-$go_to_super_admin="Location: ./Vendedor/index.php";
-$go_to_administrador="Location: ./Administrador/index.php";
+$go_to_super_admin="Location: ./SuperAdministrador/index.php?recibos=true";
+$go_to_administrador="Location: ./Administrador/index.php?recibos=true";
 $go_to_vendedor="Location: ./Vendedor/index.php?nueva_venta=true";
 // var_dump($pdo);
 

@@ -298,7 +298,6 @@
               
             </script>
             ');
-            echo (json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]));
           }
         }
     ?>
