@@ -9,7 +9,7 @@
 <div class="row" style="font-size: 25px; margin-top: 15px;">
   <div>
     Usuarios
-    <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#configImpuestos"></i>Configurar impuestos</button>
+    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left:5px" data-bs-toggle="modal" data-bs-target="#configImpuestos"></i>Configurar impuestos</button>
     <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#agregarUsuario"></i>Agregar usuario</button> 
   </div>
 </div>
@@ -219,7 +219,11 @@
             <input type="password" class="form-control" id="contrasena">
           </div>
           <div class="mb-3">
-            <label for="puntoVenta" class="col-form-label">Punto de venta:</label>
+          <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
+            <select name="puntodeventa" id="puntodeventa">
+              <option value="puntoventa">Mesa 1</option>
+              <option value="puntoventa2">Mesa 2</option>
+            </select>
           </div>
         </form>
       </div>
@@ -232,8 +236,8 @@
 </div>
 
 <!-- Modal Confirmación editar -->
-<div class="modal fade bd-example-modal-xl" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+<div class="modal fade bd-example-modal-sm" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">¿Est&aacutes seguro que deseas editar el usuario?</h5>
@@ -241,7 +245,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-dismiss="modal">S&iacute</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-dismiss="modal"  onclick="alertEdicionSatisfactoriaUsuario()">S&iacute</button>
       </div>
     </div>
   </div>

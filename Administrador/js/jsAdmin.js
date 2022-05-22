@@ -69,6 +69,16 @@ function alertEdicionSatisfactoria(){
   })
 }
 
+function alertEdicionSatisfactoriaUsuario(){ 
+  Swal.fire({
+    icon: 'success',
+    title: 'Edición de usuario',
+    text: 'Se ha realizado la edición de los datos de usuario satisfactoriamente',
+    showConfirmButton: false,
+    timer: 3000
+  })
+}
+
 function alertFactura(){ 
   Swal.fire({
     icon: 'success',
