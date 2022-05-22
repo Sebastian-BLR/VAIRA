@@ -75,9 +75,12 @@
     $pdf->Ln(6);
     $pdf->SetFont('Arial','',11);
     $pdf->Cell(0,0,'¡Gracias por su compra!',0,0,'C');  // Nombre del negocio
-
+    
+    session_start();
+    unset($_SESSION["cart"][$_SESSION['id_punto_de_venta']]);
 
     $pdf->Output('D','ticket.pdf');
+
     // $pdf->Output();
 
 ?>
