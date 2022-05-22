@@ -85,6 +85,10 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                     DECLARE jActivo TINYINT;
                     DECLARE jServicio TINYINT;
                     DECLARE _idProducto INT;
+
+                    DECLARE _proveedor VARCHAR(50);
+                    DECLARE _cantidad INT;
+
                     DECLARE exit handler for sqlexception
                     BEGIN
                         -- ERROR
@@ -97,10 +101,15 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                     SET jNombre = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'));
                     SET jCosto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'));
                     SET jPrecio = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'));
-                    SET jSku = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sku'));
                     SET jImagen = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imagen'));
                     SET jActivo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'));
                     SET jServicio = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio'));
+
+                    SELECT nombre INTO _proveedor FROM proveedor WHERE idProveedor = jFkProveedor;
+
+                    SELECT COUNT(*) INTO _cantidad FROM producto INNER JOIN proveedor p on producto.fkProveedor = p.idProveedor WHERE idProveedor = jFkProveedor;
+
+                    SET jSku = CONCAT(LEFT(_proveedor,3),'-', LEFT(jnombre,3),'-',(100 + _cantidad));
 
                     START TRANSACTION;
                         INSERT INTO producto VALUES (0, jFkCategoria, jFkProveedor, jNombre, jCosto, jPrecio, jSku, jImagen, jActivo, jServicio);
@@ -108,62 +117,6 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
                         INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
                         SELECT idLog FROM log_producto WHERE fkProducto = _idProducto LIMIT 1;
                     COMMIT;
-                END //
-
-DROP PROCEDURE IF EXISTS agregar_producto_carrito;
-CREATE PROCEDURE agregar_producto_carrito(IN _jsonA JSON)
-                BEGIN
-                    DECLARE _json JSON;
-                    DECLARE jFkProducto INT;
-                    DECLARE jFkUsuario INT;
-                    DECLARE jFkPunto INT;
-                    DECLARE jCantidad INT;
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
-
-                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-                    SET jFkProducto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.producto'));
-                    SET jFkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'));
-                    SET jFkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.punto'));
-                    SET jCantidad = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cantidad'));
-
-                    IF( (SELECT cantidad FROM existencia WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario) > 0) OR
-                        (SELECT cantidad - jCantidad FROM existencia WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario)) < 0)
-                    THEN
-                        START TRANSACTION;
-                            INSERT INTO carrito VALUES (0, jFkProducto, jFkUsuario, jFkPunto, jCantidad);
-                            UPDATE existencia SET cantidad = cantidad - jCantidad WHERE fkProducto = jFkProducto AND fkSucursal = (SELECT DISTINCT fkSucursal FROM punto_venta WHERE fkUsuario = jFkUsuario);
-                            SELECT * FROM existencia WHERE fkProducto = jFkProducto LIMIT 1;
-                        COMMIT ;
-                    ELSE
-                        SELECT 'No hay items suficientes en inventario' AS 'RESULTADO';
-                        ROLLBACK ;
-                    END IF;
-
-                END //
-
-DROP PROCEDURE IF EXISTS eliminar_producto_carrito;
-CREATE PROCEDURE eliminar_producto_carrito(IN _jsonA JSON)
-                BEGIN
-                    DECLARE _json JSON;
-                    DECLARE jNombreProducto VARCHAR(50);
-                    DECLARE jIdCarrito INT;
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
-
-                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-                    SET jNombreProducto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.id_producto'));
-                    SET jIdCarrito = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.id_carrito'));
-                    START TRANSACTION ;
-                        DELETE FROM carrito WHERE fkProducto = (SELECT nombre FROM producto WHERE nombre = jNombreProducto) AND idCarrito = jIdCarrito;
-                    COMMIT ;
-
                 END //
 
 DROP PROCEDURE IF EXISTS obtener_productos;
@@ -213,44 +166,29 @@ CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
 
 # CALL obtener_busqueda('{"sucursal": "1", "busqueda":"pa"}');
 
-DROP PROCEDURE IF EXISTS obtener_carrito;
-CREATE PROCEDURE obtener_carrito(IN _jsonA JSON)
-                BEGIN
-                    DECLARE _json JSON;
-                    DECLARE jFkUsuario INT;
-                    DECLARE jFkPunto INT;
-                    DECLARE regionIVA DECIMAL(5,3);
-                    DECLARE exit handler for sqlexception
-                    BEGIN
-                        -- ERROR
-                        ROLLBACK;
-                    END;
-                    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-                    SET jFkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'));
-                    SET jFkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.punto'));
+# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"PAP-JAL-350","cantidad":5},{"sku":"CER-CLA-355","cantidad":2},{"sku":"CHA-PIÑ-255","cantidad":10}]}]');
+# CALL obtener_productos('[{"sucursal":1}]');
 
-
-                    START TRANSACTION ;
-                        # la tercera query sería obtener el carrito de compras con respecto del vendedor (punto de venta) e inicio de sesión del usuario
-                        SELECT DISTINCT iva INTO regionIVA FROM carrito INNER JOIN punto_venta pv ON carrito.fkPunto = pv.idPunto
-                                 INNER JOIN sucursal s on pv.fkSucursal = s.idSucursal
-                                 INNER JOIN region_iva ri on s.fkRegion = ri.idRegion  WHERE carrito.fkUsuario = jFkUsuario && carrito.fkPunto = jFkPunto;
-                        SELECT nombre, (precio + (precio*regionIVA)), cantidad FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = jFkUsuario && fkPunto = jFkPunto;
-                    COMMIT ;
-                END //
-DELIMITER ;
-
-DELIMITER //
-DROP PROCEDURE IF EXISTS vender_carrito;
-CREATE PROCEDURE vender_carrito(IN _jsonA JSON)
+DROP PROCEDURE IF EXISTS realizar_venta;
+CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
 BEGIN
     DECLARE _json JSON;
+    DECLARE _productosJson JSON;
+    DECLARE _sku VARCHAR(20);
+    DECLARE _cantidad INT;
+    DECLARE _contador INT DEFAULT 0;
+    DECLARE _index INT DEFAULT 0;
     DECLARE _fkUsuario INT;
     DECLARE _fkPunto INT;
     DECLARE _fkTipoPago INT;
     DECLARE _idVenta INT;
     DECLARE _total DECIMAL(12,2);
+    DECLARE _subTotal DECIMAL(12,2);
     DECLARE _iva DECIMAL(5,2);
+
+    DECLARE _fkProducto INT;
+    DECLARE _isr DECIMAL(5,2);
+    DECLARE _ieps DECIMAL(5,2);
 
     DECLARE exit handler for sqlexception
     BEGIN
@@ -259,28 +197,44 @@ BEGIN
     END;
 
     SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _productosJson = JSON_EXTRACT(_json, '$.productos');
+
     SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
     SET _fkPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkPunto'));
     SET _fkTipoPago = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkTipoPago'));
 
+    SET _contador = JSON_DEPTH(_productosJson) - 1;
+    SET _total = 0;
+
     START TRANSACTION;
-        IF ((SELECT COUNT(*) FROM carrito WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto) > 0)
-        THEN
-            SELECT SUM(cantidad * precio) INTO _total FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
-            INSERT INTO venta VALUES (0,_fkUsuario,_fkTipoPago,_total,NOW());
+        SELECT iva INTO _iva FROM sucursal INNER JOIN punto_venta on sucursal.idSucursal = punto_venta.fkSucursal INNER JOIN region_iva ri on sucursal.fkRegion = ri.idRegion WHERE idPunto = _fkPunto;
+
+        INSERT INTO venta VALUES(0,_fkUsuario,_fkTipoPago,_total,NOW());
+
+        WHILE _contador >= 0 DO
+            SET _contador = _contador - 1;
+            SET _json = JSON_EXTRACT(_productosJson, CONCAT('$[',_index,']'));
+            SET _index = _index + 1;
+
+            SET _sku = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sku'));
+            SET _cantidad = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cantidad'));
+
+            SELECT SUM(_cantidad * precio) INTO _subTotal FROM producto JOIN existencia ON producto.idProducto = existencia.fkProducto WHERE sku = _sku;
             SELECT idVenta into _idVenta FROM venta WHERE fkUsuario = _fkUsuario && fkTipoPago = _fkTipoPago && fecha = NOW() && total = _total;
-            SELECT iva INTO _iva FROM sucursal INNER JOIN punto_venta on sucursal.idSucursal = punto_venta.fkSucursal INNER JOIN region_iva ri on sucursal.fkRegion = ri.idRegion WHERE idPunto = _fkPunto;
 
-            INSERT INTO info_venta(fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal)
-            SELECT idProducto, _idVenta, cantidad, _iva, ieps, isr, (cantidad * (precio + (precio * _iva)))
-            FROM carrito INNER JOIN producto p on carrito.fkProducto = p.idProducto INNER JOIN categoria c on p.fkCategoria = c.idCategoria WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
+            SET _total = _total + _subTotal;
 
-            DELETE FROM carrito WHERE fkUsuario = _fkUsuario && fkPunto = _fkPunto;
-            COMMIT;
-        ELSE
-            SELECT 'El carrito está vacio' as 'Resultado';
-            ROLLBACK;
-        END IF;
+            SELECT idProducto INTO _fkProducto FROM producto WHERE sku = _sku;
+
+            SELECT ieps INTO _ieps FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
+            SELECT isr INTO _isr FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
+
+            INSERT INTO info_venta VALUES (0,_fkProducto, _idVenta, _cantidad, _iva, _ieps, _isr, _subtotal);
+            UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto;
+        END WHILE;
+
+            UPDATE venta SET total = _total WHERE idVenta = _idVenta;
+    COMMIT;
 END //
 
 DELIMITER //
@@ -445,11 +399,13 @@ INSERT INTO proveedor VALUES (0, 'Coca-Cola', '1234567890', 'coca@cola.mx'),
                              (0, 'Modelo', '5432109876', 'modelo@cervecera.mx'),
                              (0, 'Vinomex SA de CV', '6789012345', 'contacto@vinomex.mx');
 
+CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Jalapeño 350g","costo":"18.0","precio":"22.0","imagen":"jalapeño.jpg" ,"activo":"1","servicio":"0"}');
+CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Fuego 150g","costo":"12.0","precio":"15.0","imagen":"papas.png" ,"activo":"1","servicio":"0"}');
+CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Saladas 150g","costo":"12.0","precio":"15.0","imagen":"papas.png" ,"activo":"1","servicio":"0"}');
+CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
+CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
 
-CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Jalapeño 350g","costo":"18.0","precio":"22.0","sku":"PAP-JAL-350","imagen":"jalapeño.jpg" ,"activo":"1","servicio":"0"}');
-CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Fuego 150g","costo":"12.0","precio":"15.0","sku":"PAP-FUE-150G","imagen":"papas.png" ,"activo":"1","servicio":"0"}');
-CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","sku":"CHA-PIÑ-255","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
-CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","sku":"CER-CLA-355","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
+SELECT * FROM producto;
 
 INSERT INTO pais VALUES (0, 'Mexico');
 

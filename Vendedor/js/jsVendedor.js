@@ -85,3 +85,19 @@ function myFunction() {
       x.type = "password";
     }
   } 
+
+  function mostrarPass() {
+  var show = document.getElementById("showPass");
+  if(show.checked == false){
+    show.checked = true;
+  }else{
+    show.checked = false;  
+  }
+
+  var x = document.getElementById("password");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+}

@@ -1,3 +1,11 @@
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="?Recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Configuraci&oacuten</li>
+  </ol>
+  </nav>
+</div>
 <div class="row" style="font-size: 25px; margin-top: 15px;">
   <div>
     Usuarios
@@ -15,6 +23,7 @@
         <th scope="col">Contraseña</th>
         <th scope="col">Rol</th>
         <th scope="col">Eliminar</th>
+        <th scope="col">Editar</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +34,7 @@
         <td>******</td>
         <td>vendedor</td>
         <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()" style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
       </tr>
       <tr>
         <th scope="row">vendedor2</th>
@@ -33,6 +43,7 @@
         <td>********</td>
         <td>vendedor</td>
         <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
       </tr>
       <tr>
         <th scope="row">vendedorPablo</th>
@@ -41,6 +52,7 @@
         <td>*********</td>
         <td>vendedor</td>
         <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
     </tbody>
   </table>
 </div>
@@ -58,22 +70,7 @@
   </div>
 </div>
 <div class="row" style="margin-top: 15px; font-size: 25px;">
-  Cambiar contraseña
-  <div class="row-1" style="margin-top: 8px;font-size: 17px;">
-    <table class="table">
-      <tbody>
-        <tr>
-          <th scope="row">Contraseña actual</th>
-          <td><input type="password" id="contraseñaActual" name="contraseñaActual"></td>
-        </tr>
-        <tr>
-          <th scope="row">Nueva contraseña</th>
-          <td><input type="password" id="contraseñaNueva" name="contraseñaNueva"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+
 <!-- Modal Agregar Usuario-->
 <div class="modal fade bd-example-modal-xl" id="agregarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -84,21 +81,39 @@
       </div>
       <div class="modal-body">
         <form>
-          <div class="mb-3">
-            <label for="rfc" class="col-form-label">Nombre:</label>
+        <div class="mb-3">
+            <label for="nombre" class="col-form-label">Nombre:</label>
             <input type="text" class="form-control" id="nombre">
           </div>
           <div class="mb-3">
-            <label for="nombre" class="col-form-label">Correo:</label>
-            <input type="email" class="form-control" id="correo">
+            <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
+            <input type="text" class="form-control" id="apellidoP">
           </div>
           <div class="mb-3">
-            <label for="nombre" class="col-form-label">Usuario:</label>
+            <label for="apellidoM" class="col-form-label">Apellido materno:</label>
+            <input type="text" class="form-control" id="apellidoM">
+          </div>
+          <div class="mb-3">
+            <label for="usuario" class="col-form-label">Usuario:</label>
             <input type="text" class="form-control" id="usuario">
           </div>
           <div class="mb-3">
-            <label for="codigopostal" class="col-form-label">Contraseña:</label>
-            <input type="password" class="form-control" id="contraseña">
+            <label for="correo" class="col-form-label">Correo:</label>
+            <input type="email" class="form-control" id="correo">
+          </div>
+          <div class="mb-3">
+            <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
+            <input type="text" class="form-control" id="teleforno">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="col-form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="contrasena">
+          </div>
+          <div class="mb-3">
+            <label for="rol" class="col-form-label">Rol:</label>
+            <select name="rol" id="rol">
+              <option value="volvo">Vendedor</option>
+            </select>
           </div>
         </form>
       </div>
@@ -156,6 +171,77 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertConfigImpuesto()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Usuario-->
+<div class="modal fade bd-example-modal-xl" id="editarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Editar usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="nombre" class="col-form-label">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
+            <input type="text" class="form-control" id="apellidoP" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="apellidoM" class="col-form-label">Apellido materno:</label>
+            <input type="text" class="form-control" id="apellidoM" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="usuario" class="col-form-label">Usuario:</label>
+            <input type="text" class="form-control" id="usuario" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="rol" class="col-form-label">Rol:</label>
+            <input type="text" class="form-control" id="rol" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="correo" class="col-form-label">Correo:</label>
+            <input type="email" class="form-control" id="correo">
+          </div>
+          <div class="mb-3">
+            <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
+            <input type="text" class="form-control" id="teleforno">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="col-form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="contrasena">
+          </div>
+          <div class="mb-3">
+            <label for="puntoVenta" class="col-form-label">Punto de venta:</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarEditar">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmación editar -->
+<div class="modal fade bd-example-modal-xl" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">¿Est&aacutes seguro que deseas editar el usuario?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-dismiss="modal">S&iacute</button>
       </div>
     </div>
   </div>

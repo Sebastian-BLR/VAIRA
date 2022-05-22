@@ -1,4 +1,4 @@
-<div class="row" style="margin-top: 5px;font-size: 19px;">
+<div class="row" style="margin-top: 5px;font-size: 18px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="?nueva_venta=true">Nueva venta</a></li>
@@ -7,9 +7,9 @@
     </nav>
 </div>
 <div class="row" >
-  <div class="col" style="font-size: 20px;  margin-top: 10px;">
+  <div class="col" style="font-size: 20px;  margin-top: 5px;">
     Resumen
-    <div class="row-1" style="margin-top: 10px;">
+    <div class="row-1" style="margin-top: 5px;">
       <label class="toggle">
         <input type="checkbox">
         <span class="slider"></span>
@@ -23,7 +23,7 @@
     </div>
   </div>
 </div>
-<div class="row" style="margin-top:15px">
+<div class="row" style="margin-top:9px">
   <table id="motion-effect-example-3" class="charts-css column show-primary-axis show-5-secondary-axes data-spacing-5">
     <caption> Motion Effect Example #3 </caption> 
     <thead>
@@ -66,7 +66,7 @@
   </tbody>
   </table>
 </div>
-<div class="row" style="margin-top:15px">
+<div class="row" style="margin-top:9px">
   <table id="animations-example-3" class="charts-css column show-labels hide-data data-spacing-5 show-primary-axis">
     <caption> Animation Example #3 </caption>
      <thead>
