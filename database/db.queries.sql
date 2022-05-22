@@ -399,6 +399,21 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_ventas;
+CREATE PROCEDURE obtener_ventas(_jsonA JSON)
+    BEGIN
+       DECLARE _json JSON;
+       DECLARE _idUsuario INT;
+
+       SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+       SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idUsuario'));
+
+       SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
+                                        SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = _idUsuario);
+    END //
+DELIMITER ;
+
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
 # ==============================================================

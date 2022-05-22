@@ -274,7 +274,8 @@
           </script>
           ');
         }
-      ?>
+      }
+    ?>
      
       
 <!-- The first div closes in the next php file   -->

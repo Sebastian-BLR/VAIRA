@@ -1,3 +1,7 @@
+<?php 
+  require "../services/funciones.php";
+?>
+
 <div class="row" style="margin-top: 5px;font-size: 19px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -27,24 +31,29 @@
         </thead>
         <tbody>
           <?php
+          $data = [
+            'idUsuario' => $id_usuario
+          ];
           // Here starts a request to get data from the data base
           // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
-          $input_from_db = array(
-            "key1"=>"",
-            "key2"=>"",
-            "key3"=>"",
-            "key4"=>"",
-            "key5"=>"",
-          );
+          // $input_from_db = array(
+          //   "key1"=>"",
+          //   "key2"=>"",
+          //   "key3"=>"",
+          //   "key4"=>"",
+          //   "key5"=>"",
+          // );
+          $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
+
           foreach($input_from_db as $value){
             //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
             // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
             echo('
             <tr>
-              <th scope="row">'.'1'.'</th>
-              <td>'.'06/03/2022'.'</td>
-              <td>'.'Cuernavaca'.'</td>
-              <td>'.'$250'.'</td>
+              <th scope="row">'.$value[0].'</th>
+              <td>'.fecha($value[1]).'</td>
+              <td>'.$value[2].'</td>
+              <td>$'.$value[3].'</td>
               <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle"><i class="fa fa-search-plus"></i></button></td>
               <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
             </tr>

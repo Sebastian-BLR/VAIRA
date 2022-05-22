@@ -9,6 +9,18 @@ function limpiarDatos($datos){
     return $datos;
 }
 
+function fecha($fecha){
+    $timestamp = strtotime($fecha);
+    // $meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    $dia = date('d', $timestamp);
+    $mes = date('m', $timestamp);
+    $year =  date('Y', $timestamp);
+
+    $fecha = "$dia/" . $mes . "/$year";
+    return $fecha;
+}
+
 // function obtenerSucursalID($pdo, $userId, $punto_venta){
 //     $stm = $pdo->prepare("SELECT fkSucursal FROM punto_venta WHERE fkUsuario = $userId AND idPunto = $punto_venta[0];");
 //     $stm->execute();
