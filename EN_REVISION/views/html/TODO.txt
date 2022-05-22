@@ -1,5 +1,0 @@
-♦ header and side bar menu in single file, as singleton.
-♦ side bar 10 vh
-♦ header 90 vh
-♦ for loop in each product demo
-♦ change html to php and add php bridge to backend
