@@ -142,7 +142,6 @@
               unset($_POST["remove_product_from_id"]);
             }
           }
-        
         }
         foreach($_SESSION['cart'][$_SESSION['id_punto_de_venta']] as $value){
           echo('
@@ -168,6 +167,17 @@
             var product_cost_'.$index.'  = 0
             ticket_product_'.$index.'_cant.addEventListener("change", function() {
               product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
+
+              fetch("./services/updateCartExternal.php?nueva_cantidad="+ ticket_product_'.$index.'_cant.value+"&id_producto="+'.$value["id_producto"].', {
+                method: "GET",
+              }).then(
+                  response => response.json()
+              ).then(
+                  response => console.log()
+              ).catch(
+                  error => console.log(error)
+              )
+
               document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ (product_cost_'.$index.').toFixed(2)
               updateTicket()
             })
