@@ -112,7 +112,6 @@
         ];  
 
         $index = 0;
-        echo($_SESSION['id_punto_de_venta']);
         echo('
         <form action="'.htmlspecialchars($_SERVER["PHP_SELF"]).'?nueva_venta=true" method="POST" style="min-height: 0px; max-height:0px;">
           <div class="btn-group">
@@ -135,169 +134,172 @@
          
         </script>
         ');
-        if(isset($_POST["remove_product_from_id"])){
-          foreach ($_SESSION["cart"][$_SESSION['id_punto_de_venta']] as $clave => $valor){
-            if($valor["id_producto"] == $_POST["remove_product_from_id"]){
-              unset($_SESSION["cart"][$_SESSION['id_punto_de_venta']][$clave]);
-              unset($_POST["remove_product_from_id"]);
+        if(isset($_SESSION['cart'][$_SESSION['id_punto_de_venta']])){
+          if(isset($_POST["remove_product_from_id"])){
+            foreach ($_SESSION["cart"][$_SESSION['id_punto_de_venta']] as $clave => $valor){
+              if($valor["id_producto"] == $_POST["remove_product_from_id"]){
+                unset($_SESSION["cart"][$_SESSION['id_punto_de_venta']][$clave]);
+                unset($_POST["remove_product_from_id"]);
+              }
             }
           }
-        }
-        foreach($_SESSION['cart'][$_SESSION['id_punto_de_venta']] as $value){
-          echo('
-            <div class="row justify-content-md-center">
-              <div class="col-sm-2" >
-                <input id="ticket_product_'.$index.'_cant" type="number" min="1" name="cantidad_actual_producto" value="'.$value["cantidad"].'" style="width:100%;">
-              </div>
-              <div class="col-sm-5">
-                <h5>'.$value["nombre_producto"].'</h5>
-              </div>
-              <div  class="col-sm-4">
-                <h4 id="ticket_product_'.$index.'_cost">$</h4>
-              </div>
-              <div  class="col-sm-1">
-              <form method="POST">
-                <button type="submit" class="btn btn-danger btn-sm" name=remove_product_from_id value='.$value["id_producto"].' ><i class="fa fa-trash"></i></button>
-              </form >
-                <input hidden id="ticket_product_'.$index.'_price" value="'.$value["precio_unitario"].'">
-              </div>
-            </div>
-          <script>
-            let ticket_product_'.$index.'_cant = document.getElementById("ticket_product_'.$index.'_cant")
-            var product_cost_'.$index.'  = 0
-            ticket_product_'.$index.'_cant.addEventListener("change", function() {
-              product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
-
-              fetch("./services/updateCartExternal.php?nueva_cantidad="+ ticket_product_'.$index.'_cant.value+"&id_producto="+'.$value["id_producto"].', {
-                method: "GET",
-              }).then(
-                  response => response.json()
-              ).then(
-                  response => console.log()
-              ).catch(
-                  error => console.log(error)
-              )
-
-              document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ (product_cost_'.$index.').toFixed(2)
-              updateTicket()
-            })
-            product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
-            document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ (product_cost_'.$index.').toFixed(2)
-          </script>
-          ');
-          $index++;
-        }
-        if(count($_SESSION["cart"][$_SESSION['id_punto_de_venta']] ) > 0){
-          echo('
-            <br>
-            <div class="row justify-content-md-center">
-              <div class="col-sm-6" >
-                <h4 id="ticket_IVA">$ 00</h4>
-                <h4 id="ticket_total">$ 00</h4>
-              </div>
-            </div>
-           
-
-                <br><br>
-                <div class="row justify-content-md-center">
-                  <div class="col-sm-6" >
-                  <button style="margin-bottom: 25px;" id="generate_ticket_button" type="button" class="btn btn-primary">Generar venta</button>
-                  </div>
+          foreach($_SESSION['cart'][$_SESSION['id_punto_de_venta']] as $value){
+            echo('
+              <div class="row justify-content-md-center">
+                <div class="col-sm-2" >
+                  <input id="ticket_product_'.$index.'_cant" type="number" min="1" name="cantidad_actual_producto" value="'.$value["cantidad"].'" style="width:100%;">
                 </div>
-                
-
+                <div class="col-sm-5">
+                  <h5>'.$value["nombre_producto"].'</h5>
+                </div>
+                <div  class="col-sm-4">
+                  <h4 id="ticket_product_'.$index.'_cost">$</h4>
+                </div>
+                <div  class="col-sm-1">
+                <form method="POST">
+                  <button type="submit" class="btn btn-danger btn-sm" name=remove_product_from_id value='.$value["id_producto"].' ><i class="fa fa-trash"></i></button>
+                </form >
+                  <input hidden id="ticket_product_'.$index.'_price" value="'.$value["precio_unitario"].'">
+                </div>
+              </div>
             <script>
-            let ticket_subtotal = document.getElementById("ticket_subtotal")
-            let ticket_IVA = document.getElementById("ticket_IVA")
-            let ticket_total = document.getElementById("ticket_total")
+              let ticket_product_'.$index.'_cant = document.getElementById("ticket_product_'.$index.'_cant")
+              var product_cost_'.$index.'  = 0
+              ticket_product_'.$index.'_cant.addEventListener("change", function() {
+                product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
 
-            var global_total = global_iva = 0
-            let updateTicket= () =>{
-              var subtotal = 0
+                fetch("./services/updateCartExternal.php?nueva_cantidad="+ ticket_product_'.$index.'_cant.value+"&id_producto="+'.$value["id_producto"].', {
+                  method: "GET",
+                }).then(
+                    response => response.json()
+                ).then(
+                    response => console.log()
+                ).catch(
+                    error => console.log(error)
+                )
 
-              for(var i = 0; i < '.$index.'; i++){
-                subtotal += eval("product_cost_" + i)
-              }
-              global_total = (subtotal).toFixed(2)
-              global_iva = (subtotal*.16).toFixed(2)
-              ticket_IVA.innerHTML = "IVA $" + global_iva
-              ticket_total.innerHTML = "Total $" + global_total
-            }
-            updateTicket()
-
-            let generate_ticket_button = document.getElementById("generate_ticket_button")
-            generate_ticket_button.addEventListener("click",() => {
-              let parameters = new FormData()
-              parameters.append("id_usuario", 1)          //hace falta agregar las variables que se necesiten
-              var object = {};
-              parameters.forEach((value, key) => {object[key] = value});
-              var json_send = JSON.stringify(object);
-              fetch("./services/generateSale.php/", {
-                method: "POST",
-                body: json_send
-              }).then(
-                  response => response.json()
-              ).then(
-                  response => console.log(response)
-              ).catch(
-                  error => console.log(error)
-              )
-              Swal.fire({
-                title: "¿Deseas imprimir el ticket?",
-                showDenyButton: true,
-                confirmButtonColor: "#198754",
-                confirmButtonText: "Imprimir",
-                denyButtonText: "Cancelar",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  
-                  window.location.assign(`./services/downloadTicket.php?productos=`+
-                  `'.urlencode( json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]) ).'`+
-                  `&nombre_tienda=`+`Tienda de Aaron`+
-                  `&direccion=`+`Calle villa de aaron xD`+
-                  `&total=`+String(global_total)+
-                  `&iva=`+String(global_iva)
-                  )
-
-                  Swal.fire({
-                    icon: "success",
-                    title: "Descargando ticket :)",
-                    showConfirmButton: false,
-                    timerProgressBar: true,
-                    timer: 1500,
-                    willClose: () => { location.reload()   } 
-                  })
-
-                } else if (result.isDenied) {
-                  Swal.fire({
-                    icon: "info",
-                    title: "Cancelando compra",
-                    showConfirmButton: false,
-                    timerProgressBar: true,
-                    timer: 1500,
-                    willClose: () => { 
-                      fetch("./services/doNotDownloadTicket.php", {
-                        method: "GET",
-                      }).then(
-                          response => response.json()
-                      ).then(
-                          response => location.reload()
-                      ).catch(
-                          error => console.log(error)
-                      ) 
-                    
-                    
-                    } 
-                  })
-                  
-
-
-                }
+                document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ (product_cost_'.$index.').toFixed(2)
+                updateTicket()
               })
-            })
+              product_cost_'.$index.' = ticket_product_'.$index.'_cant.value * document.getElementById("ticket_product_'.$index.'_price").value
+              document.getElementById("ticket_product_'.$index.'_cost").innerHTML = "$ "+ (product_cost_'.$index.').toFixed(2)
+            </script>
+            ');
+            $index++;
+          }
+          if(count($_SESSION["cart"][$_SESSION['id_punto_de_venta']] ) > 0){
+            echo('
+              <br>
+              <div class="row justify-content-md-center">
+                <div class="col-sm-6" >
+                  <h4 id="ticket_IVA">$ 00</h4>
+                  <h4 id="ticket_total">$ 00</h4>
+                </div>
+              </div>
             
-          </script>
-          ');
+
+                  <br><br>
+                  <div class="row justify-content-md-center">
+                    <div class="col-sm-6" >
+                    <button style="margin-bottom: 25px;" id="generate_ticket_button" type="button" class="btn btn-primary">Generar venta</button>
+                    </div>
+                  </div>
+                  
+
+              <script>
+              let ticket_subtotal = document.getElementById("ticket_subtotal")
+              let ticket_IVA = document.getElementById("ticket_IVA")
+              let ticket_total = document.getElementById("ticket_total")
+
+              var global_total = global_iva = 0
+              let updateTicket= () =>{
+                var subtotal = 0
+
+                for(var i = 0; i < '.$index.'; i++){
+                  subtotal += eval("product_cost_" + i)
+                }
+                global_total = (subtotal).toFixed(2)
+                global_iva = (subtotal*.16).toFixed(2)
+                ticket_IVA.innerHTML = "IVA $" + global_iva
+                ticket_total.innerHTML = "Total $" + global_total
+              }
+              updateTicket()
+
+              let generate_ticket_button = document.getElementById("generate_ticket_button")
+              generate_ticket_button.addEventListener("click",() => {
+                let parameters = new FormData()
+                parameters.append("id_usuario", 1)          //hace falta agregar las variables que se necesiten
+                var object = {};
+                parameters.forEach((value, key) => {object[key] = value});
+                var json_send = JSON.stringify(object);
+                fetch("./services/generateSale.php/", {
+                  method: "POST",
+                  body: json_send
+                }).then(
+                    response => response.json()
+                ).then(
+                    response => console.log(response)
+                ).catch(
+                    error => console.log(error)
+                )
+                Swal.fire({
+                  title: "¿Deseas imprimir el ticket?",
+                  showDenyButton: true,
+                  confirmButtonColor: "#198754",
+                  confirmButtonText: "Imprimir",
+                  denyButtonText: "Cancelar",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    
+                    window.location.assign(`./services/downloadTicket.php?productos=`+
+                    `'.urlencode( json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]) ).'`+
+                    `&nombre_tienda=`+`Tienda de Aaron`+
+                    `&direccion=`+`Calle villa de aaron xD`+
+                    `&total=`+String(global_total)+
+                    `&iva=`+String(global_iva)
+                    )
+
+                    Swal.fire({
+                      icon: "success",
+                      title: "Descargando ticket :)",
+                      showConfirmButton: false,
+                      timerProgressBar: true,
+                      timer: 1500,
+                      willClose: () => { location.reload()   } 
+                    })
+
+                  } else if (result.isDenied) {
+                    Swal.fire({
+                      icon: "info",
+                      title: "Cancelando compra",
+                      showConfirmButton: false,
+                      timerProgressBar: true,
+                      timer: 1500,
+                      willClose: () => { 
+                        fetch("./services/doNotDownloadTicket.php", {
+                          method: "GET",
+                        }).then(
+                            response => response.json()
+                        ).then(
+                            response => location.reload()
+                        ).catch(
+                            error => console.log(error)
+                        ) 
+                      
+                      
+                      } 
+                    })
+                    
+
+
+                  }
+                })
+              })
+              
+            </script>
+            ');
+            echo (json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]));
+          }
         }
     ?>
      

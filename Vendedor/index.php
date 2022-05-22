@@ -1,6 +1,6 @@
 <?php
   session_start();
-  if( !isset($_SESSION['user']) )
+  if( !isset($_SESSION['user']) || $_SESSION['userType'] != 3)
     header("Location: ../index.php");
 
   include '../services/helper.php';
