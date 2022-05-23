@@ -12,10 +12,17 @@
 </div>
 <div class="row" style="font-size: 20px;  margin-top: 10px;">
     Recibos
-    <div class="row-1" style="margin-top: 10px;">
-      <input type="date" id="eligeFecha" name="eligeFecha">
-      <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-      <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+    <div class="row" style="margin-top: 10px;">
+      <div class="col">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">
+          <input type="date" id="eligeFecha" name="eligeFecha">
+          <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
+        </form>
+      </div>
+      <div class="col">
+        <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
+        <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+      </div>
     </div>
     <div class="row-1" style="margin-top: 30px;">
       <table class="table">
@@ -31,9 +38,6 @@
         </thead>
         <tbody>
           <?php
-          $data = [
-            'idUsuario' => $id_usuario
-          ];
           // Here starts a request to get data from the data base
           // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
           // $input_from_db = array(
@@ -43,23 +47,49 @@
           //   "key4"=>"",
           //   "key5"=>"",
           // );
-          $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
-
-          foreach($input_from_db as $value){
-            //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
-            // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
-            echo('
-            <tr>
-              <th scope="row">'.$value[0].'</th>
-              <td>'.fecha($value[1]).'</td>
-              <td>'.$value[2].'</td>
-              <td>$'.$value[3].'</td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-            </tr>
-            ');
+          
+          if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
+            $data = [
+              'idUsuario' => $id_usuario,
+              'fecha' => $_POST['eligeFecha']
+            ];
+          
+            $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+          
+          } else{ 
+            $data = [
+              'idUsuario' => $id_usuario
+            ];
+            $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
           }
-           
+
+          if ($input_from_db == null){
+            echo('
+              <tr>
+                <th scope="row"></th>
+                <td>No se encontraron recibos</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              ');
+          }else{
+            foreach($input_from_db as $value){
+              //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
+              // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
+              echo('
+              <tr>
+                <th scope="row">'.$value[0].'</th>
+                <td>'.fecha($value[1]).'</td>
+                <td>'.$value[2].'</td>
+                <td>$'.$value[3].'</td>
+                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
+                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+              </tr>
+              ');
+            }
+           }
           ?>
         </tbody>
       </table>

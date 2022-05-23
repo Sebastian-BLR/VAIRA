@@ -211,13 +211,6 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                     COMMIT ;
                 END //
 
-
-# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
-CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
-# CALL obtener_productos('[{"sucursal":1}]');
-# SELECT * FROM producto;
-# SELECT * FROM existencia;
-
 DROP PROCEDURE IF EXISTS realizar_venta;
 CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
 BEGIN
@@ -410,6 +403,25 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_recibos_fecha;
+CREATE PROCEDURE obtener_recibos_fecha(_jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+       DECLARE _idUsuario INT;
+       DECLARE _fecha VARCHAR(10);
+
+       SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+       SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idUsuario'));
+       SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fecha'));
+
+       SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
+            SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = _idUsuario AND DATE(fecha) = _fecha);
+    END //
+DELIMITER ;
+
+CALL obtener_recibos_fecha('{"idUsuario": 3, "fecha": "2022-05-23"}');
+
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
 # ==============================================================
@@ -429,7 +441,7 @@ INSERT INTO tipo VALUES
 CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
 CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"user","password":"789","correo":"a@a.com","telefono":"1234567890","rol":"3"}');
-CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"torybolla","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"3"}');
+
 
 INSERT INTO categoria VALUES (0, 'Abarrotes', 'Conjunto de artículos comerciales, especialmente comidas, bebidas y conservas', 0, 0.0, 0.0),
                              (0, 'Bebidas alc. -14°', 'Bebidas que contienen etanol en su composición', 1, 0.265, 0.0),
@@ -441,11 +453,12 @@ INSERT INTO proveedor VALUES (0, 'Coca-Cola', '1234567890', 'coca@cola.mx'),
                              (0, 'Modelo', '5432109876', 'modelo@cervecera.mx'),
                              (0, 'Vinomex SA de CV', '6789012345', 'contacto@vinomex.mx');
 
+CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Jalapeño 350g","costo":"18.0","precio":"22.0","imagen":"jalapeño.jpg" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Fuego 150g","costo":"12.0","precio":"15.0","imagen":"papas.png" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Saladas 150g","costo":"12.0","precio":"15.0","imagen":"papas.png" ,"activo":"1","servicio":"0"}');
-CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
+CALL insertar_producto('{"categoria":"4","proveedor":"4","nombre":"Absolute Vodka 1.5L","costo":"366.50","precio":"425.58","imagen":"vodka.png" ,"activo":"1","servicio":"0"}');
 
 # SELECT * FROM producto;
 
@@ -475,7 +488,8 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 1, 4, 17),
                               (0, 4, 4, 27),
                               (0, 2, 4, 10),
-                              (0, 3, 1, 10);
+                              (0, 3, 1, 10),
+                              (0, 6, 1, 15);
 
 INSERT INTO tipo_pago VALUES (0,'Credito'),
                              (0,'Debito'),
