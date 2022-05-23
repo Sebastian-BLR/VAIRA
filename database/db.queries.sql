@@ -140,6 +140,37 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
                     COMMIT ;
                 END //
 
+DROP PROCEDURE IF EXISTS eliminar_producto;
+CREATE PROCEDURE eliminar_producto(IN id INT)
+                BEGIN
+                DECLARE exit handler for sqlexception
+                BEGIN
+                    -- ERROR
+                    ROLLBACK;
+                END;
+                    START TRANSACTION;
+                        UPDATE log_producto SET desactivar = 1 WHERE fkProducto = id;
+                        UPDATE producto SET activo = 0 WHERE idProducto = id;
+
+                        SELECT * FROM usuario WHERE idUsuario = id;
+                    COMMIT;
+                END //
+
+DROP PROCEDURE IF EXISTS eliminar_producto_fisico;
+CREATE PROCEDURE eliminar_producto_fisico(IN id INT)
+                BEGIN
+                    DECLARE exit handler for sqlexception
+                    BEGIN
+                        -- ERROR
+                        ROLLBACK;
+                    END;
+                    START TRANSACTION;
+                        DELETE FROM log_producto WHERE fkProducto = id;
+                        DELETE FROM producto WHERE idProducto = id;
+                        SELECT * FROM producto WHERE idProducto = id;
+                    COMMIT;
+                END //
+
 DROP PROCEDURE IF EXISTS obtener_busqueda;
 CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
                 BEGIN
@@ -212,10 +243,10 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                 END //
 
 
-# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
+CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
 CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
-# SELECT * FROM producto;
+SELECT * FROM venta;
 # SELECT * FROM existencia;
 
 DROP PROCEDURE IF EXISTS realizar_venta;
@@ -409,6 +440,49 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
        SELECT fkSucursal FROM punto_venta WHERE fkUsuario = _idUsuario AND idPunto = _puntoVenta;
     END //
 DELIMITER ;
+
+DELIMITER //
+# RANGO
+# 1.- Día
+# 2.- Semana
+# 3.- Mensual
+# 4.- Anual
+DROP PROCEDURE IF EXISTS obtener_ventas;
+CREATE PROCEDURE obtener_ventas(IN _jsonA JSON)
+    BEGIN
+       DECLARE _json JSON;
+       DECLARE _fkUsuario INT;
+       DECLARE _fecha INT;
+       DECLARE _rango INT;
+
+       DECLARE exit handler for sqlexception
+        BEGIN
+            -- ERROR
+            ROLLBACK;
+        END;
+
+       SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+       SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fkUsuario'));
+       SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fecha'));
+       SET _rango = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.rango'));
+
+        IF(_rango = 1) THEN
+            SELECT * FROM venta WHERE DATE(fecha) = DATE(_fecha) AND fkUsuario = _fkUsuario;
+        ELSEIF(_rango = 2) THEN
+            SELECT * FROM venta WHERE WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario;
+        ELSEIF(_rango = 3) THEN
+            SELECT * FROM venta WHERE MONTH(fecha) = MONTH(_fecha) AND fkUsuario = _fkUsuario;
+        ELSE
+            SELECT * FROM venta WHERE YEAR(fecha) = YEAR(_fecha) AND fkUsuario = _fkUsuario;
+        END IF;
+
+    END //
+DELIMITER ;
+
+CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":1}]');
+CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":2}]');
+CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":3}]');
+CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":4}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
