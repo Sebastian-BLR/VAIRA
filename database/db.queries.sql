@@ -243,11 +243,11 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                 END //
 
 
-CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
-CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
+# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
+# CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
 SELECT * FROM venta;
-# SELECT * FROM existencia;
+SELECT * FROM existencia WHERE fkSucursal = 1;
 
 DROP PROCEDURE IF EXISTS realizar_venta;
 CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
@@ -265,6 +265,7 @@ BEGIN
     DECLARE _total DECIMAL(12,2);
     DECLARE _subTotal DECIMAL(12,2);
     DECLARE _iva DECIMAL(5,2);
+    DECLARE _fkSucursal INT;
 
     DECLARE _fkProducto INT;
     DECLARE _isr DECIMAL(5,2);
@@ -303,6 +304,8 @@ BEGIN
             SELECT SUM(_cantidad * precio * (_iva + 1)) INTO _subTotal FROM producto JOIN existencia ON producto.idProducto = existencia.fkProducto WHERE sku = _sku AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
             SELECT idVenta into _idVenta FROM venta WHERE fkUsuario = _fkUsuario && fkTipoPago = _fkTipoPago && fecha = NOW() && total = _total;
 
+            SELECT fkSucursal INTO _fkSucursal FROM punto_venta WHERE idPunto = _fkPunto;
+
             SET _total = _total + _subTotal;
 
             SELECT idProducto INTO _fkProducto FROM producto WHERE sku = _sku;
@@ -310,12 +313,21 @@ BEGIN
             SELECT ieps INTO _ieps FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
             SELECT isr INTO _isr FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
 
-            INSERT INTO info_venta VALUES (0,_fkProducto, _idVenta, _cantidad, _iva, _ieps, _isr, _subtotal);
-            UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
+            IF ((SELECT cantidad FROM existencia WHERE fkSucursal =_fkSucursal AND fkProducto = _fkProducto) > _cantidad) THEN
+                INSERT INTO info_venta VALUES (0,_fkProducto, _idVenta, _cantidad, _iva, _ieps, _isr, _subtotal);
+                UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
+            ELSE
+                SET _contador = -10;
+                ROLLBACK;
+            END IF;
         END WHILE;
 
+        IF(_contador != -10) THEN
             UPDATE venta SET total = _total WHERE idVenta = _idVenta;
             SELECT 'Vendido!' AS 'RESULTADO';
+        ELSE
+            SELECT 'No se puede realizar la venta' AS 'RESULTADO';
+        END IF;
     COMMIT;
 END //
 
@@ -447,8 +459,8 @@ DELIMITER //
 # 2.- Semana
 # 3.- Mensual
 # 4.- Anual
-DROP PROCEDURE IF EXISTS obtener_ventas;
-CREATE PROCEDURE obtener_ventas(IN _jsonA JSON)
+DROP PROCEDURE IF EXISTS filtrar_ventas;
+CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     BEGIN
        DECLARE _json JSON;
        DECLARE _fkUsuario INT;
@@ -466,23 +478,25 @@ CREATE PROCEDURE obtener_ventas(IN _jsonA JSON)
        SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fecha'));
        SET _rango = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.rango'));
 
-        IF(_rango = 1) THEN
-            SELECT * FROM venta WHERE DATE(fecha) = DATE(_fecha) AND fkUsuario = _fkUsuario;
-        ELSEIF(_rango = 2) THEN
-            SELECT * FROM venta WHERE WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario;
-        ELSEIF(_rango = 3) THEN
-            SELECT * FROM venta WHERE MONTH(fecha) = MONTH(_fecha) AND fkUsuario = _fkUsuario;
-        ELSE
-            SELECT * FROM venta WHERE YEAR(fecha) = YEAR(_fecha) AND fkUsuario = _fkUsuario;
-        END IF;
+       START TRANSACTION;
+            IF(_rango = 1) THEN
+                SELECT * FROM venta WHERE DATE(fecha) = DATE(_fecha) AND fkUsuario = _fkUsuario;
+            ELSEIF(_rango = 2) THEN
+                SELECT * FROM venta WHERE WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario;
+            ELSEIF(_rango = 3) THEN
+                SELECT * FROM venta WHERE MONTH(fecha) = MONTH(_fecha) AND fkUsuario = _fkUsuario;
+            ELSE
+                SELECT * FROM venta WHERE YEAR(fecha) = YEAR(_fecha) AND fkUsuario = _fkUsuario;
+            END IF;
+       COMMIT;
 
     END //
 DELIMITER ;
 
-CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":1}]');
-CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":2}]');
-CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":3}]');
-CALL obtener_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":4}]');
+CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":1}]');
+CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":2}]');
+CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":3}]');
+CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":4}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
