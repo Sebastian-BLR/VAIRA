@@ -314,7 +314,7 @@ BEGIN
             SELECT ieps INTO _ieps FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
             SELECT isr INTO _isr FROM categoria INNER JOIN producto p on categoria.idCategoria = p.fkCategoria WHERE idProducto = _fkProducto;
 
-            IF ((SELECT cantidad FROM existencia WHERE fkSucursal =_fkSucursal AND fkProducto = _fkProducto) > _cantidad) THEN
+            IF ((SELECT cantidad FROM existencia WHERE fkSucursal =_fkSucursal AND fkProducto = _fkProducto) >= _cantidad) THEN
                 INSERT INTO info_venta VALUES (0,_fkProducto, _idVenta, _cantidad, _iva, _ieps, _isr, _subtotal);
                 UPDATE existencia SET cantidad = cantidad - _cantidad WHERE fkProducto = _fkProducto AND fkSucursal = (SELECT fkSucursal FROM punto_venta WHERE idPunto = _fkPunto);
             ELSE
@@ -413,7 +413,7 @@ BEGIN
     SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
 
     START TRANSACTION;
-        IF (SELECT COUNT(*) FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512)) = 1
+        IF (SELECT COUNT(*) FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512) AND fkTipo = 2) = 1
             THEN
                 SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512);
                 SELECT idVenta INTO _fkVenta FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario;
@@ -456,12 +456,12 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 # RANGO
 # 1.- Día
 # 2.- Semana
 # 3.- Mensual
 # 4.- Anual
+DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas;
 CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     BEGIN
@@ -498,10 +498,91 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
-CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
-CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
-CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
+CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
+BEGIN
+    DECLARE _json JSON;
+    DECLARE _fkUsuario INT;
+    DECLARE _resultado JSON;
+    DECLARE _tempJson TEXT;
+    DECLARE _mes INT DEFAULT 1;
+
+    DECLARE exit handler for sqlexception
+    BEGIN
+        SELECT CONCAT('Hubo un error: ',_mes);
+        ROLLBACK;
+    END;
+
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+
+    SET _resultado = '{"Resultado": []}';
+
+    WHILE _mes <= 12 DO
+        IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
+        THEN
+            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes;
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),CONVERT(_tempJson,JSON));
+        ELSE
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
+        END IF;
+
+        SET _mes = _mes + 1;
+    END WHILE;
+
+    SELECT CONVERT(_resultado,JSON) as 'Resultado';
+END//
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
+CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
+BEGIN
+    DECLARE _json JSON;
+    DECLARE _fkUsuario INT;
+    DECLARE _resultado JSON;
+    DECLARE _tempJson TEXT;
+    DECLARE _dia INT DEFAULT 1;
+    DECLARE _fecha VARCHAR(50);
+
+    DECLARE exit handler for sqlexception
+    BEGIN
+        SELECT CONCAT('Hubo un error: ',_dia);
+        ROLLBACK;
+    END;
+
+    SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+    SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
+
+    SET _resultado = '{"Resultado": []}';
+
+    WHILE _dia <= 7 DO
+        IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
+        THEN
+            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),CONVERT(_tempJson,JSON));
+#             SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),_tempJson);
+#             SELECT _tempJson;
+        ELSE
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
+        END IF;
+
+        SET _dia = _dia + 1;
+    END WHILE;
+
+    SELECT CONVERT(_resultado,JSON) as 'Resultado';
+END//
+DELIMITER ;
+
+# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
+# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
+# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
+# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
+
+CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
+CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
