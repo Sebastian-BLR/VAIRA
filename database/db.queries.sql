@@ -403,24 +403,6 @@ CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
-DROP PROCEDURE IF EXISTS obtener_recibos_fecha;
-CREATE PROCEDURE obtener_recibos_fecha(_jsonA JSON)
-    BEGIN
-        DECLARE _json JSON;
-       DECLARE _idUsuario INT;
-       DECLARE _fecha VARCHAR(10);
-
-       SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-       SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idUsuario'));
-       SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fecha'));
-
-       SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
-            SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = _idUsuario AND DATE(fecha) = _fecha);
-    END //
-DELIMITER ;
-
-CALL obtener_recibos_fecha('{"idUsuario": 3, "fecha": "2022-05-23"}');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
@@ -491,14 +473,28 @@ INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 3, 1, 10),
                               (0, 6, 1, 15);
 
-INSERT INTO tipo_pago VALUES (0,'Credito'),
-                             (0,'Debito'),
+INSERT INTO tipo_pago VALUES (0,'Tarjeta de credito'),
+                             (0,'Tarjeta de debito'),
                              (0,'Efectivo');
 
 INSERT INTO punto_venta VALUES (0, 1, 3, 'Mesa 1'),
                                (0, 1, 3, 'Mesa 2'),
                                (0, 1, NULL, 'Mesa 3'),
                                (0, 1, NULL, 'Mesa 4');
+
+
+INSERT INTO regimen_fiscal VALUES (0, 'Régimen Simplificado de Confianza'),
+                                  (0, 'Sueldos y salarios e ingresos asimilados a salarios'),
+                                  (0, 'Régimen de Actividades Empresariales y Profesionales'),
+                                  (0, 'Régimen de Incorporación Fiscal'),
+                                  (0, 'Enajenación de bienes'),
+                                  (0, 'Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas'),
+                                  (0, 'Régimen de Arrendamiento'),
+                                  (0, 'Intereses'),
+                                  (0, 'Obtención de premios'),
+                                  (0, 'Dividendos'),
+                                  (0, 'Demás ingresos');
+
 
 
 

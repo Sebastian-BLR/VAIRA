@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS venta (
 
 CREATE TABLE IF NOT EXISTS regimen_fiscal (
     idRegimen   INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
-    nombre      VARCHAR(50) NOT NULL
+    nombre      VARCHAR(100) NOT NULL
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS datos_factura(

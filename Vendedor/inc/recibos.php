@@ -103,6 +103,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <!-- //* =========================================================================================== -->
+            <!-- //*                 REALIZAR CONEXION CON EL SAT PARA REALIZAR UNA FACTURACION                  -->
+            <!-- //* =========================================================================================== -->
+            <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
+            <!-- //* =========================================================================================== -->
             <form>
               <div class="mb-3">
                 <label for="rfc" class="col-form-label">Capture su RFC:</label>
@@ -118,24 +123,29 @@
               </div>
               <div class="mb-3">
                 <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
-                <select name="cars" id="cars" form="carform">
-                  <option value="opcion1">Régimen Simplificado de Confianza</option>
-                  <option value="opcion2">Sueldos y salarios e ingresos asimilados a salarios</option>
-                  <option value="opcion3">Régimen de Actividades Empresariales y Profesionales</option>
-                  <option value="opcion4">Régimen de Incorporación Fiscal</option>
-                  <option value="opcion5">Enajenación de bienes</option>
-                  <option value="opcion5">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
-                  <option value="opcion7">Régimen de Arrendamiento</option>
-                  <option value="opcion8">Intereses</option>
-                  <option value="opcion9">Obtención de premios</option>
-                  <option value="opcion10">Dividendos</option>
-                  <option value="opcion11">Demás ingresos</option>
+                <select name="regimenFiscal" id="regimenFiscal" form="carform">
+                  <?php
+                    $input_from_db = json_decode(POST("Vendedor/services/getTaxRegimen.php",$data), true);
+
+                    foreach($input_from_db as $value){
+                      echo('
+                      <option value="'.$value[0].'">'.$value[1].'</option>
+                      ');
+                    }
+                  ?>
                 </select>
                 <div class="mb-3">
                   <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
                   <select name="cars" id="cars" form="carform">
-                    <option value="efectivo">Efectivo</option>
-                    <option value="tarjeta">Tarjet Cr&eacute;dito o D&eacute;bito</option>
+                  <?php
+                    $input_from_db = json_decode(POST("Vendedor/services/getPaymentMethods.php",$data), true);
+
+                    foreach($input_from_db as $value){
+                      echo('
+                      <option value="'.$value[0].'">'.$value[1].'</option>
+                      ');
+                    }
+                  ?>
                   </select>
                 </div>
               </div>
@@ -229,7 +239,8 @@
         </div>
       </div>
     </div>
-
+    
+    <!-- Modal Detalle Venta -->
     <?php
           $data = [
             'idUsuario' => $id_usuario
@@ -243,7 +254,6 @@
             ];
             $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
             echo('
-            <!-- Modal Detalle Venta -->
             <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
