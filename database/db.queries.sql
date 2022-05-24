@@ -464,7 +464,7 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     BEGIN
        DECLARE _json JSON;
        DECLARE _fkUsuario INT;
-       DECLARE _fecha INT;
+       DECLARE _fecha VARCHAR(50);
        DECLARE _rango INT;
 
        DECLARE exit handler for sqlexception
@@ -474,9 +474,11 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
         END;
 
        SET _json = JSON_EXTRACT(_jsonA, '$[0]');
-       SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fkUsuario'));
-       SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.fecha'));
-       SET _rango = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.rango'));
+       SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+       SET _fecha = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
+       SET _rango = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'));
+
+       SELECT _rango;
 
        START TRANSACTION;
             IF(_rango = 1) THEN
@@ -493,10 +495,10 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":1}]');
-CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":2}]');
-CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":3}]');
-CALL filtrar_ventas('[{"fkUsuario":1,"fecha":"2022-05-22","rango":4}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
