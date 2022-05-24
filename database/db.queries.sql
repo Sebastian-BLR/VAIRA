@@ -246,8 +246,8 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
 # CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":5},{"sku":"Bar-Pap-102","cantidad":2},{"sku":"Coc-Cha-100","cantidad":10}]}]');
 # CALL realizar_venta('[{"fkUsuario":"3","fkPunto":"1","fkTipoPago":"3","productos":[{"sku":"Bar-Pap-100","cantidad":2}]}]');
 # CALL obtener_productos('[{"sucursal":1}]');
-SELECT * FROM venta;
-SELECT * FROM existencia WHERE fkSucursal = 1;
+# SELECT * FROM venta;
+# SELECT * FROM existencia WHERE fkSucursal = 1;
 
 DROP PROCEDURE IF EXISTS realizar_venta;
 CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
@@ -290,7 +290,8 @@ BEGIN
     START TRANSACTION;
         SELECT iva INTO _iva FROM sucursal INNER JOIN punto_venta on sucursal.idSucursal = punto_venta.fkSucursal INNER JOIN region_iva ri on sucursal.fkRegion = ri.idRegion WHERE idPunto = _fkPunto;
 
-        INSERT INTO venta VALUES(0,_fkUsuario,_fkTipoPago,_total,NOW());
+        SELECT fkSucursal INTO _fkSucursal FROM punto_venta WHERE idPunto = _fkPunto;
+        INSERT INTO venta VALUES(0,_fkUsuario,_fkTipoPago,_fkSucursal,_total,NOW());
 
         WHILE _contador >= 0 DO
             SET _contador = _contador - 1;
@@ -347,6 +348,8 @@ BEGIN
     INNER JOIN producto p on iv.fkProducto = p.idProducto
     WHERE _idVenta = idVenta;
 END //
+
+CALL obtener_detalles_compra('{"idVenta":"4"}');
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS generar_factura;
@@ -552,22 +555,30 @@ INSERT INTO region_iva VALUES (0, 1, 0.16),
                               (0, 1, 0.16),
                               (0, 4, 0.08);
 
-INSERT INTO sucursal VALUES (0, 1, 1, 'Sucursal Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
-                            (0, 2, 1, 'Sucursal Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
-                            (0, 3, 1, 'Sucursal Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
-                            (0, 4, 1, 'Sucursal Tijuana', 'Av. Negrete', 'Miguel Negrete', '09821', '1234567890');
+INSERT INTO sucursal VALUES (0, 1, 1, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890');
+
+# INSERT INTO sucursal VALUES (0, 1, 1, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
+#                             (0, 2, 1, 'Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
+#                             (0, 3, 1, 'Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
+#                             (0, 4, 1, 'Tijuana', 'Av. Negrete', 'Miguel Negrete', '09821', '1234567890');
+
+# INSERT INTO existencia VALUES (0, 1, 1, 15),
+#                               (0, 4, 1, 22),
+#                               (0, 1, 2, 5),
+#                               (0, 4, 2, 25),
+#                               (0, 1, 3, 15),
+#                               (0, 2, 3, 7),
+#                               (0, 1, 4, 17),
+#                               (0, 4, 4, 27),
+#                               (0, 2, 4, 10),
+#                               (0, 3, 1, 10),
+#                               (0, 6, 1, 15);
 
 INSERT INTO existencia VALUES (0, 1, 1, 15),
                               (0, 4, 1, 22),
-                              (0, 1, 2, 5),
-                              (0, 4, 2, 25),
-                              (0, 1, 3, 15),
-                              (0, 2, 3, 7),
-                              (0, 1, 4, 17),
-                              (0, 4, 4, 27),
-                              (0, 2, 4, 10),
                               (0, 3, 1, 10),
                               (0, 6, 1, 15);
+
 
 INSERT INTO tipo_pago VALUES (0,'Tarjeta de credito'),
                              (0,'Tarjeta de debito'),

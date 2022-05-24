@@ -179,10 +179,12 @@ CREATE TABLE IF NOT EXISTS venta (
     idVenta     INT         NOT NULL        PRIMARY KEY        AUTO_INCREMENT,
     fkUsuario   INT,
     fkTipoPago  INT,
+    fkSucursal  INT,
     total       DECIMAL(12, 2),
     fecha       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (fkUsuario)  REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkSucursal)  REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkTipoPago)  REFERENCES tipo_pago(idTipo) ON UPDATE CASCADE ON DELETE RESTRICT
 
 )ENGINE = INNODB;

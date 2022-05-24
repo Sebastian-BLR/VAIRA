@@ -7,6 +7,12 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Evita reenviar el formulario cuando se recarga la página-->
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>  
     <meta charset="UTF-8">                      
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
