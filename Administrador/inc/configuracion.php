@@ -1,7 +1,7 @@
 <div class="row" style="margin-top: 5px;font-size: 19px;">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="?Recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
     <li class="breadcrumb-item active" aria-current="page">Configuraci&oacuten</li>
   </ol>
   </nav>
@@ -10,6 +10,7 @@
   <div>
     Usuarios
     <button type="button" class="btn btn-outline-dark" style="float: right; margin-left:5px" data-bs-toggle="modal" data-bs-target="#configImpuestos"></i>Configurar impuestos</button>
+    <button type="button" class="btn btn-outline-dark" style="float: right; margin-left:5px" data-bs-toggle="modal" data-bs-target="#agregarPuntoDeVenta"></i>Agregar Punto de venta</button>
     <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#agregarUsuario"></i>Agregar usuario</button> 
   </div>
 </div>
@@ -33,8 +34,8 @@
         <td>vendedor1</td>
         <td>******</td>
         <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()" style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()" style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
       </tr>
       <tr>
         <th scope="row">vendedor2</th>
@@ -42,8 +43,8 @@
         <td>vendedor 2</td>
         <td>********</td>
         <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
       </tr>
       <tr>
         <th scope="row">vendedorPablo</th>
@@ -51,8 +52,8 @@
         <td>vendedor Pablo</td>
         <td>*********</td>
         <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
+        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
     </tbody>
   </table>
 </div>
@@ -120,6 +121,30 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertAgregarUsuario()">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agregar Punto de Vententa-->
+<div class="modal fade bd-example-modal-xl" id="agregarPuntoDeVenta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Agregar punto de venta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+        <div class="mb-3">
+            <label for="nombre" class="col-form-label">Nombre del punto de venta:</label>
+            <input type="text" class="form-control" id="nombre">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertAgregarPunto()">Agregar</button>
       </div>
     </div>
   </div>

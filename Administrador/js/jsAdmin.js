@@ -49,6 +49,14 @@ function alertAgregarUsuario(){
       )
 }
 
+function alertAgregarPunto(){
+  Swal.fire(
+      'Punto de venta agregado',
+      'Se ha agregado satisfactoriamente un nuevo punto de venta',
+      'success',
+    )
+}
+
 function alertDevolucion(){ 
   Swal.fire({
     icon: 'success',
