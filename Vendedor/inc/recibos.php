@@ -12,10 +12,17 @@
 </div>
 <div class="row" style="font-size: 20px;  margin-top: 10px;">
     Recibos
-    <div class="row-1" style="margin-top: 10px;">
-      <input type="date" id="eligeFecha" name="eligeFecha">
-      <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-      <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+    <div class="row" style="margin-top: 10px;">
+      <div class="col">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">
+          <input type="date" id="eligeFecha" name="eligeFecha">
+          <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
+        </form>
+      </div>
+      <div class="col">
+        <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
+        <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+      </div>
     </div>
     <div class="row-1" style="margin-top: 30px;">
       <table class="table">
@@ -31,9 +38,6 @@
         </thead>
         <tbody>
           <?php
-          $data = [
-            'idUsuario' => $id_usuario
-          ];
           // Here starts a request to get data from the data base
           // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
           // $input_from_db = array(
@@ -43,23 +47,49 @@
           //   "key4"=>"",
           //   "key5"=>"",
           // );
-          $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
-
-          foreach($input_from_db as $value){
-            //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
-            // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
-            echo('
-            <tr>
-              <th scope="row">'.$value[0].'</th>
-              <td>'.fecha($value[1]).'</td>
-              <td>'.$value[2].'</td>
-              <td>$'.$value[3].'</td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
-              <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-            </tr>
-            ');
+          
+          if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
+            $data = [
+              'idUsuario' => $id_usuario,
+              'fecha' => $_POST['eligeFecha']
+            ];
+          
+            $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+          
+          } else{ 
+            $data = [
+              'idUsuario' => $id_usuario
+            ];
+            $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
           }
-           
+
+          if ($input_from_db == null){
+            echo('
+              <tr>
+                <th scope="row"></th>
+                <td>No se encontraron recibos</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              ');
+          }else{
+            foreach($input_from_db as $value){
+              //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
+              // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
+              echo('
+              <tr>
+                <th scope="row">'.$value[0].'</th>
+                <td>'.fecha($value[1]).'</td>
+                <td>'.$value[2].'</td>
+                <td>$'.$value[3].'</td>
+                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
+                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+              </tr>
+              ');
+            }
+           }
           ?>
         </tbody>
       </table>
@@ -73,6 +103,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <!-- //* =========================================================================================== -->
+            <!-- //*                 REALIZAR CONEXION CON EL SAT PARA REALIZAR UNA FACTURACION                  -->
+            <!-- //* =========================================================================================== -->
+            <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
+            <!-- //* =========================================================================================== -->
             <form>
               <div class="mb-3">
                 <label for="rfc" class="col-form-label">Capture su RFC:</label>
@@ -88,24 +123,29 @@
               </div>
               <div class="mb-3">
                 <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
-                <select name="cars" id="cars" form="carform">
-                  <option value="opcion1">Régimen Simplificado de Confianza</option>
-                  <option value="opcion2">Sueldos y salarios e ingresos asimilados a salarios</option>
-                  <option value="opcion3">Régimen de Actividades Empresariales y Profesionales</option>
-                  <option value="opcion4">Régimen de Incorporación Fiscal</option>
-                  <option value="opcion5">Enajenación de bienes</option>
-                  <option value="opcion5">Régimen de Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
-                  <option value="opcion7">Régimen de Arrendamiento</option>
-                  <option value="opcion8">Intereses</option>
-                  <option value="opcion9">Obtención de premios</option>
-                  <option value="opcion10">Dividendos</option>
-                  <option value="opcion11">Demás ingresos</option>
+                <select name="regimenFiscal" id="regimenFiscal" form="carform">
+                  <?php
+                    $input_from_db = json_decode(POST("Vendedor/services/getTaxRegimen.php",$data), true);
+
+                    foreach($input_from_db as $value){
+                      echo('
+                      <option value="'.$value[0].'">'.$value[1].'</option>
+                      ');
+                    }
+                  ?>
                 </select>
                 <div class="mb-3">
                   <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
                   <select name="cars" id="cars" form="carform">
-                    <option value="efectivo">Efectivo</option>
-                    <option value="tarjeta">Tarjet Cr&eacute;dito o D&eacute;bito</option>
+                  <?php
+                    $input_from_db = json_decode(POST("Vendedor/services/getPaymentMethods.php",$data), true);
+
+                    foreach($input_from_db as $value){
+                      echo('
+                      <option value="'.$value[0].'">'.$value[1].'</option>
+                      ');
+                    }
+                  ?>
                   </select>
                 </div>
               </div>
@@ -199,7 +239,8 @@
         </div>
       </div>
     </div>
-
+    
+    <!-- Modal Detalle Venta -->
     <?php
           $data = [
             'idUsuario' => $id_usuario
@@ -213,7 +254,6 @@
             ];
             $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
             echo('
-            <!-- Modal Detalle Venta -->
             <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -233,15 +273,18 @@
                       </div>
                       <div class="mb-3">
                         <label for="productos" class="col-form-label">Productos</label>
-                        <input type="text" class="form-control" id="Productos" value="');
+                        ');
+                        
                         foreach($infoSale as $sale){
-                          if($sale === end($infoSale))
-                            echo($sale[3] . " " . $sale[2]);
-                          else
-                            echo($sale[3] . " " . $sale[2] . ", ");
+                          echo ('
+                          <ul>
+                            <li style="list-style:none;">'
+                              .$sale[3] . " " . $sale[2] . '
+                            </li>
+                          </ul>');
                         }
                         
-                        echo('" disabled>
+                        echo('
                       </div>
                       <div class="mb-3">
                         <label for="total" class="col-form-label">Total</label>

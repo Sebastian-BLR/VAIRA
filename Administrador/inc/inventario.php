@@ -1,7 +1,7 @@
 <div class="row" style="margin-top: 5px;font-size: 19px;">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="?Recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
     <li class="breadcrumb-item active" aria-current="page">Inventario</li>
   </ol>
   </nav>
@@ -25,7 +25,7 @@
 </div>
 <div class="row">
   <div class="card" style="width: 12rem;">
-    <img src="./src/image/papas.png" class="card-img-top" alt="...">
+    <img src="../src/image/productos/papas.png" class="card-img-top" alt="...">
     <div class="card-body">
       <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mostrarDetalleProducto"><i class="fa fa-search-plus"></i></button>
       <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#actualizar"><i class="fa fa-pencil" aria-hidden="true"></i></button>

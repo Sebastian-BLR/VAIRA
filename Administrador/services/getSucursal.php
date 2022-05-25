@@ -7,12 +7,11 @@
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
         $bindings = json_decode($bindings[0]);
-        $sql = 'SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
-            SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = :idUsuario) AND fkUsuario = :idUsuario;';
+        $sql = 'SELECT fkSucursal FROM sucursal_usuario WHERE fkUsuario = :usuario;';
         $stmt = $pdo->prepare($sql);
 
         if($stmt->execute(array(
-            ':idUsuario' => $bindings->idUsuario
+            ':usuario' => $bindings->idUsuario
         ))){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;

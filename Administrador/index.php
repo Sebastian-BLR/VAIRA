@@ -2,11 +2,29 @@
   session_start();
   if (!isset($_SESSION['user']) || $_SESSION['userType'] != 2)
     header("Location: ../index.php");
+
+  include '../services/helper.php';
+  include '../services/connection.php';
+
+  $id_usuario = $_SESSION['user'];
+  $user_type = $_SESSION['userType'];
+
+  $data = [
+    "idUsuario" => $id_usuario,
+  ];
+
+  $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
 ?>
 
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Evita reenviar el formulario cuando se recarga la página-->
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>  
     <meta charset="UTF-8">                      
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

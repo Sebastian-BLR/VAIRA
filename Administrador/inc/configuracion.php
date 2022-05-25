@@ -21,13 +21,14 @@
         <th scope="col">Nombre</th>
         <th scope="col">Correo</th>
         <th scope="col">Usuario</th>
-        <th scope="col">Contraseña</th>
+        <th scope="col">Sucursal</th>
         <th scope="col">Rol</th>
         <th scope="col">Eliminar</th>
         <th scope="col">Editar</th>
       </tr>
     </thead>
     <tbody>
+<<<<<<< HEAD
       <tr>
         <th scope="row">vendedor1</th>
         <td>vendedor1@gmail.com</td>
@@ -54,6 +55,29 @@
         <td>vendedor</td>
         <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
         <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+=======
+      <?php
+      $data = [
+        'idAdmin' => $id_usuario
+      ];
+      $input_from_db = json_decode(POST("Administrador/services/getUsers.php",$data), true);
+
+      foreach($input_from_db as $value){
+        echo('
+          <tr>
+            <th scope="row">'. $value[1] .'</th>
+            <td>'. $value[2] .'</td>
+            <td>'. $value[3] .'</td>
+            <td>'. $value[4] .'</td>
+            <td>'. strtolower ($value[5]) .'</td>
+            <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()" style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+            <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario'.$value[0].'"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+          </tr>
+      ');
+      }
+
+      ?>
+>>>>>>> back
     </tbody>
   </table>
 </div>
@@ -206,72 +230,80 @@
 </div>
 
 <!-- Modal Editar Usuario-->
-<div class="modal fade bd-example-modal-xl" id="editarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Editar usuario</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="nombre" class="col-form-label">Nombre:</label>
-            <input type="text" class="form-control" id="nombre" disabled>
+<?php
+  $data = [
+    "sucursal" => $sucursal[0][0]
+  ];
+
+  $input_from_db = json_decode(POST("Administrador/services/getInfoUsers.php",$data), true);
+  foreach($input_from_db as  $value){
+    echo('
+      <div class="modal fade bd-example-modal-xl" id="editarUsuario'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Editar usuario</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label for="nombre" class="col-form-label">Nombre:</label>
+                  <input type="text" class="form-control" id="nombre" value="'. $value[1] .'" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
+                  <input type="text" class="form-control" id="apellidoP" value="'. $value[2] .'" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="apellidoM" class="col-form-label">Apellido materno:</label>
+                  <input type="text" class="form-control" id="apellidoM" value="'. $value[3] .'" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="usuario" class="col-form-label">Usuario:</label>
+                  <input type="text" class="form-control" id="usuario" value="'. $value[4] .'" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="rol" class="col-form-label">Rol:</label>
+                  <input type="text" class="form-control" id="rol" value="'. strtolower($value[5]) .'" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="correo" class="col-form-label">Correo:</label>
+                  <input type="email" class="form-control" id="correo" value="'. $value[6] .'">
+                </div>
+                <div class="mb-3">
+                  <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
+                  <input type="text" class="form-control" id="teleforno" value="'. $value[7] .'">
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="col-form-label">Contraseña:</label>
+                  <input type="password" class="form-control" id="contrasena">
+                </div>
+                <div class="mb-3">
+                  <label for="password2" class="col-form-label">Confirmar contraseña:</label>
+                  <input type="password2" class="form-control" id="contrasena">
+                </div>
+                <div class="btn-group">
+                  <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
+                  <button type="button" class="btn btn-outline-secondary" style="margin-left: 5px;" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-arrow-down"></i></button>
+                  <ul class="dropdown-menu">
+                    <button type="button" class="dropdown-item" id="1">Mesa 1</button>
+                    <button type="button" class="dropdown-item" id="2">Mesa 2</button>
+                    <button type="button" class="dropdown-item" id="3">Mesa 3</button>
+                  </ul>
+              </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarEditar">Aceptar</button>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
-            <input type="text" class="form-control" id="apellidoP" disabled>
-          </div>
-          <div class="mb-3">
-            <label for="apellidoM" class="col-form-label">Apellido materno:</label>
-            <input type="text" class="form-control" id="apellidoM" disabled>
-          </div>
-          <div class="mb-3">
-            <label for="usuario" class="col-form-label">Usuario:</label>
-            <input type="text" class="form-control" id="usuario" disabled>
-          </div>
-          <div class="mb-3">
-            <label for="rol" class="col-form-label">Rol:</label>
-            <input type="text" class="form-control" id="rol" disabled>
-          </div>
-          <div class="mb-3">
-            <label for="correo" class="col-form-label">Correo:</label>
-            <input type="email" class="form-control" id="correo">
-          </div>
-          <div class="mb-3">
-            <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-            <input type="text" class="form-control" id="teleforno">
-          </div>
-          <div class="mb-3">
-            <label for="password" class="col-form-label">Contraseña:</label>
-            <input type="password" class="form-control" id="contrasena">
-          </div>
-          <div class="mb-3">
-            <label for="password2" class="col-form-label">Confirmar contraseña:</label>
-            <input type="password2" class="form-control" id="contrasena">
-          </div>
-          <div class="btn-group">
-            <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
-            <button type="button" class="btn btn-outline-secondary" style="margin-left: 5px;" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-arrow-down"></i></button>
-            <ul class="dropdown-menu">
-              <li><input type="checkbox" id="punto1" name="punto2">
-                <label for="filtro1">Mesa 1</label></li>
-              <li><input type="checkbox" id="punto2" name="punto2">
-                <label for="filtro2">Mesa 2</label></li>
-              <li><input type="checkbox" id="punto3" name="punto3">
-                <label for="filtro3">Mesa 3</label></li>
-            </ul>
         </div>
-        </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarEditar">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
+    ');
+  }
+?>
 
 <!-- Modal Confirmación editar -->
 <div class="modal fade bd-example-modal-sm" id="confirmarEditar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
