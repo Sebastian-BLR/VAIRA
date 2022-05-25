@@ -544,6 +544,7 @@ BEGIN
     DECLARE _resultado JSON;
     DECLARE _tempJson TEXT;
     DECLARE _mes INT DEFAULT 1;
+    DECLARE _monthName VARCHAR(50);
 
     DECLARE exit handler for sqlexception
     BEGIN
@@ -560,7 +561,8 @@ BEGIN
         IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
         THEN
             SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes;
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),CONVERT(_tempJson,JSON));
+            SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
         ELSE
             SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
         END IF;
@@ -582,6 +584,7 @@ BEGIN
     DECLARE _tempJson TEXT;
     DECLARE _dia INT DEFAULT 1;
     DECLARE _fecha VARCHAR(50);
+    DECLARE _dayName VARCHAR(50);
 
     DECLARE exit handler for sqlexception
     BEGIN
@@ -598,10 +601,9 @@ BEGIN
     WHILE _dia <= 7 DO
         IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
         THEN
-            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),CONVERT(_tempJson,JSON));
-#             SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),_tempJson);
-#             SELECT _tempJson;
+            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson  FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+            SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
+            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
         ELSE
             SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
         END IF;
@@ -631,14 +633,16 @@ CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
     END //
 DELIMITER ;
 
+SELECT fecha FROM venta WHERE fkUsuario = 3 AND DAYOFWEEK(fecha) = 1 AND WEEK(fecha) = WEEK('2022-05-24');
+SELECT fecha FROM venta WHERE fkUsuario = 3 AND DAYOFWEEK(fecha) = 3;
 
-# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
-# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
-# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
-# CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
+CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
 
-# CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
-# CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
+CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
+CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
