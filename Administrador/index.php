@@ -14,7 +14,6 @@
   ];
 
   $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
-  // var_dump($sucursal);
 ?>
 
 <!doctype html>

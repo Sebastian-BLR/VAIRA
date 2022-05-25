@@ -174,11 +174,11 @@
 <!-- Modal Editar Usuario-->
 <?php
   $data = [
-    "sucursal" => $sucursal
+    "sucursal" => $sucursal[0][0]
   ];
-  $info = json_decode(POST("Administrador/services/getInfoUsers.php",$data), true);
-  // var_dump($info);
-  foreach($input_from_db as $value){
+
+  $input_from_db = json_decode(POST("Administrador/services/getInfoUsers.php",$data), true);
+  foreach($input_from_db as  $value){
     echo('
       <div class="modal fade bd-example-modal-xl" id="editarUsuario'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -195,27 +195,27 @@
                 </div>
                 <div class="mb-3">
                   <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
-                  <input type="text" class="form-control" id="apellidoP" disabled>
+                  <input type="text" class="form-control" id="apellidoP" value="'. $value[2] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="apellidoM" class="col-form-label">Apellido materno:</label>
-                  <input type="text" class="form-control" id="apellidoM" disabled>
+                  <input type="text" class="form-control" id="apellidoM" value="'. $value[3] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="usuario" class="col-form-label">Usuario:</label>
-                  <input type="text" class="form-control" id="usuario" disabled>
+                  <input type="text" class="form-control" id="usuario" value="'. $value[4] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="rol" class="col-form-label">Rol:</label>
-                  <input type="text" class="form-control" id="rol" disabled>
+                  <input type="text" class="form-control" id="rol" value="'. strtolower($value[5]) .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="correo" class="col-form-label">Correo:</label>
-                  <input type="email" class="form-control" id="correo">
+                  <input type="email" class="form-control" id="correo" value="'. $value[6] .'">
                 </div>
                 <div class="mb-3">
                   <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                  <input type="text" class="form-control" id="teleforno">
+                  <input type="text" class="form-control" id="teleforno" value="'. $value[7] .'">
                 </div>
                 <div class="mb-3">
                   <label for="password" class="col-form-label">Contraseña:</label>
@@ -225,12 +225,9 @@
                   <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
                   <button type="button" class="btn btn-outline-secondary" style="margin-left: 5px;" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-arrow-down"></i></button>
                   <ul class="dropdown-menu">
-                    <li><input type="checkbox" id="punto1" name="punto2">
-                      <label for="filtro1">Mesa 1</label></li>
-                    <li><input type="checkbox" id="punto2" name="punto2">
-                      <label for="filtro2">Mesa 2</label></li>
-                    <li><input type="checkbox" id="punto3" name="punto3">
-                      <label for="filtro3">Mesa 3</label></li>
+                    <button type="button" class="dropdown-item" id="1">Mesa 1</button>
+                    <button type="button" class="dropdown-item" id="2">Mesa 2</button>
+                    <button type="button" class="dropdown-item" id="3">Mesa 3</button>
                   </ul>
               </div>
               </form>

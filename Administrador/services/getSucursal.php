@@ -11,7 +11,7 @@
         $stmt = $pdo->prepare($sql);
 
         if($stmt->execute(array(
-            ':idUsuario' => $bindings->idUsuario
+            ':usuario' => $bindings->idUsuario
         ))){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;

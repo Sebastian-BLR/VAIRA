@@ -638,7 +638,7 @@ DELIMITER ;
 # CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
 
 # CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
-# CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
+CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
