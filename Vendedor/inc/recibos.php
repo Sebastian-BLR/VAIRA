@@ -273,15 +273,18 @@
                       </div>
                       <div class="mb-3">
                         <label for="productos" class="col-form-label">Productos</label>
-                        <input type="text" class="form-control" id="Productos" value="');
+                        ');
+                        
                         foreach($infoSale as $sale){
-                          if($sale === end($infoSale))
-                            echo($sale[3] . " " . $sale[2]);
-                          else
-                            echo($sale[3] . " " . $sale[2] . ", ");
+                          echo ('
+                          <ul>
+                            <li style="list-style:none;">'
+                              .$sale[3] . " " . $sale[2] . '
+                            </li>
+                          </ul>');
                         }
                         
-                        echo('" disabled>
+                        echo('
                       </div>
                       <div class="mb-3">
                         <label for="total" class="col-form-label">Total</label>

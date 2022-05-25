@@ -1,6 +1,35 @@
 USE db_vaira;
 
 DELIMITER //
+DROP PROCEDURE IF EXISTS prueba;
+CREATE PROCEDURE prueba(IN _jsonA JSON)
+            BEGIN
+
+                DECLARE _json JSON;
+                DECLARE _fkTipo VARCHAR(10);
+                DECLARE nombre VARCHAR(10);
+
+                DECLARE exit handler for sqlexception
+                BEGIN
+                    SELECT 'Hubo un error';
+                    ROLLBACK;
+                END;
+
+                SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+                SET _fkTipo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.tipo'));
+
+                IF(_fkTipo != 1) THEN
+                    SET nombre = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'));
+                    SELECT nombre;
+                ELSE
+                    SELECT 'Igual a 1';
+                END IF ;
+
+
+            END //
+DELIMITER ;
+
+DELIMITER //
 
 DROP PROCEDURE IF EXISTS insertar_usuario;
 CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
@@ -15,9 +44,10 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                     DECLARE jUsuario VARCHAR(50);
                     DECLARE jPassword VARCHAR(50);
                     DECLARE _fkUsuario INT;
+                    DECLARE _fkSucursal INT;
                     DECLARE exit handler for sqlexception
                     BEGIN
-                        -- ERROR
+                        SELECT 'Hubo un error';
                         ROLLBACK;
                     END;
 
@@ -37,6 +67,14 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
                         SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = jUsuario;
                         INSERT INTO log_usuario VALUES (0, _fkUsuario, NOW(), NOW(), NULL);
                         SELECT * from usuario WHERE nombre = @nombre LIMIT 1;
+
+                        IF (_fkTipo != 1) THEN
+                            SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
+                            INSERT INTO sucursal_usuario VALUES(_fkUsuario, _fkSucursal);
+                            SELECT 'Usuario agregado';
+                        ELSE
+                            SELECT 'Super admin agregado';
+                        END IF;
                     COMMIT;
                 END //
 
@@ -349,7 +387,6 @@ BEGIN
     WHERE _idVenta = idVenta;
 END //
 
-CALL obtener_detalles_compra('{"idVenta":"4"}');
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS generar_factura;
@@ -576,13 +613,32 @@ BEGIN
 END//
 DELIMITER ;
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
+CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _idAdmin INT;
+
+        SET _json = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
+
+        SELECT DISTINCT usuario.idUsuario, usuario.nombre, correo, usuario, s.nombre, tipo FROM usuario
+            JOIN punto_venta pv on usuario.idUsuario = pv.fkUsuario
+            JOIN sucursal s on pv.fkSucursal = s.idSucursal
+            JOIN tipo t on usuario.fkTipo = t.idTipo
+            WHERE fkTipo = 3 AND fkAdmin = _idAdmin;
+    END //
+DELIMITER ;
+
+
 # CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":1}]');
 # CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":2}]');
 # CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":3}]');
 # CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","rango":4}]');
 
-CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
-CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
+# CALL filtrar_ventas_mensuales('[{"fkUsuario":3}]');
+# CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fecha":"2022-05-24"}]');
 
 # ==============================================================
 # |    LLENADO DE DATOS PREDETERMINADOS DE LA BASE DE DATOS    |
@@ -597,13 +653,35 @@ INSERT INTO permisos VALUES
 INSERT INTO tipo VALUES
                     (0, 1, 'SUPER-ADMIN'),
                     (0, 2, 'ADMIN'),
-                    (0, 3, 'USER')
+                    (0, 3, 'VENDEDOR')
                     ;
 
-CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
-CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2"}');
-CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"user","password":"789","correo":"a@a.com","telefono":"1234567890","rol":"3"}');
+INSERT INTO pais VALUES (0, 'Mexico');
 
+INSERT INTO ciudad VALUES (0, 1, 'Cuernavaca'),
+                          (0, 1, 'Emiliano Zapata'),
+                          (0, 1, 'Temixco'),
+                          (0, 1, 'Tijuana');
+
+INSERT INTO region_iva VALUES (0, 1, 0.16),
+                              (0, 1, 0.16),
+                              (0, 1, 0.16),
+                              (0, 4, 0.08);
+
+INSERT INTO sucursal VALUES (0, 1, NULL, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890');
+
+# INSERT INTO sucursal VALUES (0, 1, 1, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
+#                             (0, 2, 1, 'Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
+#                             (0, 3, 1, 'Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
+#                             (0, 4, 1, 'Tijuana', 'Av. Negrete', 'Miguel Negrete', '09821', '1234567890');
+
+
+
+CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
+CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2", "sucursal":1}');
+CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"user","password":"789","correo":"a@a.com","telefono":"1234567890","rol":"3", "sucursal":1}');
+
+UPDATE sucursal SET fkAdmin = 2 WHERE idSucursal = 1;
 
 INSERT INTO categoria VALUES (0, 'Abarrotes', 'Conjunto de artículos comerciales, especialmente comidas, bebidas y conservas', 0, 0.0, 0.0),
                              (0, 'Bebidas alc. -14°', 'Bebidas que contienen etanol en su composición', 1, 0.265, 0.0),
@@ -622,26 +700,8 @@ CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Saladas
 CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"4","proveedor":"4","nombre":"Absolute Vodka 1.5L","costo":"366.50","precio":"425.58","imagen":"vodka.png" ,"activo":"1","servicio":"0"}');
 
-# SELECT * FROM producto;
+SELECT * FROM producto;
 
-INSERT INTO pais VALUES (0, 'Mexico');
-
-INSERT INTO ciudad VALUES (0, 1, 'Cuernavaca'),
-                          (0, 1, 'Emiliano Zapata'),
-                          (0, 1, 'Temixco'),
-                          (0, 1, 'Tijuana');
-
-INSERT INTO region_iva VALUES (0, 1, 0.16),
-                              (0, 1, 0.16),
-                              (0, 1, 0.16),
-                              (0, 4, 0.08);
-
-INSERT INTO sucursal VALUES (0, 1, 1, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890');
-
-# INSERT INTO sucursal VALUES (0, 1, 1, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890'),
-#                             (0, 2, 1, 'Emiliano Zapata', 'Lazaro Cardenas', 'Las granjas', '67890', '1234567890'),
-#                             (0, 3, 1, 'Temixco', 'Calz. Guadalupe', 'Lomas de Guadalupe', '56723', '1234567890'),
-#                             (0, 4, 1, 'Tijuana', 'Av. Negrete', 'Miguel Negrete', '09821', '1234567890');
 
 # INSERT INTO existencia VALUES (0, 1, 1, 15),
 #                               (0, 4, 1, 22),
@@ -683,28 +743,26 @@ INSERT INTO regimen_fiscal VALUES (0, 'Régimen Simplificado de Confianza'),
                                   (0, 'Dividendos'),
                                   (0, 'Demás ingresos');
 
+# DATOS VENTAS MUESTRA
+# COMENTAR A LA HORA DE PRODUCCION
+
+INSERT INTO venta (idVenta, fkUsuario, fkTipoPago, fkSucursal, total, fecha) VALUES (1, 3, 3, 1, 76.56, '2022-05-22 14:19:48');
+INSERT INTO venta (idVenta, fkUsuario, fkTipoPago, fkSucursal, total, fecha) VALUES (2, 3, 3, 1, 514.55, '2022-05-22 16:53:38');
+INSERT INTO venta (idVenta, fkUsuario, fkTipoPago, fkSucursal, total, fecha) VALUES (3, 3, 3, 1, 191.40, '2022-05-23 16:01:17');
+INSERT INTO venta (idVenta, fkUsuario, fkTipoPago, fkSucursal, total, fecha) VALUES (4, 3, 3, 1, 153.12, '2022-05-24 13:04:13');
 
 
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (1, 1, 1, 2, 0.16, 0.00, 0.00, 41.76);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (2, 3, 1, 2, 0.16, 0.00, 0.00, 34.80);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (3, 6, 2, 1, 0.16, 0.53, 0.00, 493.67);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (4, 1, 2, 1, 0.16, 0.00, 0.00, 20.88);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (5, 4, 3, 10, 0.16, 0.00, 0.00, 174.00);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (6, 3, 3, 1, 0.16, 0.00, 0.00, 17.40);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (7, 4, 4, 3, 0.16, 0.00, 0.00, 52.20);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (8, 1, 4, 4, 0.16, 0.00, 0.00, 83.52);
+INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (9, 3, 4, 1, 0.16, 0.00, 0.00, 17.40);
 
 
-# DESCOMENTAR EN CASO DE NO TENER NADA EN EL CARRITO, SE USARA PARA FINES PRACTICOS.
-# INSERT INTO  carrito VALUES (0,1,3,1,12);
-# INSERT INTO  carrito VALUES (0,2,3,1,2);
-# INSERT INTO  carrito VALUES (0,3,3,1,5);
-# INSERT INTO  carrito VALUES (0,1,2,1,12);
-# INSERT INTO  carrito VALUES (0,2,2,1,2);
-# INSERT INTO  carrito VALUES (0,3,2,1,5);
-# SELECT * FROM tipo_pago;
-
-# SELECT * FROM carrito;
-# CALL vender_carrito(3,1,3);
-# SELECT * FROM venta;
-
-# Esta query en realidad no se va a hacer igualando la entrada del campo sino que se debe poder encontrar un producto con una palabra sin terminar.
-# Entonce si escribo en el buscador 'vod' me deben salir en los artículos todos los productos que en el nombre, la marca, categoría, sku puedan contener
-# las tres letras 'vod' para encontrar 'vodka'.
-
-#SELECT * FROM producto WHERE nombre REGEXP CONCAT('^',?);
 
 # CALL generar_devolucion('2022-05-10',3,'user',789);
 # SELECT * FROM venta;

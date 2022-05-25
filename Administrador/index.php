@@ -2,6 +2,19 @@
   session_start();
   if (!isset($_SESSION['user']) || $_SESSION['userType'] != 2)
     header("Location: ../index.php");
+
+  include '../services/helper.php';
+  include '../services/connection.php';
+
+  $id_usuario = $_SESSION['user'];
+  $user_type = $_SESSION['userType'];
+
+  $data = [
+    "idUsuario" => $id_usuario,
+  ];
+
+  $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
+  // var_dump($sucursal);
 ?>
 
 <!doctype html>

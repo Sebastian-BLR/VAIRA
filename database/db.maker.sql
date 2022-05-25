@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS permisos;
 DROP TABLE IF EXISTS region_iva;
 DROP TABLE IF EXISTS ciudad;
 DROP TABLE IF EXISTS pais;
+DROP TABLE IF EXISTS sucursal_usuario;
 
 CREATE TABLE IF NOT EXISTS permisos(
     idPermisos  INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
@@ -52,6 +53,15 @@ CREATE TABLE IF NOT EXISTS usuario(
 
     FOREIGN KEY (fkTipo) REFERENCES tipo(idTipo)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS sucursal_usuario(
+    fkUsuario   INT     NOT NULL ,
+    fkSucursal  INT     NOT NULL ,
+
+    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
+    PRIMARY KEY (fkUsuario, fkSucursal)
+);
 
 CREATE TABLE IF NOT EXISTS log_usuario(
     idLog       INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
@@ -87,7 +97,7 @@ CREATE TABLE IF NOT EXISTS region_iva(
 CREATE TABLE IF NOT EXISTS sucursal(
     idSucursal  INT          NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkRegion    INT          NOT NULL,
-    fkAdmin    INT          NOT NULL,
+    fkAdmin    INT,
     nombre      VARCHAR(100) NOT NULL,
     calle       VARCHAR(100) NOT NULL,
     colonia     VARCHAR(100) NOT NULL,
