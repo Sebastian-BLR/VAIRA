@@ -111,6 +111,10 @@
             <input type="password" class="form-control" id="contrasena">
           </div>
           <div class="mb-3">
+            <label for="password2" class="col-form-label">Confirmar contraseña:</label>
+            <input type="password2" class="form-control" id="contrasena">
+          </div>
+          <div class="mb-3">
             <label for="rol" class="col-form-label">Rol:</label>
             <select name="rol" id="rol">
               <option value="volvo">Vendedor</option>
@@ -242,6 +246,10 @@
           <div class="mb-3">
             <label for="password" class="col-form-label">Contraseña:</label>
             <input type="password" class="form-control" id="contrasena">
+          </div>
+          <div class="mb-3">
+            <label for="password2" class="col-form-label">Confirmar contraseña:</label>
+            <input type="password2" class="form-control" id="contrasena">
           </div>
           <div class="btn-group">
             <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
