@@ -3,7 +3,7 @@
 -- |   Copyright (c) 2022 VAIRA   | --
 -- |     All Rights Reserved.     | --
 -- ================================ --
--- | Código encargador de llenar  | --
+-- |  Código encargado de llenar  | --
 -- |   la base de datos durante   | --
 -- |    la fase de desarrollo     | --
 -- ================================ --

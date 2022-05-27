@@ -1,3 +1,22 @@
+<?php
+  
+if(isset($_POST['add-punto-venta'])){
+  $data = [
+    'sucursal' => $sucursal[0][0],
+    'nombre' => $_POST['nombre']
+  ];
+
+  $agregar = json_decode(POST("Administrador/services/addPuntoVenta.php",$data), true);
+
+  if($agregar[0] == "Success")   
+    echo('
+      <script>
+        alertAgregarPunto()
+      </script>
+    ');
+}
+?>
+
 <div class="row" style="margin-top: 5px;font-size: 19px;">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -28,34 +47,6 @@
       </tr>
     </thead>
     <tbody>
-<<<<<<< HEAD
-      <tr>
-        <th scope="row">vendedor1</th>
-        <td>vendedor1@gmail.com</td>
-        <td>vendedor1</td>
-        <td>******</td>
-        <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()" style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-      </tr>
-      <tr>
-        <th scope="row">vendedor2</th>
-        <td>vendedor2@gmail.com</td>
-        <td>vendedor 2</td>
-        <td>********</td>
-        <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-      </tr>
-      <tr>
-        <th scope="row">vendedorPablo</th>
-        <td>pablovende@gmail.com</td>
-        <td>vendedor Pablo</td>
-        <td>*********</td>
-        <td>vendedor</td>
-        <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"  style="float: center; margin-left: 15px;"><i class="fa fa-minus-circle"></i></button></td>
-        <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-=======
       <?php
       $data = [
         'idAdmin' => $id_usuario
@@ -77,7 +68,6 @@
       }
 
       ?>
->>>>>>> back
     </tbody>
   </table>
 </div>
@@ -163,17 +153,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
-        <div class="mb-3">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?configuracion=true'?>" method="POST">
+          <div class="mb-3">
             <label for="nombre" class="col-form-label">Nombre del punto de venta:</label>
-            <input type="text" class="form-control" id="nombre">
+            <input type="text" class="form-control" name="nombre" id="nombre" required>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertAgregarPunto()">Agregar</button>
-      </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success" name="add-punto-venta">Agregar</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -236,6 +226,7 @@
   ];
 
   $input_from_db = json_decode(POST("Administrador/services/getInfoUsers.php",$data), true);
+  $puntos_venta = json_decode(POST("Administrador/services/getPuntosVenta.php",$data), true);
   foreach($input_from_db as  $value){
     echo('
       <div class="modal fade bd-example-modal-xl" id="editarUsuario'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -286,12 +277,27 @@
                 <div class="btn-group">
                   <label for="puntodeventa" class="col-form-label">Punto de venta:</label>
                   <button type="button" class="btn btn-outline-secondary" style="margin-left: 5px;" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-arrow-down"></i></button>
-                  <ul class="dropdown-menu">
-                    <button type="button" class="dropdown-item" id="1">Mesa 1</button>
-                    <button type="button" class="dropdown-item" id="2">Mesa 2</button>
-                    <button type="button" class="dropdown-item" id="3">Mesa 3</button>
-                  </ul>
-              </div>
+                  <ul class="dropdown-menu">');
+                  foreach($puntos_venta as $puntos){
+                    if($puntos[2] == $value[0])
+                      echo('
+                      <li><input type="checkbox" id="'. $puntos[0] .'" name="'. $puntos[1] .'" checked>
+                        <label for="filtro1">'.$puntos[1].'</label></li>
+                      ');
+                    else if ($puntos[2] == null)
+                      echo('
+                      <li><input type="checkbox" id="'. $puntos[0] .'" name="'. $puntos[1] .'">
+                        <label for="filtro1">'.$puntos[1].'</label></li>
+                      ');
+                  }
+                    // <li><input type="checkbox" id="punto1" name="punto2">
+                    //   <label for="filtro1">Mesa 1</label></li>
+                    // <li><input type="checkbox" id="punto2" name="punto2">
+                    //   <label for="filtro2">Mesa 2</label></li>
+                    // <li><input type="checkbox" id="punto3" name="punto3">
+                    //   <label for="filtro3">Mesa 3</label></li>
+                  echo('</ul>
+                </div>
               </form>
             </div>
             <div class="modal-footer">
