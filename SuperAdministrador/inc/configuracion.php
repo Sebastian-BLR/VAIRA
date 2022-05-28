@@ -75,6 +75,7 @@
               <tr>
                 <th scope="row">Nueva contraseña</th>
                 <td><input type="password" id="contraseñaNueva" name="contraseñaNueva"></td>
+                <td><button type="button" class="btn btn-success" >Cambiar contraseña</button></td>
               </tr>
             </tbody>
           </table>
@@ -111,6 +112,10 @@
             <label for="codigopostal" class="col-form-label">Contraseña:</label>
             <input type="password" class="form-control" id="contraseña">
           </div>
+          <div class="mb-3">
+                  <label for="password2" class="col-form-label">Confirmar contraseña:</label>
+                  <input type="password2" class="form-control" id="contrasena">
+                </div>
           <div class="mb-3">
             <label for="regimenfiscal" class="col-form-label">Rol:</label>
             <select name="rol" id="rol" form="carform">
