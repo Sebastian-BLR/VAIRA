@@ -1,12 +1,9 @@
-<?php
-  echo(date("d/m/Y"));
-?>
-  <div class="row" style="margin-top: 5px;font-size: 19px;">
-    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
-      </ol>
-    </nav>
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
+    </ol>
+  </nav>
 </div>
 <!-- //* Validamos que el usuario tenga un punto de venta asignado -->
 <?php if(isset($_SESSION['id_punto_de_venta'])): ?>  
