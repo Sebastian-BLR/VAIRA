@@ -6,11 +6,10 @@
       </ol>
     </nav>
 </div>
+<!-- //* Validamos que el usuario tenga un punto de venta asignado -->
+<?php if(isset($_SESSION['id_punto_de_venta'])): ?>
   <div class="row">
     <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="POST">
-      <!-- <input id="buscar_producto_entrada" style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
-      <button style="margin: 1.4% 0 0 1.4%;" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
-       -->
       <input id="buscar_producto_entrada" name="busqueda" type="text" placeholder="Buscar producto">
       <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
     </form>
@@ -18,7 +17,6 @@
     <button type="button" class="btn btn-secondary"  data-bs-toggle="dropdown" style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
       <ul class="dropdown-menu">
         <?php
-        // var_dump($categorias);
         foreach ($categorias as $categoria) {
           echo '<li><button type="submit" class="dropdown-item" name="categoria" value="'.$categoria[0].'">'.$categoria[1].'</button></li>';
         }
@@ -28,7 +26,7 @@
   </div>
   <div class="wrapper"  style="height:65vh;">
     <?php
-    // * Validamos que el usuario tenga un punto de venta asignado asi como una sucursal
+    // * Validamos que la sucursal exista
     if ($sucursal != null)
       $data = [
         "sucursal" => $sucursal[0][0]
@@ -108,7 +106,7 @@
 
 
 <div class="col-4" style="height:80vh; overflow-y: scroll;" >
-  <h1>Carrito de compra <?php echo(trim($_SESSION['id_punto_de_venta']))  ?></h1>
+  <h1><?php echo(trim($_SESSION['nombre_punto_de_venta']))  ?></h1>
 
       
 
@@ -329,6 +327,7 @@
           }
         }
     ?>
+    <?php else: ?>
+    <h4>No hay un punto asignado a este vendedor</h4>
+    <?php endif; ?>
      
-      
-<!-- The first div closes in the next php file   -->

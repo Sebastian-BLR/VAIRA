@@ -18,18 +18,24 @@
   // ! Validamos que el usuario tenga un punto de venta asignado
   if(!isset($_SESSION['id_punto_de_venta']) && $id_punto_de_venta != null){
     $_SESSION['id_punto_de_venta'] = $id_punto_de_venta[0][0]; //  ! DECLARAMOS EL ID DEL PUNTO DE VENTA DEFAULT
+    $_SESSION['nombre_punto_de_venta'] = $id_punto_de_venta[0][1]; //  ! DECLARAMOS EL NOMBRE DEL PUNTO DE VENTA DEFAULT
   }
 
   
   $data = [
     "idUsuario" => $id_usuario,
-    "puntoVenta" => trim($_SESSION['id_punto_de_venta'])
   ];
 
   $sucursal = json_decode(POST("Vendedor/services/getSucursal.php",$data), true);
   if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['punto_de_venta'])){
       $_SESSION['id_punto_de_venta'] = $_POST['punto_de_venta'];
+      $stmt = $pdo->prepare("SELECT nombre FROM punto_venta WHERE idPunto = :id");
+      $stmt->execute(array(
+        ':id' => $_POST['punto_de_venta']
+      ));
+      $row = $stmt->fetch(PDO::FETCH_NUM);
+      $_SESSION['nombre_punto_de_venta'] = $row[0];
       unset($_POST['punto_de_venta']);
 
     }

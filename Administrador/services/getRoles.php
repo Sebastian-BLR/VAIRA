@@ -7,10 +7,11 @@
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
         $bindings = json_decode($bindings[0]);
-        $sql = 'SELECT fkSucursal FROM sucursal_usuario WHERE fkUsuario = :usuario;';
+        $sql = 'SELECT idTipo, tipo FROM tipo WHERE idTipo > :idTipo;';
         $stmt = $pdo->prepare($sql);
+
         if($stmt->execute(array(
-            ':usuario' => $bindings->idUsuario
+            ':idTipo' => $bindings->idTipo
         ))){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;

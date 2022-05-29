@@ -48,7 +48,7 @@
         <div class="row" >
           <div class="col-2" style="height: 90vh; ">
             <?php 
-              $user_type = 'vendedor';
+              // $user_type = 'vendedor';
               include 'inc/sidenavbar.php' 
             ?>
           </div>
