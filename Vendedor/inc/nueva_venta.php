@@ -1,4 +1,6 @@
-
+<?php
+  echo(date("d/m/Y"));
+?>
   <div class="row" style="margin-top: 5px;font-size: 19px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
       <ol class="breadcrumb">
@@ -7,7 +9,7 @@
     </nav>
 </div>
 <!-- //* Validamos que el usuario tenga un punto de venta asignado -->
-<?php if(isset($_SESSION['id_punto_de_venta'])): ?>
+<?php if(isset($_SESSION['id_punto_de_venta'])): ?>  
   <div class="row">
     <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="POST">
       <input id="buscar_producto_entrada" name="busqueda" type="text" placeholder="Buscar producto">
@@ -27,24 +29,25 @@
   <div class="wrapper"  style="height:65vh;">
     <?php
     // * Validamos que la sucursal exista
-    if ($sucursal != null)
+    if ($sucursal != null){
       $data = [
-        "sucursal" => $sucursal[0][0]
+        "sucursal" => $sucursal[0]
       ];
-    else
+      $info_sucursal = json_decode(Post("Vendedor/services/getInfoSucursal.php",$data),true);
+    } else
       $data = [
         "sucursal" => null
       ];
     
     if(isset($_POST['busqueda'])){
       $data = [
-        "sucursal" => $sucursal[0][0],
+        "sucursal" => $sucursal[0],
         "busqueda" => trim($_POST['busqueda'])
       ];
       $input_from_db = json_decode(Post("Vendedor/services/getSearch.php",$data),true);
     } else if (isset($_POST['categoria'])) {
       $data = [
-        "sucursal" => $sucursal[0][0],
+        "sucursal" => $sucursal[0],
         "categoria" => $_POST['categoria']
       ];
       $input_from_db = json_decode(Post("Vendedor/services/getFilters.php",$data),true);
@@ -216,7 +219,7 @@
               let ticket_IVA = document.getElementById("ticket_IVA")
               let ticket_total = document.getElementById("ticket_total")
 
-              var global_total = global_iva = 0
+              var global_total = global_iva = idVenta = 0
               let updateTicket= () =>{
                 var subtotal = 0
 
@@ -264,10 +267,15 @@
                 }).then(
                     response => response.json()
                 ).then(
+                    data => idVenta = data
+                ).then(
                     response => console.log(response)
                 ).catch(
                     error => console.log(error)
                 )
+
+                console.log(idVenta)
+
                 Swal.fire({
                   title: "¿Deseas imprimir el ticket?",
                   showDenyButton: true,
@@ -279,8 +287,11 @@
                     
                     window.location.assign(`./services/downloadTicket.php?productos=`+
                     `'.urlencode( json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]) ).'`+
-                    `&nombre_tienda=`+`Tienda de Aaron`+
-                    `&direccion=`+`Calle villa de aaron xD`+
+                    `&nombre_tienda=`+`'.$info_sucursal[0].'`+
+                    `&sucursal=`+`Calle '. $info_sucursal[1] . ', Col.' . $info_sucursal[2] . ' C.P.: ' . $info_sucursal[3] . '`+
+                    `&nombre_usuario=`+`'.$_SESSION['userName'].'`+
+                    `&fecha=`+`'.date("d/m/Y").'`+
+                    `&folio=`+String(idVenta)+
                     `&total=`+String(global_total)+
                     `&iva=`+String(global_iva)
                     )
@@ -297,7 +308,7 @@
                   } else if (result.isDenied) {
                     Swal.fire({
                       icon: "info",
-                      title: "Cancelando compra",
+                      title: "No se imprimira el ticket",
                       showConfirmButton: false,
                       timerProgressBar: true,
                       timer: 1500,

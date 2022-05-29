@@ -362,7 +362,7 @@ BEGIN
 
         IF(_contador != -10) THEN
             UPDATE venta SET total = _total WHERE idVenta = _idVenta;
-            SELECT 'Vendido!' AS 'RESULTADO';
+            SELECT _idVenta AS 'FOLIO';
         ELSE
             SELECT 'No se puede realizar la venta' AS 'RESULTADO';
         END IF;

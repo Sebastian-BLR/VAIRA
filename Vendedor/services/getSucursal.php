@@ -12,9 +12,7 @@
         if($stmt->execute(array(
             ':usuario' => $bindings->idUsuario
         ))){
-            while($row = $stmt->fetch(PDO::FETCH_NUM)){
-                $data[] = $row;
-            }
+            $data = $stmt->fetch(PDO::FETCH_NUM);
             // $data[] = "Success";
           
         }else{

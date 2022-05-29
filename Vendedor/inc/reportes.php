@@ -1,3 +1,8 @@
+<?php
+
+
+
+?>
 <div class="row" style="margin-top: 5px;font-size: 18px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -8,18 +13,24 @@
 </div>
 <div class="row" >
   <div class="col" style="font-size: 20px;  margin-top: 5px;">
-    Resumen
-    <div class="row-1" style="margin-top: 5px;">
-      <label class="toggle">
-        <input type="checkbox">
-        <span class="slider"></span>
-      
-        <!-- label element 👇 -->
-        <span class="labels" data-on="Día" data-off="Mes"></span>
-      </label>
-      <input type="date" id="eligeFechareporte" name="eligeFechareporte" style="margin-left: 20px;float:right">
-      <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;">Ventas por producto</button>
-      <button type="button" class="btn btn-outline-dark" style="float: right;">Ventas por categoría</button>
+    <p>
+      Resumen
+    </p>
+    <div class="row" style="margin-top: 5px;">
+      <div class="col-6">
+        <label class="toggle">
+          <input type="checkbox" name="modo">
+          <span class="slider"></span>
+        
+          <!-- label element 👇 -->
+          <span class="labels" data-on="Día" data-off="Mes"></span>
+        </label>
+      </div>
+      <div class="col-6">
+        <input type="date" id="eligeFechareporte" name="eligeFechareporte" style="margin-left: 20px;float:right">
+        <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;">Ventas por producto</button>
+        <button type="button" class="btn btn-outline-dark" style="float: right;">Ventas por categoría</button>
+      </div>
     </div>
   </div>
 </div>

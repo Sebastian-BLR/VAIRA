@@ -15,11 +15,11 @@
             $this->Cell(0,0, $_GET['nombre_tienda'] ,0,0,'C');  // Nombre del negocio
             $this->Ln(10);
             $this->SetFont('Arial','',11);
-            $this->Cell(0,0,'Direccion: '.$_GET['direccion'],0,0,'C');  // Direccion
+            $this->Cell(0,0,'Direccion: '.$_GET['sucursal'],0,0,'C');  // Sucursal
             $this->Ln(7);
-            $this->Cell(0,0,'Vendedor: Nombre del vendedor',0,0,'C');  // Vendedor
+            $this->Cell(0,0,'Vendedor: '.$_GET['nombre_usuario'],0,0,'C');  // Vendedor
             $this->Ln(7);
-            $this->Cell(0,0,'Fecha: 17/05/2022                                    Folio: 00',0,0,'C');  // Fecha y folio
+            $this->Cell(0,0,'Fecha: '.$_GET['fecha'].'                                    Folio: '.$_GET['folio'],0,0,'C');  // Fecha y folio
             $this->Ln(7);
             $this->Cell(0,0,'________________________________________________________',0,0,'C');  // Vendedor
             $this->Ln(7);
@@ -49,20 +49,20 @@
     $pdf->SetFont('Arial','B',12);
     $w = array(40, 80, 40, 30); // Declaramos el ancho de las columnas
     //Declaramos el encabezado de la tabla
-    $pdf->Cell($w[0],6,'SKU', true,0,'C');
-    $pdf->Cell($w[1],6,'ARTICULO',true,0,'C');
-    $pdf->Cell($w[2],6,'CANTIDAD',true,0,'C');
-    $pdf->Cell($w[3],6,'PRECIO',true,0,'C');
+    $pdf->Cell($w[0],6,'SKU', 0,0,'C');
+    $pdf->Cell($w[1],6,'ARTICULO',0,0,'C');
+    $pdf->Cell($w[2],6,'CANTIDAD',0,0,'C');
+    $pdf->Cell($w[3],6,'PRECIO',0,0,'C');
     $pdf->Ln(6);
     $pdf->SetFont('Arial','',12);
     //Mostramos el contenido de la tabla
     $received = $_GET['productos'];
     $received =  json_decode($received, true);
     foreach($received as $row){
-        $pdf->Cell($w[0],6,$row['sku_producto'],1);
-        $pdf->Cell($w[1],6,$row['nombre_producto'],1);
-        $pdf->Cell($w[2],6,$row['cantidad'],1);
-        $pdf->Cell($w[3],6,number_format($row['precio_unitario'] * $row['cantidad'],2),1);
+        $pdf->Cell($w[0],6,$row['sku_producto'],0, 0, 'C');
+        $pdf->Cell($w[1],6,$row['nombre_producto'],0, 0, 'C');
+        $pdf->Cell($w[2],6,$row['cantidad'],0, 0, 'C');
+        $pdf->Cell($w[3],6,number_format($row['precio_unitario'] * $row['cantidad'],2),0, 0, 'C');
         $pdf->Ln();
     }
 
