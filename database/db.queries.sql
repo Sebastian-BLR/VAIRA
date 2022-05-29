@@ -62,37 +62,49 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_usuario;
-CREATE PROCEDURE eliminar_usuario(IN id INT)
+CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
     BEGIN
+        DECLARE _json JSON;
+        DECLARE _idUsuario VARCHAR(5);
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
 
-        START TRANSACTION;
-            UPDATE log_usuario SET desactivar = 1 WHERE fkUsuario = id;
-            UPDATE usuario SET activo = 0 WHERE idUsuario = id;
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idUsuario    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'));
 
-            SELECT * FROM usuario WHERE idUsuario = id;
+
+        START TRANSACTION;
+            UPDATE log_usuario SET desactivar = NOW() WHERE fkUsuario = _idUsuario;
+            UPDATE usuario SET activo = 0 WHERE idUsuario = _idUsuario;
+
+            SELECT * FROM usuario WHERE idUsuario = _idUsuario;
         COMMIT;
     END //
 DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_usuario_fisico;
-CREATE PROCEDURE eliminar_usuario_fisico(IN id INT)
+CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
     BEGIN
+        DECLARE _json JSON;
+        DECLARE _idUsuario INT;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
 
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+
+        SET _idUsuario    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'   ));
+
         START TRANSACTION;
-            DELETE FROM log_usuario WHERE fkUsuario = id;
-            DELETE FROM usuario WHERE idUsuario = id;
-            SELECT * FROM usuario WHERE idUsuario = id;
+            DELETE FROM log_usuario WHERE fkUsuario = _idUsuario;
+            DELETE FROM usuario WHERE idUsuario = _idUsuario;
+            SELECT * FROM usuario WHERE idUsuario = _idUsuario;
         COMMIT;
     END //
 DELIMITER ;
@@ -633,10 +645,102 @@ CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
         SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
         SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
 
-        SELECT DISTINCT usuario.idUsuario, usuario.nombre, correo, usuario, s.nombre, tipo FROM usuario
-            JOIN punto_venta pv on usuario.idUsuario = pv.fkUsuario
-            JOIN sucursal s on pv.fkSucursal = s.idSucursal
+        SELECT DISTINCT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
+            JOIN sucursal_usuario su ON fkUsuario = idUsuario
+            JOIN sucursal s on su.fkSucursal = s.idSucursal
             JOIN tipo t on usuario.fkTipo = t.idTipo
-            WHERE fkTipo = 3 AND fkAdmin = _idAdmin;
+            WHERE fkTipo = 3 AND fkAdmin = _idAdmin AND activo = 1;
     END //
+DELIMITER ;
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS actualizar_usuario;
+CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _idUsuario VARCHAR(50);
+        DECLARE _correo VARCHAR(50);
+        DECLARE _telefono VARCHAR(50);
+        DECLARE _password VARCHAR(128);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'));
+        SET _correo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'));
+        SET _telefono = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono'));
+        SET _password = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'));
+
+        IF (_password = '') THEN
+            IF(_correo != (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono != (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET correo = _correo, telefono = _telefono WHERE idUsuario = _idUsuario;
+            ELSEIF(_correo = (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono != (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET telefono = _telefono WHERE idUsuario = _idUsuario;
+            ELSEIF(_correo != (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono = (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET correo = _correo WHERE idUsuario = _idUsuario;
+            END IF;
+        ELSE
+            IF(_correo != (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono != (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET correo = _correo, telefono = _telefono, password = sha2(_password, 512) WHERE idUsuario = _idUsuario;
+            ELSEIF(_correo = (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono != (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET telefono = _telefono, password = sha2(_password, 512) WHERE idUsuario = _idUsuario;
+            ELSEIF(_correo != (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono = (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
+                UPDATE usuario SET correo = _correo, password = sha2(_password, 512) WHERE idUsuario = _idUsuario;
+            END IF;
+        END IF;
+    END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS actualizar_puntos_usuario;
+CREATE PROCEDURE actualizar_puntos_usuario(IN _jsonA JSON)
+        BEGIN
+            DECLARE _json JSON;
+            DECLARE _fkUsuario INT;
+            DECLARE _idPunto INT;
+            DECLARE _puntosJSON JSON;
+
+            DECLARE _contador INT DEFAULT 0;
+            DECLARE _index INT DEFAULT 0;
+
+            DECLARE EXIT HANDLER FOR SQLEXCEPTION
+            BEGIN
+                SELECT '¡Error!' as 'Resultado';
+                ROLLBACK;
+                END;
+
+            SET _json          = JSON_EXTRACT(_jsonA, '$[0]');
+            SET _puntosJson    = JSON_EXTRACT(_json, '$.puntos');
+            SET _fkUsuario     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario' ));
+            SET _contador      = JSON_LENGTH(_puntosJson) - 1;
+
+            START TRANSACTION ;
+                UPDATE punto_venta SET fkUsuario = NULL WHERE fkUsuario = _fkUsuario;
+                WHILE _contador >= 0 DO
+                    SET _contador = _contador - 1;
+                    SET _json = JSON_EXTRACT(_puntosJson, CONCAT('$[',_index,']'));
+                    SET _index = _index + 1;
+
+                    SET _idPunto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idPunto'));
+
+                    IF((SELECT fkUsuario FROM punto_venta WHERE idPunto = _idPunto) IS NULL) THEN
+                        UPDATE punto_venta SET fkUsuario = _fkUsuario WHERE idPunto = _idPunto;
+                    ELSE
+                        SET _contador = -10;
+                        ROLLBACK;
+                    END IF ;
+                END WHILE ;
+
+                IF(_contador != -10) THEN
+                    SELECT 'Actualizado' AS 'Resultado';
+                ELSE
+                    SELECT 'No se pudo actualizar los puntos de venta' AS 'Resultado';
+                END IF ;
+            COMMIT ;
+        END //
 DELIMITER ;

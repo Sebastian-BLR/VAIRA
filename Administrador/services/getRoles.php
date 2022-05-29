@@ -7,14 +7,17 @@
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
         $bindings = json_decode($bindings[0]);
-        $sql = 'INSERT INTO punto_venta VALUES (0, :sucursal, NULL, :nombre);';
+        $sql = 'SELECT idTipo, tipo FROM tipo WHERE idTipo > :idTipo;';
         $stmt = $pdo->prepare($sql);
 
         if($stmt->execute(array(
-            ':sucursal' => $bindings->sucursal,
-            ':nombre' => $bindings->nombre
+            ':idTipo' => $bindings->idTipo
         ))){
-            $data[] = $stmt->rowCount();
+            while($row = $stmt->fetch(PDO::FETCH_NUM)){
+                $data[] = $row;
+            }
+            // $data[] = "Success";
+          
         }else{
             $data[] = "Error";
         }

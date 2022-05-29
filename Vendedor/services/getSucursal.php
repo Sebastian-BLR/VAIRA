@@ -6,9 +6,12 @@
     if($pdo!=null){
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
-        $sql = 'CALL obtener_sucursal(?);';
+        $bindings = json_decode($bindings[0]);
+        $sql = 'SELECT fkSucursal FROM sucursal_usuario WHERE fkUsuario = :usuario;';
         $stmt = $pdo->prepare($sql);
-        if($stmt->execute($bindings)){
+        if($stmt->execute(array(
+            ':usuario' => $bindings->idUsuario
+        ))){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;
             }
