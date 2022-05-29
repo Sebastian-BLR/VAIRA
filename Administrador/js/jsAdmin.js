@@ -1,5 +1,5 @@
 
-function alertElimarUsuario(){
+function alertElimarUsuario(id){
     Swal.fire({
         title: 'Alerta',
         text: "¿Estás seguro que deseas eliminar este usuario?",
@@ -12,15 +12,11 @@ function alertElimarUsuario(){
         allowOutsideClick: false
       }).then((result) => {
         if (result.isConfirmed) {
-          Swal.fire(
-            'Usuario eliminado',
-            'Se ha eliminado satisfactoriamente el usuario',
-            'success',
-          )
-        }
+          window.location.href = "index.php?configuracion=true&id="+id;
+        }  
       })
-}
-
+    }
+    
 function alertGeneraDocCorteCaja(){
     Swal.fire({
         position: 'top-end',
@@ -47,6 +43,50 @@ function alertAgregarUsuario(){
         'Se ha agregado satisfactoriamente un nuevo usuario',
         'success',
       )
+}
+
+function alertAgregarPunto(){
+  Swal.fire(
+      'Punto de venta agregado',
+      'Se ha agregado satisfactoriamente un nuevo punto de venta',
+      'success',
+    )
+}
+
+function alertCamposVacios(){
+  Swal.fire(
+      'Error',
+      'Por favor llena todos los campos',
+      'error',
+    )
+}
+
+function alertUsuarioExistente(){
+  Swal.fire(
+      'Error',
+      'El nombre de usuario ya existe, intenta con otro',
+      'error',
+    )
+}
+
+function alertPassDiferente(){
+  Swal.fire(
+      'Error',
+      'Las constraseñas no coinciden',
+      'error',
+    )
+}
+
+function alertUpdateUser(form){
+  Swal.fire({
+    icon: 'question',
+    title: 'Actualización de usuario',
+    text: '¿Estas seguro de los cambios a realizar?',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      form.submit();
+    }  
+  })
 }
 
 function alertDevolucion(){ 

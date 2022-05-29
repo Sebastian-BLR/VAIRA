@@ -154,6 +154,10 @@
             <input type="text" class="form-control" id="nombreproducto">
           </div>
           <div class="mb-3">
+            <label for="formFile" class="form-label">Imagen producto</label>
+            <input class="form-control" type="file" id="formFile">
+          </div>
+          <div class="mb-3">
             <label for="precio" class="col-form-label">Precio</label>
             <input type="text" class="form-control" id="precio">
           </div>
@@ -161,6 +165,17 @@
             <label for="categoria" class="col-form-label">Categoria</label>
             <input type="text" class="form-control" id="categoria">
           </div>
+          <div class="btn-group">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Es un servicio:
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Sí</a></li>
+          <li><a class="dropdown-item" href="#">No</a></li>
+        </ul>
+      </div>
+    </div>
           <div class="mb-3">
             <label for="existencia" class="col-form-label">En existencia</label>
             <input type="text" class="form-control" id="existencia">
@@ -176,21 +191,20 @@
 </div>
 
 <!-- Modal Agregar varios productos-->
-<div class="modal fade bd-example-modal-sm" id="agregarVariosProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+<div class="modal fade bd-example-modal-lg" id="agregarVariosProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Agregar varios productos al inventario</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Validar conexión con lector de códigos</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form>
-          
+          Esperando conexión ...
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

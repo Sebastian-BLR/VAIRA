@@ -21,6 +21,7 @@
     <title>Login</title>
     <script src="Vendedor/js/jsVendedor.js"></script>
     <script src="js/jsAdmin.js"></script>
+    <script src="js/javascript.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 
   </head>

@@ -14,7 +14,6 @@
   ];
 
   $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
-  // var_dump($sucursal);
 ?>
 
 <!doctype html>
@@ -49,7 +48,7 @@
         <div class="row" >
           <div class="col-2" style="height: 90vh; ">
             <?php 
-              $user_type = 'vendedor';
+              // $user_type = 'vendedor';
               include 'inc/sidenavbar.php' 
             ?>
           </div>

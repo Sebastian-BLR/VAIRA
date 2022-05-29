@@ -1,16 +1,14 @@
-
-  <div class="row" style="margin-top: 5px;font-size: 19px;">
-    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
-      </ol>
-    </nav>
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Nueva venta</li>
+    </ol>
+  </nav>
 </div>
+<!-- //* Validamos que el usuario tenga un punto de venta asignado -->
+<?php if(isset($_SESSION['id_punto_de_venta'])): ?>  
   <div class="row">
     <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?nueva_venta=true'?>" class="col-9 buscar" method="POST">
-      <!-- <input id="buscar_producto_entrada" style="float: left; width: 50%; margin-top: 1.35%" class="form-control mr-sm-2" type="search" placeholder="Buscar producto" aria-label="Search">
-      <button style="margin: 1.4% 0 0 1.4%;" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i></button>
-       -->
       <input id="buscar_producto_entrada" name="busqueda" type="text" placeholder="Buscar producto">
       <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
     </form>
@@ -18,7 +16,6 @@
     <button type="button" class="btn btn-secondary"  data-bs-toggle="dropdown" style="margin-left: 29%; margin-top:-.8%;"><i class="fa fa-filter"></i>Filtrar</button>
       <ul class="dropdown-menu">
         <?php
-        // var_dump($categorias);
         foreach ($categorias as $categoria) {
           echo '<li><button type="submit" class="dropdown-item" name="categoria" value="'.$categoria[0].'">'.$categoria[1].'</button></li>';
         }
@@ -28,25 +25,26 @@
   </div>
   <div class="wrapper"  style="height:65vh;">
     <?php
-    // * Validamos que el usuario tenga un punto de venta asignado asi como una sucursal
-    if ($sucursal != null)
+    // * Validamos que la sucursal exista
+    if ($sucursal != null){
       $data = [
-        "sucursal" => $sucursal[0][0]
+        "sucursal" => $sucursal[0]
       ];
-    else
+      $info_sucursal = json_decode(Post("Vendedor/services/getInfoSucursal.php",$data),true);
+    } else
       $data = [
         "sucursal" => null
       ];
     
     if(isset($_POST['busqueda'])){
       $data = [
-        "sucursal" => $sucursal[0][0],
+        "sucursal" => $sucursal[0],
         "busqueda" => trim($_POST['busqueda'])
       ];
       $input_from_db = json_decode(Post("Vendedor/services/getSearch.php",$data),true);
     } else if (isset($_POST['categoria'])) {
       $data = [
-        "sucursal" => $sucursal[0][0],
+        "sucursal" => $sucursal[0],
         "categoria" => $_POST['categoria']
       ];
       $input_from_db = json_decode(Post("Vendedor/services/getFilters.php",$data),true);
@@ -108,7 +106,7 @@
 
 
 <div class="col-4" style="height:80vh; overflow-y: scroll;" >
-  <h1>Carrito de compra <?php echo(trim($_SESSION['id_punto_de_venta']))  ?></h1>
+  <h1><?php echo(trim($_SESSION['nombre_punto_de_venta']))  ?></h1>
 
       
 
@@ -218,7 +216,7 @@
               let ticket_IVA = document.getElementById("ticket_IVA")
               let ticket_total = document.getElementById("ticket_total")
 
-              var global_total = global_iva = 0
+              var global_total = global_iva = idVenta = 0
               let updateTicket= () =>{
                 var subtotal = 0
 
@@ -266,10 +264,15 @@
                 }).then(
                     response => response.json()
                 ).then(
+                    data => idVenta = data
+                ).then(
                     response => console.log(response)
                 ).catch(
                     error => console.log(error)
                 )
+
+                console.log(idVenta)
+
                 Swal.fire({
                   title: "¿Deseas imprimir el ticket?",
                   showDenyButton: true,
@@ -281,8 +284,11 @@
                     
                     window.location.assign(`./services/downloadTicket.php?productos=`+
                     `'.urlencode( json_encode($_SESSION["cart"][$_SESSION['id_punto_de_venta']]) ).'`+
-                    `&nombre_tienda=`+`Tienda de Aaron`+
-                    `&direccion=`+`Calle villa de aaron xD`+
+                    `&nombre_tienda=`+`'.$info_sucursal[0].'`+
+                    `&sucursal=`+`Calle '. $info_sucursal[1] . ', Col.' . $info_sucursal[2] . ' C.P.: ' . $info_sucursal[3] . '`+
+                    `&nombre_usuario=`+`'.$_SESSION['userName'].'`+
+                    `&fecha=`+`'.date("d/m/Y").'`+
+                    `&folio=`+String(idVenta)+
                     `&total=`+String(global_total)+
                     `&iva=`+String(global_iva)
                     )
@@ -299,7 +305,7 @@
                   } else if (result.isDenied) {
                     Swal.fire({
                       icon: "info",
-                      title: "Cancelando compra",
+                      title: "No se imprimira el ticket",
                       showConfirmButton: false,
                       timerProgressBar: true,
                       timer: 1500,
@@ -329,6 +335,7 @@
           }
         }
     ?>
+    <?php else: ?>
+    <h4>No hay un punto asignado a este vendedor</h4>
+    <?php endif; ?>
      
-      
-<!-- The first div closes in the next php file   -->
