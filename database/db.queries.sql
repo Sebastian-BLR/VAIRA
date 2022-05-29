@@ -15,20 +15,6 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario  INT;
         DECLARE _fkSucursal INT;
-<<<<<<< HEAD
-
-        DECLARE _json       JSON;
-
-        DECLARE _fkTipo     VARCHAR(10);
-        DECLARE _nombre     VARCHAR(50);
-        DECLARE _apellidoP  VARCHAR(50);
-        DECLARE _apellidoM  VARCHAR(50);
-        DECLARE _correo     VARCHAR(50);
-        DECLARE _telefono   VARCHAR(50);
-        DECLARE _usuario    VARCHAR(50);
-        DECLARE _password   VARCHAR(50);
-
-=======
 
         DECLARE _json       JSON;
 
@@ -80,7 +66,6 @@ CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
         DECLARE _idUsuario VARCHAR(5);
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
@@ -88,49 +73,6 @@ CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
         END;
 
         SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-<<<<<<< HEAD
-
-        SET _nombre    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
-        SET _apellidoP = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.apellidoP'));
-        SET _apellidoM = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.apellidoM'));
-        SET _usuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'  ));
-        SET _password  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password' ));
-        SET _correo    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'   ));
-        SET _telefono  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono' ));
-        SET _fkTipo    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rol'      ));
-
-        START TRANSACTION;
-            INSERT INTO usuario VALUES (0, _fkTipo, _usuario, sha2(_password, 512), _nombre, _apellidoP, _apellidoM, _correo, _telefono, 1);
-            SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = _usuario;
-            INSERT INTO log_usuario VALUES (0, _fkUsuario, NOW(), NOW(), NULL);
-
-            IF (_fkTipo != 1) THEN
-                SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
-                INSERT INTO sucursal_usuario VALUES(_fkUsuario, _fkSucursal);
-                SELECT 'Usuario agregado' as 'Resultado';
-            ELSE
-                SELECT 'Super admin agregado' as 'Resultado';
-            END IF;
-        COMMIT;
-    END //
-DELIMITER ;
-
-DELIMITER //
-DROP PROCEDURE IF EXISTS eliminar_usuario;
-CREATE PROCEDURE eliminar_usuario(IN id INT)
-    BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
-        BEGIN
-            SELECT '¡Error!' as 'Resultado';
-            ROLLBACK;
-        END;
-
-        START TRANSACTION;
-            UPDATE log_usuario SET desactivar = 1 WHERE fkUsuario = id;
-            UPDATE usuario SET activo = 0 WHERE idUsuario = id;
-
-            SELECT * FROM usuario WHERE idUsuario = id;
-=======
         SET _idUsuario    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'));
 
 
@@ -139,34 +81,21 @@ CREATE PROCEDURE eliminar_usuario(IN id INT)
             UPDATE usuario SET activo = 0 WHERE idUsuario = _idUsuario;
 
             SELECT * FROM usuario WHERE idUsuario = _idUsuario;
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
         COMMIT;
     END //
 DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_usuario_fisico;
-<<<<<<< HEAD
-CREATE PROCEDURE eliminar_usuario_fisico(IN id INT)
-    BEGIN
-=======
 CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
         DECLARE _idUsuario INT;
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
-<<<<<<< HEAD
-
-        START TRANSACTION;
-            DELETE FROM log_usuario WHERE fkUsuario = id;
-            DELETE FROM usuario WHERE idUsuario = id;
-            SELECT * FROM usuario WHERE idUsuario = id;
-=======
 
         SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
 
@@ -176,7 +105,6 @@ CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
             DELETE FROM log_usuario WHERE fkUsuario = _idUsuario;
             DELETE FROM usuario WHERE idUsuario = _idUsuario;
             SELECT * FROM usuario WHERE idUsuario = _idUsuario;
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
         COMMIT;
     END //
 DELIMITER ;
@@ -203,7 +131,6 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
         DECLARE _costo       DECIMAL(10,2);
         DECLARE _precio      DECIMAL(10,2);
 
-<<<<<<< HEAD
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -235,39 +162,6 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-=======
-
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
-        BEGIN
-            SELECT '¡Error!' as 'Resultado';
-            ROLLBACK;
-        END;
-
-        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
-        SET _fkProveedor = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.proveedor'));
-        SET _nombre      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
-        SET _costo       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'    ));
-        SET _precio      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'   ));
-        SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imagen'   ));
-        SET _activo      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'   ));
-        SET _servicio    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio' ));
-
-        SELECT nombre INTO _proveedor FROM proveedor WHERE idProveedor = _fkProveedor;
-
-        SELECT COUNT(*) INTO _cantidad FROM producto INNER JOIN proveedor p on producto.fkProveedor = p.idProveedor WHERE idProveedor = _fkProveedor;
-
-        SET _sku = UPPER(CONCAT(LEFT(_proveedor,3),'-', LEFT(_nombre,3),'-',(100 + _cantidad)));
-
-        START TRANSACTION;
-            INSERT INTO producto VALUES (0, _fkCategoria, _fkProveedor, _nombre, _costo, _precio, _sku, _imagen, _activo, _servicio);
-            SELECT idProducto INTO _idProducto FROM producto WHERE nombre = _nombre LIMIT 1;
-            INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
-        COMMIT;
-    END //
-DELIMITER ;
-
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_productos;
 CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
@@ -280,17 +174,10 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
-<<<<<<< HEAD
 
         SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
         SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
 
-=======
-
-        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
-
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
         START TRANSACTION ;
             SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
@@ -312,21 +199,12 @@ CREATE PROCEDURE eliminar_producto(IN id INT)
         START TRANSACTION;
             UPDATE log_producto SET desactivar = 1 WHERE fkProducto = id;
             UPDATE producto SET activo = 0 WHERE idProducto = id;
-<<<<<<< HEAD
 
             SELECT * FROM usuario WHERE idUsuario = id;
         COMMIT;
     END //
 DELIMITER ;
 
-=======
-
-            SELECT * FROM usuario WHERE idUsuario = id;
-        COMMIT;
-    END //
-DELIMITER ;
-
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
 DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_producto_fisico;
 CREATE PROCEDURE eliminar_producto_fisico(IN id INT)
@@ -675,7 +553,6 @@ DELIMITER ;
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
-<<<<<<< HEAD
     BEGIN
         DECLARE _fkUsuario INT;
 
@@ -684,28 +561,6 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
 
         DECLARE _tempJson  TEXT;
         DECLARE _monthName VARCHAR(50);
-=======
-BEGIN
-    DECLARE _fkUsuario INT;
-
-    DECLARE _json      JSON;
-    DECLARE _resultado JSON;
-
-    DECLARE _tempJson  TEXT;
-    DECLARE _monthName VARCHAR(50);
-
-    DECLARE _mes       INT DEFAULT 1;
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SELECT '¡Error!' as 'Resultado';
-        ROLLBACK;
-    END;
-
-    SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-    SET _resultado = '{"Resultado": []}';
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
 
         DECLARE _mes       INT DEFAULT 1;
 
@@ -739,7 +594,6 @@ DELIMITER ;
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
 CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
-<<<<<<< HEAD
     BEGIN
         DECLARE _fkUsuario INT;
 
@@ -747,31 +601,6 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
         DECLARE _resultado JSON;
 
         DECLARE _tempJson  TEXT;
-=======
-BEGIN
-    DECLARE _fkUsuario INT;
-
-    DECLARE _json      JSON;
-    DECLARE _resultado JSON;
-
-    DECLARE _tempJson  TEXT;
-
-    DECLARE _fecha     VARCHAR(50);
-    DECLARE _dayName   VARCHAR(50);
-
-    DECLARE _dia       INT DEFAULT 1;
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SELECT '¡Error!' as 'Resultado';
-        ROLLBACK;
-    END;
-
-    SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-    SET _fecha     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
-    SET _resultado = '{"Resultado": []}';
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
 
         DECLARE _fecha     VARCHAR(50);
         DECLARE _dayName   VARCHAR(50);
@@ -816,25 +645,6 @@ CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
         SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
         SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
 
-        SELECT DISTINCT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
-            JOIN sucursal_usuario su ON fkUsuario = idUsuario
-            JOIN sucursal s on su.fkSucursal = s.idSucursal
-            JOIN tipo t on usuario.fkTipo = t.idTipo
-            WHERE fkTipo = 3 AND fkAdmin = _idAdmin AND activo = 1;
-    END //
-DELIMITER ;
-
-DELIMITER //
-<<<<<<< HEAD
-DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
-CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
-    BEGIN
-        DECLARE _idAdmin INT;
-        DECLARE _json    JSON;
-
-        SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
-
         SELECT DISTINCT usuario.idUsuario, usuario.nombre, correo, usuario, s.nombre, tipo FROM usuario
             JOIN punto_venta pv on usuario.idUsuario = pv.fkUsuario
             JOIN sucursal s on pv.fkSucursal = s.idSucursal
@@ -844,15 +654,24 @@ CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
 DELIMITER ;
 
 DELIMITER //
-CALL filtrar_ventas_categoria('[{"fkUsuario":3,"fkCategoria":1}]');
-DROP PROCEDURE IF EXISTS filtrar_ventas_categoria;
-CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
+DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
+CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
     BEGIN
-        DECLARE _fkUsuario   INT;
-        DECLARE _fkCategoria INT;
+        DECLARE _idAdmin INT;
+        DECLARE _json    JSON;
 
-        DECLARE _json        JSON;
-=======
+        SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
+
+        SELECT DISTINCT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
+            JOIN sucursal_usuario su ON fkUsuario = idUsuario
+            JOIN sucursal s on su.fkSucursal = s.idSucursal
+            JOIN tipo t on usuario.fkTipo = t.idTipo
+            WHERE fkTipo = 3 AND fkAdmin = _idAdmin AND activo = 1;
+    END //
+DELIMITER ;
+
+DELIMITER //
 
 DROP PROCEDURE IF EXISTS actualizar_usuario;
 CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
@@ -862,7 +681,6 @@ CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
         DECLARE _correo VARCHAR(50);
         DECLARE _telefono VARCHAR(50);
         DECLARE _password VARCHAR(128);
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -870,42 +688,6 @@ CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-<<<<<<< HEAD
-        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'  ));
-        SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkCategoria'));
-
-        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
-            WHERE fkUsuario = _fkUsuario AND fkCategoria = _fkCategoria;
-
-    END//
-DELIMITER ;
-
-DELIMITER //
-CALL filtrar_ventas_producto('[{"fkUsuario":3,"fkProducto":1}]');
-DROP PROCEDURE IF EXISTS filtrar_ventas_producto;
-CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
-    BEGIN
-        DECLARE _fkUsuario   INT;
-        DECLARE _fkProducto INT;
-
-        DECLARE _json        JSON;
-
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
-        BEGIN
-            SELECT '¡Error!' as 'Resultado';
-            ROLLBACK;
-        END;
-
-        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
-        SET _fkProducto  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkProducto'));
-
-        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
-            WHERE fkUsuario = _fkUsuario AND idProducto = _fkProducto;
-
-    END//
-=======
         SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
         SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'));
         SET _correo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'));
@@ -979,5 +761,54 @@ CREATE PROCEDURE actualizar_puntos_usuario(IN _jsonA JSON)
                 END IF ;
             COMMIT ;
         END //
->>>>>>> 5c3264b5efd14561c9080e1bc151d5a70a05e6d5
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_categoria;
+CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkUsuario   INT;
+        DECLARE _fkCategoria INT;
+
+        DECLARE _json        JSON;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'  ));
+        SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkCategoria'));
+
+        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
+            WHERE fkUsuario = _fkUsuario AND fkCategoria = _fkCategoria;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_producto;
+CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkUsuario   INT;
+        DECLARE _fkProducto INT;
+
+        DECLARE _json        JSON;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+        SET _fkProducto  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkProducto'));
+
+        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
+            WHERE fkUsuario = _fkUsuario AND idProducto = _fkProducto;
+
+    END//
 DELIMITER ;
