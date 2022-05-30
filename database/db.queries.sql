@@ -553,86 +553,104 @@ DELIMITER ;
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
-BEGIN
-    DECLARE _fkUsuario INT;
-
-    DECLARE _json      JSON;
-    DECLARE _resultado JSON;
-
-    DECLARE _tempJson  TEXT;
-    DECLARE _monthName VARCHAR(50);
-
-    DECLARE _mes       INT DEFAULT 1;
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        SELECT '¡Error!' as 'Resultado';
-        ROLLBACK;
-    END;
+        DECLARE _fkUsuario INT;
 
-    SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-    SET _resultado = '{"Resultado": []}';
+        DECLARE _json      JSON;
+        DECLARE _resultado JSON;
 
-    WHILE _mes <= 12 DO
-        IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
-        THEN
-            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes;
-            SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
-        ELSE
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
-        END IF;
+        DECLARE _tempJson  TEXT;
+        DECLARE _monthName VARCHAR(50);
 
-        SET _mes = _mes + 1;
-    END WHILE;
+        DECLARE _mes       INT DEFAULT 1;
 
-    SELECT CONVERT(_resultado,JSON) as 'Resultado';
-END//
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+        SET _resultado = '{"Resultado": []}';
+
+        WHILE _mes <= 12 DO
+            IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
+            THEN
+                SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes;
+                SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
+                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
+            ELSE
+                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
+            END IF;
+
+            SET _mes = _mes + 1;
+        END WHILE;
+
+        SELECT CONVERT(_resultado,JSON) as 'Resultado';
+    END//
 DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
 CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
-BEGIN
-    DECLARE _fkUsuario INT;
-
-    DECLARE _json      JSON;
-    DECLARE _resultado JSON;
-
-    DECLARE _tempJson  TEXT;
-
-    DECLARE _fecha     VARCHAR(50);
-    DECLARE _dayName   VARCHAR(50);
-
-    DECLARE _dia       INT DEFAULT 1;
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        SELECT '¡Error!' as 'Resultado';
-        ROLLBACK;
-    END;
+        DECLARE _fkUsuario INT;
 
-    SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-    SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-    SET _fecha     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
-    SET _resultado = '{"Resultado": []}';
+        DECLARE _json      JSON;
+        DECLARE _resultado JSON;
 
-    WHILE _dia <= 7 DO
-        IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
-        THEN
-            SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson  FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
-            SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
-        ELSE
-            SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
-        END IF;
+        DECLARE _tempJson  TEXT;
 
-        SET _dia = _dia + 1;
-    END WHILE;
+        DECLARE _fecha     VARCHAR(50);
+        DECLARE _dayName   VARCHAR(50);
 
-    SELECT CONVERT(_resultado,JSON) as 'Resultado';
-END//
+        DECLARE _dia       INT DEFAULT 1;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+        SET _fecha     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
+        SET _resultado = '{"Resultado": []}';
+
+        WHILE _dia <= 7 DO
+            IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
+            THEN
+                SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson  FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+                SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
+                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
+            ELSE
+                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
+            END IF;
+
+            SET _dia = _dia + 1;
+        END WHILE;
+
+        SELECT CONVERT(_resultado,JSON) as 'Resultado';
+    END//
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
+CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
+    BEGIN
+        DECLARE _idAdmin INT;
+        DECLARE _json    JSON;
+
+        SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
+
+        SELECT DISTINCT usuario.idUsuario, usuario.nombre, correo, usuario, s.nombre, tipo FROM usuario
+            JOIN punto_venta pv on usuario.idUsuario = pv.fkUsuario
+            JOIN sucursal s on pv.fkSucursal = s.idSucursal
+            JOIN tipo t on usuario.fkTipo = t.idTipo
+            WHERE fkTipo = 3 AND fkAdmin = _idAdmin;
+    END //
 DELIMITER ;
 
 DELIMITER //
@@ -743,4 +761,54 @@ CREATE PROCEDURE actualizar_puntos_usuario(IN _jsonA JSON)
                 END IF ;
             COMMIT ;
         END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_categoria;
+CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkUsuario   INT;
+        DECLARE _fkCategoria INT;
+
+        DECLARE _json        JSON;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'  ));
+        SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkCategoria'));
+
+        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
+            WHERE fkUsuario = _fkUsuario AND fkCategoria = _fkCategoria;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS filtrar_ventas_producto;
+CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkUsuario   INT;
+        DECLARE _fkProducto INT;
+
+        DECLARE _json        JSON;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+        SET _fkProducto  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkProducto'));
+
+        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
+            WHERE fkUsuario = _fkUsuario AND idProducto = _fkProducto;
+
+    END//
 DELIMITER ;
