@@ -20,6 +20,7 @@
     <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
   </div>
   <div class="row-1" style="margin-top: 30px;">
+  <div class="wrapper"  style="height:65vh;">
     <table class="table">
       <thead>
         <tr>
@@ -58,6 +59,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </div>
    

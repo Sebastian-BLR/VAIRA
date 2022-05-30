@@ -23,6 +23,7 @@
       </div>
     </div>
   <div class="row-1" style="margin-top: 30px;">
+  <div class="wrapper"  style="height:65vh;">
     <table class="table">
       <thead>
         <tr>
@@ -91,6 +92,7 @@
           ?>
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 

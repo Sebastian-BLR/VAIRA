@@ -25,6 +25,7 @@
       </div>
     </div>
     <div class="row-1" style="margin-top: 30px;">
+    <div class="wrapper"  style="height:65vh;">
       <table class="table">
         <thead>
           <tr>
@@ -83,6 +84,7 @@
           ?>
         </tbody>
       </table>
+      </div>
 
     <!-- Modal Factura-->
     <div class="modal fade bd-example-modal-xl" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
