@@ -8,13 +8,13 @@
         $bindings[] = file_get_contents('php://input');
         $bindings = json_decode($bindings[0]);
         $sql = 'SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
-            SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = :idUsuario AND DATE(fecha) = :fecha);';
+            SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = :idUsuario AND DATE(fecha) = :fecha AND venta.fkUsuario = :idUsuario);';
         $stmt = $pdo->prepare($sql);
 
-        if($stmt->execute(array(
-            ':idUsuario' => $bindings->idUsuario,
-            ':fecha' => $bindings->fecha
-        ))){
+        $stmt->bindParam(':idUsuario', $bindings->idUsuario);
+        $stmt->bindParam(':fecha', $bindings->fecha);
+
+        if($stmt->execute()){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;
             }

@@ -10,10 +10,8 @@
         $sql = 'SELECT idVenta, fecha, nombre, total FROM venta JOIN sucursal WHERE idSucursal = (
             SELECT DISTINCT fkSucursal FROM punto_venta WHERE punto_venta.fkUsuario = :idUsuario) AND fkUsuario = :idUsuario;';
         $stmt = $pdo->prepare($sql);
-
-        if($stmt->execute(array(
-            ':idUsuario' => $bindings->idUsuario
-        ))){
+        $stmt->bindParam(':idUsuario', $bindings->idUsuario);
+        if($stmt->execute()){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
                 $data[] = $row;
             }

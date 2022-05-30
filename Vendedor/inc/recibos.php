@@ -38,16 +38,6 @@
         </thead>
         <tbody>
           <?php
-          // Here starts a request to get data from the data base
-          // the variable $input_from_db stores all data from database as list (if not make adjustments in foreach)
-          // $input_from_db = array(
-          //   "key1"=>"",
-          //   "key2"=>"",
-          //   "key3"=>"",
-          //   "key4"=>"",
-          //   "key5"=>"",
-          // );
-          
           if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
             $data = [
               'idUsuario' => $id_usuario,
@@ -55,13 +45,14 @@
             ];
           
             $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
-          
+            
           } else{ 
             $data = [
               'idUsuario' => $id_usuario
             ];
             $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
           }
+
 
           if ($input_from_db == null){
             echo('
@@ -74,7 +65,7 @@
                 <td></td>
               </tr>
               ');
-          }else{
+          } else{
             foreach($input_from_db as $value){
               //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
               // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
@@ -88,7 +79,6 @@
                 <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
               </tr>
               ');
-            }
            }
           ?>
         </tbody>
@@ -242,68 +232,75 @@
     
     <!-- Modal Detalle Venta -->
     <?php
+      if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
+        $data = [
+          'idUsuario' => $id_usuario,
+          'fecha' => $_POST['eligeFecha']
+        ];
+      
+        $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+      } else {
           $data = [
             'idUsuario' => $id_usuario
           ];
-          
           $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
-
-          foreach($input_from_db as $value){
-            $data = [
-              'idVenta' => $value[0]
-            ];
-            $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
-            echo('
-            <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-              <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form>
-                      <div class="mb-3">
-                        <label for="vendedor" class="col-form-label">Vendedor</label>
-                        <input type="text" class="form-control" id="vendedor" value="'.$infoSale[0][0].'" disabled>
-                      </div>
-                      <div class="mb-3">
-                        <label for="hora" class="col-form-label">Hora</label>
-                        <input type="text" class="form-control" id="hora" value="'.hora($infoSale[0][1]).'" disabled>
-                      </div>
-                      <div class="mb-3">
-                        <label for="productos" class="col-form-label">Productos</label>
-                        ');
-                        
-                        foreach($infoSale as $sale){
-                          echo ('
-                          <ul>
-                            <li style="list-style:none;">'
-                              .$sale[3] . " " . $sale[2] . '
-                            </li>
-                          </ul>');
-                        }
-                        
-                        echo('
-                      </div>
-                      <div class="mb-3">
-                        <label for="total" class="col-form-label">Total</label>
-                        <input type="text" class="form-control" id="total" value="'. $infoSale[0][5] .'" disabled>
-                      </div>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                  </div>
+        }
+        foreach($input_from_db as $value){
+          $data = [
+            'idVenta' => $value[0]
+          ];
+          $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
+          echo('
+          <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="mb-3">
+                      <label for="vendedor" class="col-form-label">Vendedor</label>
+                      <input type="text" class="form-control" id="vendedor" value="'.$infoSale[0][0].'" disabled>
+                    </div>
+                    <div class="mb-3">
+                      <label for="hora" class="col-form-label">Hora</label>
+                      <input type="text" class="form-control" id="hora" value="'.hora($infoSale[0][1]).'" disabled>
+                    </div>
+                    <div class="mb-3">
+                      <label for="productos" class="col-form-label">Productos</label>
+                      ');
+                      
+                      foreach($infoSale as $sale){
+                        echo ('
+                        <ul>
+                          <li style="list-style:none;">'
+                            .$sale[3] . " " . $sale[2] . '
+                          </li>
+                        </ul>');
+                      }
+                      
+                      echo('
+                    </div>
+                    <div class="mb-3">
+                      <label for="total" class="col-form-label">Total</label>
+                      <input type="text" class="form-control" id="total" value="'. $infoSale[0][5] .'" disabled>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                 </div>
               </div>
-            </div>');
-          }
+            </div>
+          </div>');
+          } 
+        }
           
           
           ?>
 
   </div>
-</div>
-      
+
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
