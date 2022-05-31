@@ -14,6 +14,9 @@
   ];
 
   $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
+  $sucursal = $sucursal[0];
+
+  $categorias = json_decode(POST("Administrador/services/getCategories.php", $data), true);
 ?>
 
 <!doctype html>
