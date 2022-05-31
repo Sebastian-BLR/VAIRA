@@ -115,7 +115,7 @@ for($i = 0; $i < count($meses); $i++){
       Resumen
     </p>
     <div class="row" style="margin-top: 5px;">
-      <div class="col-6">
+      <div class="col-4" style="border-style: none; text-align: left;">
         <label class="toggle" id="status">
           <input type="checkbox" name="modo" id="modo">
           <span class="slider"></span>
@@ -124,10 +124,15 @@ for($i = 0; $i < count($meses); $i++){
           <span class="labels" data-on="Día" data-off="Mes"></span>
         </label>
       </div>
-      <div class="col-6">
-        <input type="date" id="eligeFechareporte" name="eligeFechareporte" style="margin-left: 20px;float:right">
+      <div class="col-5">
         <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;">Ventas por producto</button>
         <button type="button" class="btn btn-outline-dark" style="float: right;">Ventas por categoría</button>
+      </div>
+      <div class="col-3">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?reportes=true'?>" method="POST" style="display: inline;" style="margin-top:5">
+          <input type="date" id="eligeFechareporte" name="eligeFechareporte" style="margin-right: 10px;float:left">
+          <button type="submit" class="btn btn-primary fa fa-search" style="padding: 5px 12px; margin-top:-.8%;"></button>
+        </form>
       </div>
     </div>
   </div>
