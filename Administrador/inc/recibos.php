@@ -23,7 +23,7 @@
       </div>
     </div>
   <div class="row-1" style="margin-top: 30px;">
-  <div class="wrapper"  style="height:65vh;">
+  <div class="wrapper"  style="height:55vh;">
     <table class="table">
       <thead>
         <tr>

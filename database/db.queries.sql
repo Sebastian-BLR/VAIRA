@@ -179,9 +179,10 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
         SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
 
         START TRANSACTION ;
-            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
+                JOIN categoria c on c.idCategoria = producto.fkCategoria
                 JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal;
         COMMIT ;
     END //
@@ -273,10 +274,11 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
         SET _categoria   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
 
         START TRANSACTION ;
-            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
-                JOIN region_iva ri on s.fkRegion = ri.idRegion 
+                JOIN region_iva ri on s.fkRegion = ri.idRegion
+                JOIN categoria c on producto.fkCategoria = c.idCategoria
                 WHERE fkSucursal = _idSucursal AND fkCategoria = _categoria;
         COMMIT ;
     END //
