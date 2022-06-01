@@ -121,6 +121,7 @@ for($i = 0; $i < count($meses); $i++){
     'porcentaje' => $datos_grafica_mes[$i]
   ];
 }
+var_dump($sales_month);
 ?>
 <div class="row" style="margin-top: 5px;font-size: 18px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
