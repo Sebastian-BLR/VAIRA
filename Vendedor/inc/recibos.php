@@ -10,9 +10,9 @@
     </ol>
     </nav>
 </div>
-<div class="row" style="font-size: 20px;  margin-top: 10px;">
+<div class="row" style="font-size: 20px;  margin-top: 5px;">
     Recibos
-    <div class="row" style="margin-top: 10px;">
+    <div class="row" style="margin-top: 5px;">
       <div class="col">
         <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">
           <input type="date" id="eligeFecha" name="eligeFecha">
@@ -24,67 +24,70 @@
         <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
       </div>
     </div>
-    <div class="row-1" style="margin-top: 30px;">
-    <div class="wrapper"  style="height:65vh;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">No.Venta</th>
-            <th scope="col">Fecha</th>
-            <th scope="col">Sucursal</th>
-            <th scope="col">Monto</th>
-            <th scope="col">Detalle</th>
-            <th scope="col">Factura</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
-            $data = [
-              'idUsuario' => $id_usuario,
-              'fecha' => $_POST['eligeFecha']
-            ];
-          
-            $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+    <div class="row-1" style="margin-top: 10px;">
+      <div class="wrapper"  style="height:62vh;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">No.Venta</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Sucursal</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Detalle</th>
+              <th scope="col">Factura</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if (isset($_POST['eligeFecha']) && $_POST['eligeFecha'] != "") {
+              $data = [
+                'idUsuario' => $id_usuario,
+                'fecha' => $_POST['eligeFecha']
+              ];
             
-          } else{ 
-            $data = [
-              'idUsuario' => $id_usuario
-            ];
-            $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
-          }
+              $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+              
+            } else{ 
+              $data = [
+                'idUsuario' => $id_usuario
+              ];
+              $input_from_db = json_decode(POST("Vendedor/services/getSales.php",$data), true);
+            }
 
 
-          if ($input_from_db == null){
-            echo('
-              <tr>
-                <th scope="row"></th>
-                <td>No se encontraron recibos</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              ');
-          } else{
-            foreach($input_from_db as $value){
-              //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
-              // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
+            if ($input_from_db == null){
               echo('
-              <tr>
-                <th scope="row">'.$value[0].'</th>
-                <td>'.fecha($value[1]).'</td>
-                <td>'.$value[2].'</td>
-                <td>$'.$value[3].'</td>
-                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
-                <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
-              </tr>
-              ');
-           }
-          ?>
-        </tbody>
-      </table>
+                <tr>
+                  <th scope="row"></th>
+                  <td>No se encontraron recibos</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                ');
+            } else{
+              foreach($input_from_db as $value){
+                //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
+                // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
+                echo('
+                <tr>
+                  <th scope="row">'.$value[0].'</th>
+                  <td>'.fecha($value[1]).'</td>
+                  <td>'.$value[2].'</td>
+                  <td>$'.$value[3].'</td>
+                  <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
+                  <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+                </tr>
+                ');
+            }
+          }
+            ?>
+          </tbody>
+        </table>
       </div>
+    </div>
+  </div>
 
     <!-- Modal Factura-->
     <div class="modal fade bd-example-modal-xl" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -297,12 +300,7 @@
               </div>
             </div>
           </div>');
-          } 
-        }
-          
-          
-          ?>
-
-  </div>
+          }      
+    ?>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
