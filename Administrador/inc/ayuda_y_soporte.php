@@ -1,3 +1,11 @@
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Ayuda y soporte</li>
+  </ol>
+  </nav>
+</div>
 <div class="row" >
     <div class="col" style="font-size: 22px;  margin-top: 10px;">
       Como usar Vaira si eres administrador

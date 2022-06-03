@@ -1,7 +1,11 @@
-
-
-
-               
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Inventario</li>
+  </ol>
+  </nav>
+</div>               
                 
 <div class="btn-group">
   <button type="button" class="btn btn-secondary" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-filter"></i>Filtrar</button>
@@ -31,7 +35,7 @@
     </ul>
   </div>
 </div>
-<div class="wrapper">
+<div class="wrapper" style="height:65vh;">
   <div class="row" style="margin: 0 0 5px 0;">
     <div class="card" style="width: 12rem;">
       <div class="card-body">
@@ -39,6 +43,8 @@
         <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" data-bs-target="#eliminar"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
       </div>
       <img src="../src/image/productos/papas.png" class="card-img-top" alt="...">
+      <h5> Nombre </h5>
+      <h7>SKU: </h7>
       <div class="card-body">
         <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mostrarDetalleProducto"><i class="fa fa-search-plus"></i></button>
       </div>

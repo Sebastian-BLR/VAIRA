@@ -1,4 +1,11 @@
-    
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Configuraci&oacuten</li>
+  </ol>
+  </nav>
+</div>    
       
 <div style="font-size: 20px;  margin-top: 10px;">
   <div class="row" style="font-size: 25px;  margin-top: 15px;">
@@ -14,7 +21,7 @@
   </div>
 </div>
 <div class="row-1" style="margin-top: 15px; font-size: 17px;">
-  <div class="wrapper"  style="height:33vh;">
+  <div class="wrapper"  style="height:32vh;">
     <table class="table">
       <thead>
         <tr>
@@ -35,8 +42,8 @@
           <td>******</td>
           <td>administrador</td>
           <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"
-              style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-          <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
+              style="float: center; margin-left: 12px; "><i class="fa fa-minus-circle"></i></button></td>
+          <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
             <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
         </tr>
         <tr>
@@ -46,8 +53,8 @@
           <td>********</td>
           <td>vendedor</td>
           <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"
-              style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-          <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
+              style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
+          <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
             <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
         </tr>
         <tr>
@@ -57,8 +64,8 @@
           <td>*********</td>
           <td>administrador</td>
           <td><button type="button" class="btn btn-danger" onclick="alertElimarUsuario()"
-              style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-          <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
+              style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
+          <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarUsuario">
             <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
         </tr>
       </tbody>
@@ -71,7 +78,7 @@
   </div>
 </div>
 <div class="row-1" style="margin-top: 15px; font-size: 17px;">
-    <div class="wrapper"  style="height:30vh;">   
+    <div class="wrapper"  style="height:24vh;">   
       <table class="table">
         <thead>
           <tr>
@@ -84,28 +91,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>administrador 1</td>
+            <td>Proveedor 1</td>
             <td>1234567890</td>
             <td>admin1@gmail.com</td>
             <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
+                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
+            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
               <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
           </tr>
-          <td>administrador 2</td>
+          <td>Proveedor 2</td>
             <td>1234567890</td>
             <td>admin2@gmail.com</td>
             <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
+                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
+            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
               <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
           </tr>
-          <td>administrador 3</td>
+          <td>Proveedor 3</td>
             <td>1234567890</td>
             <td>admin3@gmail.com</td>
             <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
+                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
+            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
               <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
           </tr>
         </tbody>

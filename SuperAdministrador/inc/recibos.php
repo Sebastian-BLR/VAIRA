@@ -1,4 +1,10 @@
-
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Recibos</li>
+    </ol>
+    </nav>
+</div>
               
 <div style="font-size: 20px;  margin-top: 10px;">
   Recibos
@@ -20,7 +26,7 @@
     <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
   </div>
   <div class="row-1" style="margin-top: 30px;">
-  <div class="wrapper"  style="height:65vh;">
+  <div class="wrapper"  style="height:58vh;">
     <table class="table">
       <thead>
         <tr>

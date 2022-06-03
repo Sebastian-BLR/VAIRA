@@ -1,4 +1,11 @@
-
+<div class="row" style="margin-top: 5px;font-size: 19px;">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="?recibos=true">Recibos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Reportes</li>
+  </ol>
+  </nav>
+</div>
 <div style="font-size: 20px;  margin-top: 10px;">
   Resumen
   <div class="btn-group" style="float: right; margin-left: 5px; margin-bottom: 2px;">
