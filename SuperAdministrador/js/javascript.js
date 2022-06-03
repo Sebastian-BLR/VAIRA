@@ -21,6 +21,72 @@ function alertElimarUsuario(){
       })
 }
 
+function alertElimarProveedor(){
+  Swal.fire({
+      title: 'Alerta',
+      text: "¿Estás seguro que deseas eliminar este proveedor?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Proveedor eliminado',
+          'Se ha eliminado satisfactoriamente el proveedor',
+          'success',
+        )
+      }
+    })
+}
+
+function alertEditarUsuario(){
+  Swal.fire({
+      title: 'Alerta',
+      text: "¿Estás seguro que deseas editar este usuario?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Usuario editado',
+          'Se ha editado satisfactoriamente el usuario',
+          'success',
+        )
+      }
+    })
+}
+
+function alertEditarProveedor(){
+  Swal.fire({
+      title: 'Alerta',
+      text: "¿Estás seguro que deseas editar este proveedor?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Proveedor editado',
+          'Se ha editado satisfactoriamente el proveedor',
+          'success',
+        )
+      }
+    })
+}
+
 function alertGeneraDocCorteCaja(){
     Swal.fire({
         position: 'top-end',
@@ -48,6 +114,15 @@ function alertAgregarUsuario(){
         'success',
       )
 }
+
+function alertAgregarProveedor(){
+  Swal.fire(
+      'Proveedor agregado',
+      'Se ha agregado satisfactoriamente un nuevo proveedor',
+      'success',
+    )
+}
+
 
 function alertDevolucion(){ 
   Swal.fire({

@@ -214,20 +214,6 @@ if(isset($_POST['updateUser'])){
     </tbody>
   </table>
 </div>
-<div class="row" style="margin-top: 15px; font-size: 25px;">
-  Respaldo
-  <div class="row-1" style="margin-top: 8px;font-size: 17px;">
-    <table class="table">
-      <tbody>
-        <tr>
-          <th scope="row">Fecha de Respaldo</th>
-          <td><input type="date" id="eligeFechaRespaldo" name="eligeFechaRespaldo"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-<div class="row" style="margin-top: 15px; font-size: 25px;">
 
 <!-- Modal Agregar Usuario-->
 <div class="modal fade bd-example-modal-xl" id="agregarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

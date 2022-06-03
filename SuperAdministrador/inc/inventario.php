@@ -165,20 +165,20 @@
             <label for="categoria" class="col-form-label">Categoria</label>
             <input type="text" class="form-control" id="categoria">
           </div>
-          <div class="btn-group">
-      <div class="btn-group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        Es un servicio:
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Sí</a></li>
-          <li><a class="dropdown-item" href="#">No</a></li>
-        </ul>
-      </div>
-    </div>
           <div class="mb-3">
+            <label for="servicio" class="col-form-label">Es un servicio:</label>
+            <select name="select servicio" onchange="cambiarVisibiidadExistencia()" id="select_servicio" form="carform">
+              <option value="0">No</option>
+              <option value="1">Sí</option>
+            </select>
+          </div>
+          <div class="mb-3" id="existeniaDiv">
             <label for="existencia" class="col-form-label">En existencia</label>
             <input type="text" class="form-control" id="existencia">
+          </div>
+          <div class="mb-3">
+            <label for="proveedor" class="col-form-label">Proveedor</label>
+            <input type="text" class="form-control" id="proveedor">
           </div>
         </form>
       </div>
@@ -209,4 +209,13 @@
     </div>
   </div>
 </div>
+<script>
+  function cambiarVisibiidadExistencia(newStatus){
+    var selectedValue = document.getElementById("select_servicio").value;
+    // var newStatus = selectedValue ==1? "block":"none";
+    // document.getElementById("existeniaDiv").style.display = newStatus;
+    var newStatus = selectedValue ==1? "hidden":"visible";
+    document.getElementById("existeniaDiv").style.visibility = newStatus;
+  }
+</script>
 
