@@ -552,7 +552,6 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-# CALL filtrar_ventas_mensuales('[{"fkUsuario":1,"fkSucursal":1}]');
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
@@ -560,6 +559,7 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
         DECLARE _fkUsuario   INT;
         DECLARE _tipoUsuario INT;
         DECLARE _fkSucursal  INT;
+        DECLARE _totalVentas INT;
 
         DECLARE _json        JSON;
         DECLARE _resultado   JSON;
@@ -586,7 +586,8 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
             WHILE _mes <= 12 DO
                 IF(_tipoUsuario = 1) THEN
                     IF ((SELECT COUNT(*) FROM venta WHERE MONTH(fecha) = _mes) > 0) THEN
-                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        SELECT COUNT(*) INTO _totalVentas FROM venta WHERE MONTH(fecha) = _mes;
+                        SELECT JSON_OBJECT('Ventas',_totalVentas,'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
                         WHERE MONTH(fecha) = _mes;
                         SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE MONTH(fecha) = _mes LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
@@ -599,7 +600,8 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
                     END IF;
                 ELSEIF(_tipoUsuario = 2) THEN
                     IF ((SELECT COUNT(*) FROM venta WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal) > 0) THEN
-                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        SELECT COUNT(*) INTO _totalVentas FROM venta WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal;
+                        SELECT JSON_OBJECT('Ventas',_totalVentas,'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
                         WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal;
                         SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
@@ -612,7 +614,8 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
                     END IF;
                 ELSE
                     IF ((SELECT COUNT(*) FROM venta WHERE MONTH(fecha) = _mes AND fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal) > 0) THEN
-                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        SELECT COUNT(*) INTO _totalVentas FROM venta WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                        SELECT JSON_OBJECT('Ventas',_totalVentas,'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
                         WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
                         SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND MONTH(fecha) = _mes LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
@@ -639,24 +642,24 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
     END//
 DELIMITER ;
 
-# CALL filtrar_ventas_semanal('[{"fkUsuario":1,"fkSucursal":1,"fecha":"2022-05-22"}]');
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
 CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
     BEGIN
-        DECLARE _fkUsuario INT;
+        DECLARE _fkUsuario   INT;
         DECLARE _tipoUsuario INT;
         DECLARE _fkSucursal  INT;
+        DECLARE _totalVentas INT;
 
-        DECLARE _json      JSON;
-        DECLARE _resultado JSON;
+        DECLARE _json        JSON;
+        DECLARE _resultado   JSON;
 
-        DECLARE _tempJson  TEXT;
+        DECLARE _tempJson    TEXT;
 
-        DECLARE _fecha     VARCHAR(50);
-        DECLARE _dayName   VARCHAR(50);
+        DECLARE _fecha       VARCHAR(50);
+        DECLARE _dayName     VARCHAR(50);
 
-        DECLARE _dia       INT DEFAULT 1;
+        DECLARE _dia         INT DEFAULT 1;
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -676,7 +679,9 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
             WHILE _dia <= 7 DO
                 IF(_tipoUsuario = 1) THEN
                     IF ((SELECT COUNT(*) FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0) THEN
-                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
+                        SELECT COUNT(*) INTO _totalVentas FROM venta
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+                        SELECT JSON_OBJECT('Ventas',_totalVentas,'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
                             WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
                         SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
@@ -689,8 +694,10 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
                     END IF;
                 ELSEIF(_tipoUsuario = 2) THEN
                     IF ((SELECT COUNT(*) FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal) > 0) THEN
+                        SELECT COUNT(*) INTO _totalVentas FROM venta
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal;
                         SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
-                        WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal;
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal;
                         SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkSucursal = _fkSucursal AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
 
@@ -702,6 +709,8 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
                     END IF;
                 ELSE
                     IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal) > 0) THEN
+                        SELECT COUNT(*) INTO _totalVentas FROM venta
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal;
                         SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
                             WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal;
                         SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
