@@ -35,25 +35,39 @@ if(isset($_POST['eligeFechaReporte']) && $_POST['eligeFechaReporte'] != ""){
 // ! FOR PRODUCTION
 $data = [
   'fkUsuario' => $id_usuario,
-  'fecha' => date('Y-m-d')
+  'fecha' => date('Y-m-d'),
+  'fkSucursal' => $sucursal
 ];
 
 $input_week = json_decode(POST('Vendedor/services/getSalesWeek.php', $data), true);
-// echo('getSalesWeek=> '); var_dump($input_week);
 $sales_week = json_decode($input_week[0]);
 
 $total_week = 0;
 $semana = [];
 
-// ! Se obtiene el total de ventas de la semana por dia
-foreach ($sales_week as $sale){
-  foreach ($sale as $sale_detail){
-    if(gettype($sale_detail) == 'array'){
-      $semana[] = count($sale_detail);
-    } else 
+foreach($sales_week as $sale){
+  $datos = (array)$sale;
+  foreach($datos as $data){
+    if(gettype($data) == 'object'){
+      foreach($data as $dato){
+        $ventas = (array)$dato;
+        $semana[] = $ventas['Ventas'];
+        
+      } 
+    } else
       $semana[] = 0;
   }
 }
+
+// // ! Se obtiene el total de ventas de la semana por dia
+// foreach ($sales_week as $sale){
+//   foreach ($sale as $sale_detail){
+//     if(gettype($sale_detail) == 'array'){
+//       $semana[] = count($sale_detail);
+//     } else 
+//       $semana[] = 0;
+//   }
+// }
 
 // ! Se obtiene el total de ventas de la semana
 foreach ($semana as $dia)
@@ -93,26 +107,32 @@ $input_month = json_decode(POST('Vendedor/services/getSalesMonth.php', $data), t
 $sales_month = json_decode($input_month[0]);
 // echo('getSalesMonth=> '); var_dump($sales_month);
 
-foreach($sales_month as $sale){
-  $datos = $sale[4];
-  foreach($datos as $dato){
-    $ventas = (array)$dato;
-    $nVentas = $ventas['Ventas'];
-    echo($nVentas);
-  }
-}
-
 $total_year = 0;
 $mes = [];
 
 // ! Se obtiene el total de ventas del año por mes
-foreach ($sales_month as $sale)
-  foreach ($sale as $sale_detail){
-    if(gettype($sale_detail) == 'array')
-      $mes[] = count($sale_detail);
-    else 
+foreach($sales_month as $sale){
+  $datos = (array)$sale;
+  foreach($datos as $data){
+    if(gettype($data) == 'object'){
+      foreach($data as $dato){
+        $ventas = (array)$dato;
+        $mes[] = $ventas['Ventas'];
+        
+      } 
+    } else
       $mes[] = 0;
   }
+}
+
+// // Se obtiene el total de ventas del año por mes
+// // foreach ($sales_month as $sale)
+// //   foreach ($sale as $sale_detail){
+// //     if(gettype($sale_detail) == 'array')
+// //       $mes[] = count($sale_detail);
+// //     else 
+// //       $mes[] = 0;
+// //   }
 
 // ! Se obtiene el total de ventas del año
 foreach ($mes as $m)
