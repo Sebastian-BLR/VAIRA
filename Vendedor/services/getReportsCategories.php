@@ -1,19 +1,15 @@
 <?php 
     require "../../services/connection.php";
-
     $bindings = [];
     $data=[];
     if($pdo!=null){
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
-        $sql = 'CALL insertar_usuario(?);';
+        $sql = 'CALL filtrar_ventas_categoria(?);';
         $stmt = $pdo->prepare($sql);
         if($stmt->execute($bindings)){
-            // while($row = $stmt->fetch(PDO::FETCH_NUM)){
-            //     $data[] = $row;
-            // }
-            $data[] = "Success";
-          
+            $data = $stmt->fetch(PDO::FETCH_NUM);
+            // $data[] = "Success";
         }else{
             $data[] = "Error";
         }
