@@ -946,9 +946,9 @@ CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
                 END IF;
 
                 IF(_tempJson IS NULL) THEN
-                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,'Sin ventas'));
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT('id',_index, 'nombre',_nombre, 'detalles', 'Sin ventas'));
                 ELSE
-                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,_tempJson));
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT('id',_index, 'nombre',_nombre, 'detalles', _tempJson));
                 END IF;
 
                 SET _index = _index + 1;
