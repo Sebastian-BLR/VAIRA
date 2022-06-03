@@ -4,7 +4,7 @@ $dias_semana = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 // * ========================================================================================================
-// *                                            SEMANAL                                                    //
+// *                                            BUSQUEDA                                                   //
 // * ========================================================================================================
 
 if(isset($_POST['eligeFechaReporte']) && $_POST['eligeFechaReporte'] != ""){
@@ -39,6 +39,7 @@ $data = [
 ];
 
 $input_week = json_decode(POST('Vendedor/services/getSalesWeek.php', $data), true);
+// echo('getSalesWeek=> '); var_dump($input_week);
 $sales_week = json_decode($input_week[0]);
 
 $total_week = 0;
@@ -83,11 +84,23 @@ for($i = 0; $i < count($dias_semana); $i++){
 // * ========================================================================================================
 
 $data = [
-  'fkUsuario' => $id_usuario
+  'fkUsuario' => $id_usuario,
+  'fkSucursal' => $sucursal
 ];
 
 $input_month = json_decode(POST('Vendedor/services/getSalesMonth.php', $data), true);
+// echo('getSalesMonth=> '); var_dump($input_month);
 $sales_month = json_decode($input_month[0]);
+// echo('getSalesMonth=> '); var_dump($sales_month);
+
+foreach($sales_month as $sale){
+  $datos = $sale[4];
+  foreach($datos as $dato){
+    $ventas = (array)$dato;
+    $nVentas = $ventas['Ventas'];
+    echo($nVentas);
+  }
+}
 
 $total_year = 0;
 $mes = [];
@@ -121,7 +134,7 @@ for($i = 0; $i < count($meses); $i++){
     'porcentaje' => $datos_grafica_mes[$i]
   ];
 }
-var_dump($sales_month);
+// var_dump($sales_month);
 ?>
 <div class="row" style="margin-top: 5px;font-size: 18px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">

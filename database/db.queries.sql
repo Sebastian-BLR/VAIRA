@@ -552,7 +552,7 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-CALL filtrar_ventas_mensuales('[{"fkUsuario":1,"fkSucursal":1}]');
+CALL filtrar_ventas_mensuales('[{"fkUsuario":3,"fkSucursal":1}]');
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
