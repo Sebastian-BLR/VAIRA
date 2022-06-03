@@ -26,7 +26,7 @@
     $pass = $_POST['password'];
     $pass2 = $_POST['password2'];
     $rol = $_POST['rol'];
-    $_sucursal = $sucursal[0][0];
+    $_sucursal = $sucursal;
 
     if(empty($nombre) || empty($apellidoP) || empty($apellidoM) || empty($usuario) || empty($correo) 
         || empty($telefono) || empty($pass) || empty($pass2) || empty($rol))
@@ -72,8 +72,7 @@
           ];
 
           $insertarUsuario = json_decode(POST("Administrador/services/addUser.php",$data), true);
-          var_dump($insertarUsuario);
-          if($insertarUsuario[0] > 0)
+          if($insertarUsuario[0] == "Success")
             echo('
               <script>
                 alertAgregarUsuario()
@@ -156,6 +155,12 @@
         ');
     }
   }
+
+  $data = [];
+
+  $regiones = json_decode(POST("Administrador/services/getRegions.php",$data), true);
+
+  // var_dump($region);
 ?>
 
 <div class="row" style="margin-top: 5px;font-size: 19px;">
@@ -264,7 +269,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                  <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $telefono .'" required>
+                  <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $telefono .'" minlength="10" maxlength="10" required>
                 </div>
                 <div class="mb-3">
                   <label for="contrasena" class="col-form-label">Contraseña:</label>
@@ -318,7 +323,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                  <input type="text" class="form-control" id="teleforno" name="telefono" required>
+                  <input type="text" class="form-control" id="teleforno" name="telefono" minlength="10" maxlength="10" required>
                 </div>
                 <div class="mb-3">
                   <label for="contrasena" class="col-form-label">Contraseña:</label>
@@ -398,31 +403,35 @@
               <br>
               <div class="btn-group">
                 <div class="btn-group">
-                  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <select name="region" id="regionIVA" class="form-select">
+                    <option selected>Region</option>
+                    <?php
+                    // var_dump($regiones);
+                    foreach($regiones as $region){
+                      echo('
+                        <option value="'.$region[0].'" name="'.$region[1].'">'.$region[2].'</option>
+                        
+                      ');
+                    }
+                    ?>
+                    <!-- <option value=".08">Tijuana</option>
+                    <option value=".16">CDMX</option> -->
+                  </select>
+                  <!-- <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" id="regionIVA" aria-expanded="false">
                     Región
                   </button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="#">Tijuana</a></li>
                     <li><a class="dropdown-item" href="#">CDMX</a></li>
                     <li><a class="dropdown-item" href="#">Sinaloa</a></li>
-                  </ul>
+                  </ul> -->
                 </div>
               </div>
             </div>
             <div class="mb-3">
-              <label for="hora" class="col-form-label">Selecciona IVA</label>
+              <label for="hora" class="col-form-label">IVA</label>
               <br>
-              <div class="btn-group">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    IVA
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">8%</a></li>
-                    <li><a class="dropdown-item" href="#">16%</a></li>
-                  </ul>
-                </div>
-              </div>
+              <input type="text" class="form-control" name="iva" id="iva" value="" disabled>
             </div>
           </form>
         </div>
@@ -563,3 +572,18 @@
   </div>
 
 </div>
+
+
+<script>
+  let regionIVA = document.getElementById('regionIVA');
+  let iva = document.getElementById('iva');
+  regionIVA.addEventListener("change", function(){
+    let valIVA = regionIVA.options[regionIVA.selectedIndex].getAttribute('name');
+    console.log(valIVA);
+    if(regionIVA.value != "Region")
+      iva.value = valIVA * 100 + "%";
+    else
+      iva.value = "";
+  })
+
+</script>
