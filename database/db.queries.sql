@@ -519,12 +519,14 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas;
 CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     BEGIN
-       DECLARE _rango     INT;
-       DECLARE _fkUsuario INT;
+       DECLARE _rango       INT;
+       DECLARE _fkUsuario   INT;
+       DECLARE _fkSucursal  INT;
+       DECLARE _tipoUsuario INT;
 
-       DECLARE _json      JSON;
+       DECLARE _json        JSON;
 
-       DECLARE _fecha     VARCHAR(50);
+       DECLARE _fecha       VARCHAR(50);
 
        DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -532,20 +534,23 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-       SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-       SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-       SET _fecha     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'    ));
-       SET _rango     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'    ));
+       SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+       SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+       SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
+       SET _fecha      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
+       SET _rango      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'     ));
 
        START TRANSACTION;
+           SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
+
             IF(_rango = 1) THEN
-                SELECT * FROM venta WHERE DATE(fecha)  = DATE(_fecha)  AND fkUsuario = _fkUsuario;
+                SELECT * FROM venta WHERE DATE(fecha)  = DATE(_fecha)  AND ((fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND _tipoUsuario = 3) OR (fkSucursal = _fkSucursal AND _tipoUsuario = 2) OR (_tipoUsuario = 1));
             ELSEIF(_rango = 2) THEN
-                SELECT * FROM venta WHERE WEEK(fecha)  = WEEK(_fecha)  AND fkUsuario = _fkUsuario;
+                SELECT * FROM venta WHERE WEEK(fecha)  = WEEK(_fecha)  AND ((fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND _tipoUsuario = 3) OR (fkSucursal = _fkSucursal AND _tipoUsuario = 2) OR (_tipoUsuario = 1));
             ELSEIF(_rango = 3) THEN
-                SELECT * FROM venta WHERE MONTH(fecha) = MONTH(_fecha) AND fkUsuario = _fkUsuario;
+                SELECT * FROM venta WHERE MONTH(fecha) = MONTH(_fecha) AND ((fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND _tipoUsuario = 3) OR (fkSucursal = _fkSucursal AND _tipoUsuario = 2) OR (_tipoUsuario = 1));
             ELSE
-                SELECT * FROM venta WHERE YEAR(fecha)  = YEAR(_fecha)  AND fkUsuario = _fkUsuario;
+                SELECT * FROM venta WHERE YEAR(fecha)  = YEAR(_fecha)  AND ((fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND _tipoUsuario = 3) OR (fkSucursal = _fkSucursal AND _tipoUsuario = 2) OR (_tipoUsuario = 1));
             END IF;
        COMMIT;
 
@@ -576,7 +581,7 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
         END;
 
         SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+        SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
         SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
         SET _resultado  = '{"Resultado": []}';
 
