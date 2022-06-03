@@ -179,9 +179,10 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
         SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
 
         START TRANSACTION ;
-            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
+                JOIN categoria c on c.idCategoria = producto.fkCategoria
                 JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal;
         COMMIT ;
     END //
@@ -273,10 +274,11 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
         SET _categoria   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
 
         START TRANSACTION ;
-            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL FROM producto
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
-                JOIN region_iva ri on s.fkRegion = ri.idRegion 
+                JOIN region_iva ri on s.fkRegion = ri.idRegion
+                JOIN categoria c on producto.fkCategoria = c.idCategoria
                 WHERE fkSucursal = _idSucursal AND fkCategoria = _categoria;
         COMMIT ;
     END //
@@ -550,17 +552,22 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
+CALL filtrar_ventas_mensuales('[{"fkUsuario":1,"fkSucursal":1}]');
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
     BEGIN
-        DECLARE _fkUsuario INT;
+        DECLARE _fkUsuario   INT;
+        DECLARE _tipoUsuario INT;
+        DECLARE _fkSucursal  INT;
 
-        DECLARE _json      JSON;
-        DECLARE _resultado JSON;
+        DECLARE _json        JSON;
+        DECLARE _resultado   JSON;
+        
+        DECLARE _fecha       DATE;
 
-        DECLARE _tempJson  TEXT;
-        DECLARE _monthName VARCHAR(50);
+        DECLARE _tempJson    TEXT;
+        DECLARE _monthName   VARCHAR(50);
 
         DECLARE _mes       INT DEFAULT 1;
 
@@ -570,32 +577,71 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-        SET _resultado = '{"Resultado": []}';
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+        SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
+        SET _resultado  = '{"Resultado": []}';
 
-        WHILE _mes <= 12 DO
-            IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
-            THEN
-                SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes;
-                SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
-                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
-            ELSE
-                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
-            END IF;
+        START TRANSACTION;
+            SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
 
-            SET _mes = _mes + 1;
-        END WHILE;
+            WHILE _mes <= 12 DO
+                IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes) > 0)
+                THEN
+                    IF(_tipoUsuario = 1) THEN
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE MONTH(fecha) = _mes;
+                        SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
 
-        SELECT CONVERT(_resultado,JSON) as 'Resultado';
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE MONTH(fecha) = _mes;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,'].',_monthName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    ELSEIF(_tipoUsuario = 2) THEN
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal;
+                        SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
+
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,'].',_monthName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    ELSE
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                        SELECT MONTHNAME(fecha) INTO _monthName FROM venta WHERE fkUsuario = _fkUsuario AND MONTH(fecha) = _mes LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),JSON_OBJECT(_monthName,CONVERT(_tempJson,JSON)));
+
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE MONTH(fecha) = _mes AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,'].',_monthName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    END IF;
+                ELSE
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_mes-1,']'),'Sin registros');
+                END IF;
+
+                SET _mes = _mes + 1;
+            END WHILE;
+        COMMIT;
+
+        IF(_tipoUsuario = 1) THEN
+            SELECT _resultado as 'Resultado Super-Administrador';
+        ELSEIF(_tipoUsuario = 2) THEN
+            SELECT _resultado as 'Resultado Administrador';
+        ELSE
+            SELECT _resultado as 'Resultado';
+        END IF;
     END//
 DELIMITER ;
 
+CALL filtrar_ventas_semanal('[{"fkUsuario":3,"fkSucursal":1,"fecha":"2022-05-22"}]');
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
 CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario INT;
+        DECLARE _tipoUsuario INT;
+        DECLARE _fkSucursal  INT;
 
         DECLARE _json      JSON;
         DECLARE _resultado JSON;
@@ -613,44 +659,62 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
-        SET _fecha     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'));
-        SET _resultado = '{"Resultado": []}';
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+        SET _fecha      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
+        SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
+        SET _resultado  = '{"Resultado": []}';
 
-        WHILE _dia <= 7 DO
-            IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
-            THEN
-                SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson  FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
-                SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
-                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
-            ELSE
-                SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
-            END IF;
+        START TRANSACTION;
+            SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
 
-            SET _dia = _dia + 1;
-        END WHILE;
+            WHILE _dia <= 7 DO
+                IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0)
+                THEN
+                    IF(_tipoUsuario = 1) THEN
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+                        SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
 
-        SELECT CONVERT(_resultado,JSON) as 'Resultado';
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,'].',_dayName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    ELSEIF(_tipoUsuario = 2) THEN
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
+                        WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal;
+                        SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkSucursal = _fkSucursal AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
+
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,'].',_dayName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    ELSE
+                        SELECT JSON_OBJECT('Ventas',COUNT(*),'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
+                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal;
+                        SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
+
+                        SELECT JSON_ARRAYAGG(JSON_OBJECT('idVenta',idVenta,'fkUsuario',fkUsuario,'fkTipoPago',fkTipoPago,'total',total,'fecha',fecha)) as Resultado INTO _tempJson FROM venta
+                        WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkUsuario = _fkUsuario AND fkSucursal = _fkSucursal;
+                        SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,'].',_dayName,'.Detalles'),CONVERT(_tempJson,JSON));
+                    END IF;
+                ELSE
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
+                END IF;
+
+                SET _dia = _dia + 1;
+            END WHILE;
+        COMMIT;
+
+        IF(_tipoUsuario = 1) THEN
+            SELECT _resultado as 'Resultado Super-Administrador';
+        ELSEIF(_tipoUsuario = 2) THEN
+            SELECT _resultado as 'Resultado Administrador';
+        ELSE
+            SELECT _resultado as 'Resultado';
+        END IF;
     END//
-DELIMITER ;
-
-DELIMITER //
-DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
-CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
-    BEGIN
-        DECLARE _idAdmin INT;
-        DECLARE _json    JSON;
-
-        SET _json    = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _idAdmin = JSON_UNQUOTE(JSON_EXTRACT(_jsonA, '$.idAdmin'));
-
-        SELECT DISTINCT usuario.idUsuario, usuario.nombre, correo, usuario, s.nombre, tipo FROM usuario
-            JOIN punto_venta pv on usuario.idUsuario = pv.fkUsuario
-            JOIN sucursal s on pv.fkSucursal = s.idSucursal
-            JOIN tipo t on usuario.fkTipo = t.idTipo
-            WHERE fkTipo = 3 AND fkAdmin = _idAdmin;
-    END //
 DELIMITER ;
 
 DELIMITER //
@@ -690,9 +754,9 @@ CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
 
         SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
         SET _idUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idUsuario'));
-        SET _correo = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'));
-        SET _telefono = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono'));
-        SET _password = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'));
+        SET _correo    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'));
+        SET _telefono  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono'));
+        SET _password  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'));
 
         IF (_password = '') THEN
             IF(_correo != (SELECT correo FROM usuario WHERE idUsuario = _idUsuario) && _telefono != (SELECT telefono FROM usuario WHERE idUsuario = _idUsuario)) THEN
@@ -763,52 +827,221 @@ CREATE PROCEDURE actualizar_puntos_usuario(IN _jsonA JSON)
         END //
 DELIMITER ;
 
+# RANGO
+# 1.- Día
+# 2.- Semana
+# 3.- Mensual
+# 4.- Anual
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_categoria;
 CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
-        DECLARE _fkCategoria INT;
+        DECLARE _fkSucursal  INT;
+        DECLARE _limite      INT;
+        DECLARE _idCategoria INT;
+        DECLARE _tipoUsuario INT;
+        DECLARE _rango       INT;
+        DECLARE _fecha       DATE;
+
+        DECLARE _tempJson    JSON;
 
         DECLARE _json        JSON;
+        DECLARE _resultado   JSON;
 
+        DECLARE _nombre      VARCHAR(50);
+
+        DECLARE _index       INT DEFAULT 0;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
 
+        SET _resultado   = '{"Resultado": []}';
         SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'  ));
-        SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkCategoria'));
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+        SET _rango       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'     ));
+        SET _fecha       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
 
-        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
-            WHERE fkUsuario = _fkUsuario AND fkCategoria = _fkCategoria;
+        START TRANSACTION;
+            SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
 
+            SELECT fkSucursal INTO _fkSucursal FROM sucursal_usuario WHERE fkUsuario = _fkUsuario;
+
+            IF(_tipoUsuario = 1) THEN
+                SELECT COUNT(*) INTO _limite FROM categoria;
+            ELSE
+                SELECT COUNT(DISTINCT categoria.idCategoria) INTO _limite FROM categoria INNER JOIN producto p3 on categoria.idCategoria = p3.fkCategoria INNER JOIN existencia e on p3.idProducto = e.fkProducto
+                    WHERE fkSucursal = _fkSucursal;
+            END IF;
+
+            WHILE _index < _limite DO
+                IF(_tipoUsuario = 1) THEN
+                    SELECT idCategoria INTO _idCategoria FROM categoria
+                        ORDER BY idCategoria
+                        LIMIT _index,1;
+                ELSE
+                    SELECT DISTINCT idCategoria INTO _idCategoria FROM categoria INNER JOIN producto p3 on categoria.idCategoria = p3.fkCategoria INNER JOIN existencia e on p3.idProducto = e.fkProducto
+                        WHERE fkSucursal = _fkSucursal
+                        ORDER BY idCategoria
+                        LIMIT _index,1;
+                END IF;
+
+                SELECT nombre INTO _nombre FROM categoria WHERE idCategoria = _idCategoria;
+
+                IF(_tipoUsuario = 1) THEN
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkCategoria',_idCategoria) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        INNER JOIN producto p on iv.fkProducto = p.idProducto
+                        WHERE fkCategoria = _idCategoria AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                ELSEIF(_tipoUsuario = 2) THEN
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkCategoria',_idCategoria,'fkSucursal',_fkSucursal) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        INNER JOIN producto p on iv.fkProducto = p.idProducto
+                        WHERE fkCategoria = _idCategoria AND fkSucursal = _fkSucursal AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                ELSE
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkCategoria',_idCategoria,'fkSucursal',_fkSucursal,'fkUsuario',_fkUsuario) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        INNER JOIN producto p on iv.fkProducto = p.idProducto
+                        WHERE fkCategoria = _idCategoria AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                END IF;
+
+                IF(_tempJson IS NULL) THEN
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,'Sin ventas'));
+                ELSE
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,_tempJson));
+                END IF;
+
+                SET _index = _index + 1;
+            END WHILE;
+        COMMIT;
+
+        IF(_tipoUsuario = 1) THEN
+            SELECT _resultado as 'Resultado Super-Administrador';
+        ELSEIF(_tipoUsuario = 2) THEN
+            SELECT _resultado as 'Resultado Administrador';
+        ELSE
+            SELECT _resultado as 'Resultado';
+        END IF;
     END//
 DELIMITER ;
 
+# RANGO
+# 1.- Día
+# 2.- Semana
+# 3.- Mensual
+# 4.- Anual
 DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_producto;
 CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
-        DECLARE _fkProducto INT;
+        DECLARE _fkSucursal  INT;
+        DECLARE _limite      INT;
+        DECLARE _idProducto  INT;
+        DECLARE _tipoUsuario INT;
+        DECLARE _rango       INT;
+        DECLARE _fecha       DATE;
+
+        DECLARE _tempJson    JSON;
 
         DECLARE _json        JSON;
+        DECLARE _resultado   JSON;
 
+        DECLARE _nombre      VARCHAR(50);
+
+        DECLARE _index       INT DEFAULT 0;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
 
+        SET _resultado   = '{"Resultado": []}';
         SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
         SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
-        SET _fkProducto  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkProducto'));
+        SET _rango       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'     ));
+        SET _fecha       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
 
-        SELECT * FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta INNER JOIN producto p on iv.fkProducto = p.idProducto
-            WHERE fkUsuario = _fkUsuario AND idProducto = _fkProducto;
+        START TRANSACTION;
+            SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
 
+            IF(_tipoUsuario = 1) THEN
+                SELECT COUNT(*) INTO _limite FROM producto;
+            ELSE
+                SELECT COUNT(*) INTO _limite FROM existencia INNER JOIN producto p on existencia.fkProducto = p.idProducto
+                    WHERE fkSucursal = _fkSucursal;
+            END IF;
+
+            WHILE _index < _limite DO
+                IF(_tipoUsuario = 1) THEN
+                    SELECT idProducto INTO _idProducto FROM producto
+                        ORDER BY idProducto
+                        LIMIT _index,1;
+                ELSE
+                    SELECT idProducto INTO _idProducto FROM existencia INNER JOIN producto p2 on existencia.fkProducto = p2.idProducto
+                        WHERE fkSucursal = _fkSucursal
+                        ORDER BY idExistencia
+                        LIMIT _index,1;
+                END IF;
+
+                SELECT nombre INTO _nombre FROM producto WHERE idProducto = _idProducto;
+
+                IF(_tipoUsuario = 1) THEN
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkProducto',_idProducto) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE fkProducto = _idProducto AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                ELSEIF(_tipoUsuario = 2) THEN
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkProducto',_idProducto,'fkSucursal',_fkSucursal) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE fkProducto = _idProducto AND fkSucursal = _fkSucursal AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                ELSE
+                    SELECT JSON_OBJECT('Ventas',COUNT(*),'Subtotal',IFNULL(SUM(subtotal),0),'fkProducto',_idProducto,'fkSucursal',_fkSucursal,'fkUsuario',_fkUsuario) INTO _tempJson FROM venta
+                        INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta
+                        WHERE fkProducto = _idProducto AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario AND
+                              (    (DATE(fecha)  = DATE(_fecha)  AND _rango = 1)
+                                OR (WEEK(fecha)  = WEEK(_fecha)  AND _rango = 2)
+                                OR (MONTH(fecha) = MONTH(_fecha) AND _rango = 3)
+                                OR (YEAR(fecha)  = YEAR(_fecha)  AND _rango = 4));
+                END IF;
+
+                IF(_tempJson IS NULL) THEN
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,'Sin ventas'));
+                ELSE
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,_tempJson));
+                END IF;
+
+                SET _index = _index + 1;
+            END WHILE;
+        COMMIT;
+
+        IF(_tipoUsuario = 1) THEN
+            SELECT _resultado as 'Resultado Super-Administrador';
+        ELSEIF(_tipoUsuario = 2) THEN
+            SELECT _resultado as 'Resultado Administrador';
+        ELSE
+            SELECT _resultado as 'Resultado';
+        END IF;
     END//
 DELIMITER ;

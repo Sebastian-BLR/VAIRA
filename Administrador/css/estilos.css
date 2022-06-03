@@ -24,8 +24,7 @@
   transform: scale(1);
 }
 #animations-example-3 {
-  height: 200px;
-  max-width: 300px;
+  height: 450px;
   margin: 0 auto;
 }
 #animations-example-3 tbody {
@@ -36,26 +35,13 @@
   z-index: 1;
 }
 #animations-example-3 tbody td {
-  animation: moving-bars 4s linear infinite;
+  animation: moving-bars 4s linear;
 }
 @keyframes moving-bars {
   0%  { transform: translateY( 100% ); }
   15% { transform: translateY( 0 ); }
 }
 
-#animations-example-5 {
-  height: 200px;
-  max-width: 350px;
-  margin: 0 auto;
-}
-#animations-example-5 .highlighted {
-  animation: highlighted-bar 2s linear infinite;
-}
-@keyframes highlighted-bar {
-  0%   { box-shadow: none; }
-  50%  { box-shadow: 0 0 1px 0 black, 0 0 20px 5px darkgrey; }
-  100% { box-shadow: none; }
-}
 
     html,body {
         height: 100%;

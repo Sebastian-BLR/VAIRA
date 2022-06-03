@@ -4,10 +4,10 @@
 
 <div class="row" style="margin-top: 5px;font-size: 19px;">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="?nueva_venta=true">Nueva venta</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Recibos</li>
-    </ol>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="?nueva_venta=true">Nueva venta</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Recibos</li>
+      </ol>
     </nav>
 </div>
 <div class="row" style="font-size: 20px;  margin-top: 5px;">
