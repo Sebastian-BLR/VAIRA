@@ -1,3 +1,30 @@
+<?php
+
+if(isset($_POST['edit-product'])){
+  $data = [
+    'fkUsuario' => $id_usuario,
+    'fkSucursal' => $sucursal,
+    'fkProducto' => $_POST['idProducto'],
+    'cantidad' => $_POST['existencia']
+  ];
+  // var_dump($data);
+  $reponse = json_decode(Post("Administrador/services/updateProductsInventory.php",$data),true);
+  // var_dump($reponse);
+  if($reponse[0] == 'SUCCESS')
+    echo '
+    <script>
+      actualizarProductoInventarioExito()
+    </script>';  
+  else
+    echo '
+    <script>
+      $msg = "'. $reponse[0] .'"
+      actualizarProductoInventarioError($msg)
+    </script>';
+}
+
+?>
+
 <div class="row" style="margin-top: 5px;font-size: 19px;">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -99,44 +126,29 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form>
+              <form action="'. htmlspecialchars($_SERVER['PHP_SELF']).'?inventario=true" method="POST" style="display: inline;">
+                <input type="hidden" name="idProducto" value="'. $producto[0] .'">
                 <div class="mb-3">
                   <label for="producto" class="col-form-label">Nombre de producto</label>
-                  <input type="text" class="form-control" id="nombreproducto'. $producto[0] .'" value="'. $producto[1] .'" disabled>
+                  <input type="text" class="form-control" name="nombre" id="nombreproducto'. $producto[0] .'" value="'. $producto[1] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="precio" class="col-form-label">Precio</label>
-                  <input type="text" class="form-control" id="precio'. $producto[0] .'" value="'. $producto[5] .'" disabled>
+                  <input type="text" class="form-control" name="precio" id="precio'. $producto[0] .'" value="'. $producto[5] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="categoria" class="col-form-label">Categoria</label>
-                  <input type="text" class="form-control" id="categoria'. $producto[0] .'" value="'. $producto[6] .'" disabled>
+                  <input type="text" class="form-control" name="categoria" id="categoria'. $producto[0] .'" value="'. $producto[6] .'" disabled>
                 </div>
                 <div class="mb-3">
                   <label for="existencia" class="col-form-label">En existencia</label>
-                  <input type="text" class="form-control" id="existencia'. $producto[0] .'" value="'. $producto[2] .'">
+                  <input type="text" class="form-control" name="existencia" id="existencia'. $producto[0] .'" value="'. $producto[2] .'" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
                 </div>
-              </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-              <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarEditar'. $producto[0] .'">Aceptar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Modal Confirmación editar -->
-      <div class="modal fade bd-example-modal-sm" id="confirmarEditar'. $producto[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel">¿Est&aacutes seguro que deseas editar el producto?</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-              <button type="button" class="btn btn-success" data-bs-toggle="modal" onclick="alertEdicionSatisfactoria()" d data-bs-dismiss="modal">S&iacute</button>
+              <button type="submit" name="edit-product" class="btn btn-success">Aceptar</button>
+              </form>
             </div>
           </div>
         </div>

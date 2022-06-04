@@ -134,8 +134,37 @@ function alertConfigImpuesto(){
       'Impuesto configurado',
       'Se ha configurado exitosamente el impuesto',
       'success',
+      ).then((result) => {
+        if (result.isConfirmed) {
+          location.reload()
+        }  
+      })
+}
+
+function alertConfigImpuestoError(){
+  Swal.fire(
+      'Error',
+      'No se pudo actualizar la region',
+      'error',
     )
 }
+
+function actualizarProductoInventarioExito(){
+  Swal.fire(
+      'Producto actualizado',
+      'Se ha actualizado exitosamente el producto',
+      'success',
+    )
+}
+
+function actualizarProductoInventarioError(msg){
+  Swal.fire(
+      'Error',
+      msg,
+      'error',
+    )
+}
+
 
 function myFunction() {
     var x = document.getElementById("password");

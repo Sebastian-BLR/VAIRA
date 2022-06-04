@@ -34,6 +34,9 @@ INSERT INTO region_iva VALUES (0, 1, 0.16),
                               (0, 1, 0.16),
                               (0, 4, 0.08);
 
+INSERT INTO motivo_egreso VALUES (0, 'Compra producto'),
+                                 (0, 'Devolucion');
+
 INSERT INTO sucursal VALUES (0, 1, NULL, 'Cuernavaca', 'Degollado', 'Centro', '12345', '1234567890');
 
 CALL filtrar_ventas('[{"fkUsuario":3,"fecha":"2022-05-22","fkSucursal":1,"rango":1}]');

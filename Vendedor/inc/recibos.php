@@ -1,5 +1,12 @@
 <?php 
   require "../services/funciones.php";
+  
+  if(isset($_POST['generaFactura']))
+    echo ('
+      <script>
+        alertFactura()
+      </script>
+    ');
 ?>
 
 <div class="row" style="margin-top: 5px;font-size: 19px;">
@@ -251,18 +258,18 @@
                   <!-- //* =========================================================================================== -->
                   <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
                   <!-- //* =========================================================================================== -->
-                  <form>
+                  <form action="'. htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true" method="POST" style="display: inline;">
                     <div class="mb-3">
                       <label for="rfc" class="col-form-label">Capture su RFC:</label>
-                      <input type="text" class="form-control" id="rfc" maxlength="13">
+                      <input type="text" class="form-control" id="rfc" maxlength="13" required>
                     </div>
                     <div class="mb-3">
                       <label for="nombre" class="col-form-label">Nombre Completo:</label>
-                      <input type="text" class="form-control" id="nombre">
+                      <input type="text" class="form-control" id="nombre" required>
                     </div>
                     <div class="mb-3">
                       <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
-                      <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
+                      <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
                     </div>
                     <div class="mb-3">
                       <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
@@ -289,11 +296,11 @@
                         </select>
                       </div>
                     </div>
-                  </form>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="button" class="btn btn-success" onclick="alertFactura()" data-bs-dismiss="modal">Generar</button>
+                  <button type="submit" class="btn btn-success">Generar</button>
+                  </form>
                 </div>
               </div>
             </div>

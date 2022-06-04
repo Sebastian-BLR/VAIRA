@@ -1,8 +1,29 @@
 <?php
   $errores = false;
+
+  if(isset($_POST['setRegion'])){
+    // var_dump($_POST);
+    $data = [
+      'sucursal' => $sucursal,
+      'region' => $_POST['region']
+    ];
+    $response = json_decode(Post("Administrador/services/setRegionSucursal.php",$data),true);
+    // var_dump($response);
+    if($response[0] == 'Success')
+      echo '
+      <script>
+        alertConfigImpuesto()
+      </script>';  
+    else
+      echo '
+      <script>
+        alertConfigImpuestoError()
+      </script>';
+  }
+
   if(isset($_POST['add-punto-venta'])){
     $data = [
-      'sucursal' => $sucursal[0][0],
+      'sucursal' => $sucursal,
       'nombre' => $_POST['nombre']
     ];
 
@@ -309,7 +330,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                  <input type="text" class="form-control" id="teleforno" name="telefono" minlength="10" maxlength="10" required>
+                  <input type="text" class="form-control" id="teleforno" name="telefono" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
                 </div>
                 <div class="mb-3">
                   <label for="contrasena" class="col-form-label">Contraseña:</label>
@@ -383,34 +404,29 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?configuracion=true'?>" method="POST" style="display: inline;">
             <div class="mb-3">
               <label for="hora" class="col-form-label">Selecciona la región</label>
               <br>
               <div class="btn-group">
                 <div class="btn-group">
-                  <select name="region" id="regionIVA" class="form-select">
-                    <option selected>Region</option>
+                  <select name="region" id="regionIVA" class="form-select" required>
+                    <option value="">Region</option>
                     <?php
                     // var_dump($regiones);
                     foreach($regiones as $region){
-                      echo('
-                        <option value="'.$region[0].'" name="'.$region[1].'">'.$region[2].'</option>
-                        
-                      ');
+                      if($region[0] == $region_iva)
+                        echo('
+                          <option value="'.$region[0].'" name="'.$region[1].'" selected>'.$region[2].'</option>
+                        ');
+                      else
+                        echo('
+                          <option value="'.$region[0].'" name="'.$region[1].'">'.$region[2].'</option>
+                          
+                        ');
                     }
                     ?>
-                    <!-- <option value=".08">Tijuana</option>
-                    <option value=".16">CDMX</option> -->
                   </select>
-                  <!-- <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" id="regionIVA" aria-expanded="false">
-                    Región
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Tijuana</a></li>
-                    <li><a class="dropdown-item" href="#">CDMX</a></li>
-                    <li><a class="dropdown-item" href="#">Sinaloa</a></li>
-                  </ul> -->
                 </div>
               </div>
             </div>
@@ -419,11 +435,11 @@
               <br>
               <input type="text" class="form-control" name="iva" id="iva" value="" disabled>
             </div>
-          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertConfigImpuesto()">Aceptar</button>
+          <button type="submit" class="btn btn-success" name="setRegion">Aceptar</button>
+          </form>
         </div>
       </div>
     </div>
@@ -475,7 +491,7 @@
                   </div>
                   <div class="mb-3">
                     <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                    <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $value[7] .'" minlength="10" maxlength="10" required">
+                    <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $value[7] .'" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required">
                   </div>
                   <div class="mb-3">
                     <label for="password" class="col-form-label">Contraseña:</label>
@@ -563,10 +579,16 @@
 <script>
   let regionIVA = document.getElementById('regionIVA');
   let iva = document.getElementById('iva');
+
+  let valIVA = regionIVA.options[regionIVA.selectedIndex].getAttribute('name');
+  if(regionIVA.value != "Region" && valIVA != null)
+    iva.value = valIVA * 100 + "%";
+  else
+    iva.value = "";
+    
   regionIVA.addEventListener("change", function(){
-    let valIVA = regionIVA.options[regionIVA.selectedIndex].getAttribute('name');
-    console.log(valIVA);
-    if(regionIVA.value != "Region")
+    let valIVA = regionIVA.options[regionIVA.selectedIndex].getAttribute('name');    
+    if(regionIVA.value != "Region" && valIVA != null)
       iva.value = valIVA * 100 + "%";
     else
       iva.value = "";

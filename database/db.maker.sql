@@ -32,6 +32,9 @@ DROP TABLE IF EXISTS ciudad;
 DROP TABLE IF EXISTS pais;
 DROP TABLE IF EXISTS sucursal_usuario;
 
+DROP TABLE IF EXISTS egresos;
+DROP TABLE IF EXISTS motivo_egreso;
+
 CREATE TABLE IF NOT EXISTS permisos(
     idPermisos  INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     crear       TINYINT     NOT NULL,
@@ -241,4 +244,22 @@ CREATE TABLE IF NOT EXISTS info_venta(
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkVenta)    REFERENCES venta(idVenta)         ON UPDATE CASCADE ON DELETE RESTRICT
 
+)ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS motivo_egreso(
+    idMotivo        INT             NOT NULL        PRIMARY KEY         AUTO_INCREMENT,
+    nombre          VARCHAR(50)     NOT NULL
+)ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS egresos(
+    idEgreso        INT             NOT NULL        PRIMARY KEY         AUTO_INCREMENT,
+    fkMotivo        INT             NOT NULL,
+    fkUsuario       INT             NOT NULL,
+    fkSucursal      INT             NOT NULL,
+    total           DECIMAL(5,2)    NOT NULL,
+    fecha           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (fkMotivo) REFERENCES motivo_egreso(idMotivo) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;

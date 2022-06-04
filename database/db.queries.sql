@@ -1072,3 +1072,52 @@ CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
         END IF;
     END//
 DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS actualizar_producto_inventario;
+CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json       JSON;
+        DECLARE _fkUsuario  INT;
+        DECLARE _fkProducto INT;
+        DECLARE _fkSucursal  INT;
+        DECLARE _cantidad   INT;
+
+        DECLARE _costo     DECIMAL(10,2);
+        DECLARE _total     DECIMAL(10,2);
+
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'   ));
+        SET _fkProducto  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkProducto'  ));
+        SET _fkSucursal  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'  ));
+        SET _cantidad    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cantidad'     ));
+
+        START TRANSACTION ;
+            SELECT costo INTO _costo FROM producto WHERE idProducto = _fkProducto;
+            IF(_cantidad > 0) THEN
+                SELECT _costo * _cantidad INTO _total;
+                IF((SELECT idExistencia FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) IS NOT NULL) THEN
+                    IF((SELECT cantidad FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) < _cantidad) THEN
+                        UPDATE existencia SET cantidad = _cantidad WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto;
+                        INSERT INTO egresos VALUE (0, 1, _fkUsuario, _fkSucursal, _total, NOW());
+                        SELECT 'SUCCESS' AS "RESULTADO";
+                    ELSE
+                        SELECT 'La cantidad debe ser mayor a la existente' AS "RESULTADO";
+                    END IF;
+                ELSE
+                    SELECT 'No existe ese producto en la sucursal indicada' AS "RESULTADO";
+                END IF ;
+            ELSE
+                SELECT 'La cantidad debe ser mayor a 0' AS "RESULTADO";
+            END IF;
+        COMMIT ;
+
+    END //
+DELIMITER ;

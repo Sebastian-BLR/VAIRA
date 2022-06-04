@@ -12,9 +12,15 @@
   $data = [
     "idUsuario" => $id_usuario,
   ];
-
+  
   $sucursal = json_decode(POST("Administrador/services/getSucursal.php", $data), true);
   $sucursal = $sucursal[0];
+
+  $data = [
+    "sucursal" => $sucursal,
+  ];
+  $region_iva =  json_decode(POST("Administrador/services/getRegionSucursal.php", $data), true);
+  $region_iva = $region_iva[0];
 
   $categorias = json_decode(POST("Administrador/services/getCategories.php", $data), true);
 ?>
