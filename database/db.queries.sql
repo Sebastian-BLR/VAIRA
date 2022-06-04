@@ -1001,6 +1001,7 @@ CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
         SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
         SET _rango       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.rango'     ));
         SET _fecha       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
+        SET _fkSucursal  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
 
         START TRANSACTION;
             SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
@@ -1053,9 +1054,9 @@ CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
                 END IF;
 
                 IF(_tempJson IS NULL) THEN
-                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,'Sin ventas'));
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT('nombre', _nombre,'detalles', 'Sin ventas'));
                 ELSE
-                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT(_nombre,_tempJson));
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_index,']'),JSON_OBJECT('nombre', _nombre,'detalles', _tempJson));
                 END IF;
 
                 SET _index = _index + 1;

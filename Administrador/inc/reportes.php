@@ -4,6 +4,68 @@ $dias_semana = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 // * ========================================================================================================
+// *                                            PRODUCTO                                                   //
+// * ========================================================================================================
+
+if(isset($_POST['productsFilter'])){
+  $data = [
+    'fkUsuario' => $id_usuario,
+    'rango' => 4,
+    'fecha' => date('Y-m-d'),
+    'fkSucursal' => $sucursal
+  ];
+
+  $data_from_db = json_decode(POST('Administrador/services/getReportsProducts.php', $data), true);
+  $products = json_decode($data_from_db[0], true);
+
+  // var_dump($products);
+
+  $total_sales = 0;
+  $porcentaje_productos = [];
+  $ventas = [];
+  $array_products = [];
+
+  foreach($products as $sale){
+    $datos = (array)$sale;
+    foreach($datos as $data){
+      // ! Obtenemos el nombre de la categoria
+      $array_products[] = $data['nombre'];
+      foreach($data as $info){
+        // ! Obtenemos el total de ventas de esa categoria
+        if(gettype($info) == 'array')
+          $ventas[] = $info['Ventas'];
+      }
+    }
+  }
+
+  // ! Se obtiene el total de ventas de la semana
+  foreach ($ventas as $venta)
+    $total_sales += $venta;
+
+  $datos_grafica_categorias = [];
+  if ($total_sales > 0){
+    foreach ($ventas as $venta){
+      $porcentaje_productos[] = round( $venta/$total_sales, 2);
+    }
+  }else{
+    foreach ($ventas as $venta){
+      $porcentaje_productos[] = 0;
+    }
+  }
+
+  $data_for_p_graph = [];
+
+  for($i = 0; $i < count($array_products); $i++){
+    $data_for_p_graph[] = [
+      'categoria' => $array_products[$i],
+      'ventas' => $ventas[$i],
+      'porcentaje' => $porcentaje_productos[$i]
+    ];
+  }
+}
+
+
+// * ========================================================================================================
 // *                                            CATEGORIA                                                  //
 // * ========================================================================================================
 
@@ -21,8 +83,7 @@ if(isset($_POST['categoriesFilter'])){
   ];
   $data_from_db = json_decode(POST('Vendedor/services/getReportsCategories.php', $data), true);
   $categories = json_decode($data_from_db[0], true);
-  // var_dump($categories);
-
+  
   $total_sales = 0;
   $porcentaje_categoria = [];
   $ventas = [];
@@ -41,10 +102,7 @@ if(isset($_POST['categoriesFilter'])){
     }
   }
 
-  // var_dump($ventas);
-  // var_dump($array_categories);
-
-  // ! Se obtiene el total de ventas de la semana
+  // ! Se obtiene el total de ventas generadas en total
   foreach ($ventas as $venta)
     $total_sales += $venta;
 
@@ -59,8 +117,8 @@ if(isset($_POST['categoriesFilter'])){
     }
   }
 
+  // ! Se crea el array que se enviara a la grafica
   $data_for_c_graph = [];
-  
   for($i = 0; $i < count($array_categories); $i++){
     $data_for_c_graph[] = [
       'categoria' => $array_categories[$i],
@@ -68,9 +126,6 @@ if(isset($_POST['categoriesFilter'])){
       'porcentaje' => $porcentaje_categoria[$i]
     ];
   }
-
-  // var_dump($data_for_c_graph);
-  
 }
 
 // * ========================================================================================================
@@ -80,6 +135,7 @@ if(isset($_POST['categoriesFilter'])){
 if(isset($_POST['eligeFechaReporte']) && $_POST['eligeFechaReporte'] != ""){
   $data = [
     'fkUsuario' => $id_usuario,
+    'fkSucursal' => $sucursal,
     'fecha' => $_POST['eligeFechaReporte'],
     'rango' => 1
   ];
@@ -247,6 +303,17 @@ for($i = 0; $i < count($meses); $i++){
         </div>
       </div>
     </p>
+  <?php elseif (isset($_POST['productsFilter'])):  ?>
+    <p>
+      Ventas por productos anual
+      <div class="row" style="margin-top: 5px;">
+        <div class="col-4" style="border-style: none; text-align: left;">
+          <a href="?reportes=true" class="btn btn-primary ms-3">
+            <i class="fa fa-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </p>
   <?php elseif (isset($_POST['categoriesFilter'])):  ?>
     <p>
       Ventas por categorias anual
@@ -293,13 +360,43 @@ for($i = 0; $i < count($meses); $i++){
 </div>
 <div class="row" style="margin-top:9px" id="graph">
 <?php
-    if(isset($_POST['categoriesFilter'])){
+    if(isset($_POST['productsFilter'])){
       echo('
         <script>
         const divGrafica = document.getElementById("graph");      
         divGrafica.innerHTML = 
         `
-        <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis" style="max-width: 300px">
+        <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis">
+          <caption> Ventas por productos </caption>
+          <thead>
+            <tr>
+              <th scope="col"> Producto </th> 
+              <th scope="col"> Ventas por producto </th>
+              </tr>
+          </thead> 
+          <tbody class="bodyGrafica">');
+            foreach ($data_for_p_graph as $product) {
+              echo('
+                <tr>
+                  <th scope="row">'. $product['categoria'] .'</th>
+                  <td style="--size: '. $product['porcentaje'] .';">
+                  <span class="data">'.$product['ventas'].'</span>
+                  </td>
+                </tr>');
+            }
+              echo('
+              </tbody>
+            </table>
+            `
+        </script>
+      ');
+    }else if(isset($_POST['categoriesFilter'])){
+      echo('
+        <script>
+        const divGrafica = document.getElementById("graph");      
+        divGrafica.innerHTML = 
+        `
+        <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis">
           <caption> Ventas por dia </caption>
           <thead>
             <tr>

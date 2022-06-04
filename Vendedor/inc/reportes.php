@@ -1,7 +1,68 @@
 <?php
+require "../services/funciones.php";
 
 $dias_semana = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+// * ========================================================================================================
+// *                                            PRODUCTO                                                   //
+// * ========================================================================================================
+
+if(isset($_POST['productsFilter'])){
+  $data = [
+    'fkUsuario' => $id_usuario,
+    'rango' => 4,
+    'fecha' => date('Y-m-d'),
+    'fkSucursal' => $sucursal
+  ];
+
+  $data_from_db = json_decode(POST('Administrador/services/getReportsProducts.php', $data), true);
+  $products = json_decode($data_from_db[0], true);
+
+  $total_sales = 0;
+  $porcentaje_productos = [];
+  $ventas = [];
+  $array_products = [];
+
+  foreach($products as $sale){
+    $datos = (array)$sale;
+    foreach($datos as $data){
+      // ! Obtenemos el nombre de la categoria
+      $array_products[] = $data['nombre'];
+      foreach($data as $info){
+        // ! Obtenemos el total de ventas de esa categoria
+        if(gettype($info) == 'array')
+          $ventas[] = $info['Ventas'];
+      }
+    }
+  }
+
+  // ! Se obtiene el total de ventas de la semana
+  foreach ($ventas as $venta)
+    $total_sales += $venta;
+
+  $datos_grafica_categorias = [];
+  if ($total_sales > 0){
+    foreach ($ventas as $venta){
+      $porcentaje_productos[] = round( $venta/$total_sales, 2);
+    }
+  }else{
+    foreach ($ventas as $venta){
+      $porcentaje_productos[] = 0;
+    }
+  }
+
+  $data_for_p_graph = [];
+
+  for($i = 0; $i < count($array_products); $i++){
+    $data_for_p_graph[] = [
+      'categoria' => $array_products[$i],
+      'ventas' => $ventas[$i],
+      'porcentaje' => $porcentaje_productos[$i]
+    ];
+  }
+}
+
 
 // * ========================================================================================================
 // *                                            CATEGORIA                                                  //
@@ -80,6 +141,7 @@ if(isset($_POST['categoriesFilter'])){
 if(isset($_POST['eligeFechaReporte']) && $_POST['eligeFechaReporte'] != ""){
   $data = [
     'fkUsuario' => $id_usuario,
+    'fkSucursal' => $sucursal,
     'fecha' => $_POST['eligeFechaReporte'],
     'rango' => 1
   ];
@@ -245,6 +307,17 @@ for($i = 0; $i < count($meses); $i++){
         </div>
       </div>
     </p>
+  <?php elseif (isset($_POST['productsFilter'])):  ?>
+    <p>
+      Ventas por productos anual
+      <div class="row" style="margin-top: 5px;">
+        <div class="col-4" style="border-style: none; text-align: left;">
+          <a href="?reportes=true" class="btn btn-primary ms-3">
+            <i class="fa fa-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </p>
   <?php elseif (isset($_POST['categoriesFilter'])):  ?>
     <p>
       Ventas por categorias anual
@@ -291,13 +364,43 @@ for($i = 0; $i < count($meses); $i++){
 </div>
 <div class="row" style="margin-top:9px" id="graph">
 <?php
-  if(isset($_POST['categoriesFilter'])){
+  if(isset($_POST['productsFilter'])){
     echo('
       <script>
       const divGrafica = document.getElementById("graph");      
       divGrafica.innerHTML = 
       `
-      <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis" style="max-width: 300px">
+      <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis">
+        <caption> Ventas por productos </caption>
+        <thead>
+          <tr>
+            <th scope="col"> Producto </th> 
+            <th scope="col"> Ventas por producto </th>
+            </tr>
+        </thead> 
+        <tbody class="bodyGrafica">');
+          foreach ($data_for_p_graph as $product) {
+            echo('
+              <tr>
+                <th scope="row">'. $product['categoria'] .'</th>
+                <td style="--size: '. $product['porcentaje'] .';">
+                <span class="data">'.$product['ventas'].'</span>
+                </td>
+              </tr>');
+          }
+            echo('
+            </tbody>
+          </table>
+          `
+      </script>
+    ');
+  }else if(isset($_POST['categoriesFilter'])){
+    echo('
+      <script>
+      const divGrafica = document.getElementById("graph");      
+      divGrafica.innerHTML = 
+      `
+      <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis">
         <caption> Ventas por dia </caption>
         <thead>
           <tr>
@@ -328,26 +431,80 @@ for($i = 0; $i < count($meses); $i++){
       const divGrafica = document.getElementById("graph");      
       divGrafica.innerHTML = 
           `
-          <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis" style="max-width: 300px">
-            <caption> Ventas por dia </caption>
-            <thead>
-              <tr>
-                <th scope="col"> Dia </th> 
-                <th scope="col"> Ventas </th>
+          <div class="col-3">
+            <table id="animations-example-3" class="charts-css column show-labels data-spacing-5 show-primary-axis" style="max-width: 300px">
+              <caption> Ventas por dia </caption>
+              <thead>
+                <tr>
+                  <th scope="col"> Dia </th> 
+                  <th scope="col"> Ventas </th>
+                  </tr>
+              </thead> 
+              <tbody class="bodyGrafica">
+                <tr>
+                  <th scope="row">'. $fecha_parseada .'</th>');
+                  if($total_dia == 0)
+                    echo('<td style="--size: 0;">');
+                  else
+                    echo('<td style="--size: 1.0;">');
+                  echo('<span class="data" style="padding-top: 200px; font-size:35px">'.$total_dia.'</span>
+                  </td>
                 </tr>
-            </thead> 
-            <tbody class="bodyGrafica">
-              <tr>
-                <th scope="row">'. $fecha_parseada .'</th>');
-                if($total_dia == 0)
-                  echo('<td style="--size: 0;">');
-                else
-                  echo('<td style="--size: 1.0;">');
-                echo('<span class="data" style="padding-top: 200px; font-size:35px">'.$total_dia.'</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-9">
+            <div class="wrapper"  style="height:50vh;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">No.Venta</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Sucursal</th>
+                    <th scope="col">Monto</th>
+                    <th scope="col">Detalle</th>
+                    <th scope="col">Factura</th>
+                  </tr>
+                </thead>
+                <tbody>');
+                  $data = [
+                    'idUsuario' => $id_usuario,
+                    'fecha' => $_POST['eligeFechaReporte']
+                  ];
+                
+                  $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);                
+                  if ($input_from_db == null){
+                    echo('
+                      <tr>
+                        <th scope="row"></th>
+                        <td>No se encontraron recibos</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                      ');
+                  } else{
+                    foreach($input_from_db as $value){
+                      //In between the pair of dots is supposed to be the variable $value andin brackets the specific value retrieved from the db
+                      // NOTE: each button below must have a 'name' or/and 'value' attribute added, the modal wont work if we dont pass anything specific from each item
+                      echo('
+                      <tr>
+                        <th scope="row">'.$value[0].'</th>
+                        <td>'.fecha($value[1]).'</td>
+                        <td>'.$value[2].'</td>
+                        <td>$'.$value[3].'</td>
+                        <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
+                        <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura'. $value[0] .'"><i class="fa fa-book"></i></button></td>
+                      </tr>
+                      ');
+                  }
+                }
+                
+                echo('</tbody>
+              </table>
+            </div>  
+          </div>
           `
       </script>
     ');
@@ -438,5 +595,134 @@ for($i = 0; $i < count($meses); $i++){
     ');
   }
 ?>
+    
+    <!-- Modal Detalle Venta -->
+    <?php
+    if(isset($_POST['eligeFechaReporte'])){
+      $data = [
+        'idUsuario' => $id_usuario,
+        'fecha' => $_POST['eligeFechaReporte']
+      ];
+    
+      $input_from_db = json_decode(POST("Vendedor/services/getSalesPerDate.php",$data), true);
+      foreach($input_from_db as $value){
+
+        $data = [
+          'idVenta' => $value[0]
+        ];
+        $infoSale = json_decode(POST("Vendedor/services/getInfoSale.php",$data), true);
+        echo('
+        <div class="modal fade bd-example-modal-xl" id="mostrarDetalle'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Detalle de Venta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="vendedor" class="col-form-label">Vendedor</label>
+                    <input type="text" class="form-control" id="vendedor" value="'.$infoSale[0][0].'" disabled>
+                  </div>
+                  <div class="mb-3">
+                    <label for="hora" class="col-form-label">Hora</label>
+                    <input type="text" class="form-control" id="hora" value="'.hora($infoSale[0][1]).'" disabled>
+                  </div>
+                  <div class="mb-3">
+                    <label for="productos" class="col-form-label">Productos</label>
+                    ');
+                    
+                    foreach($infoSale as $sale){
+                      echo ('
+                      <ul>
+                        <li style="list-style:none;">'
+                          .$sale[3] . " " . $sale[2] . '
+                        </li>
+                      </ul>');
+                    }
+                    
+                    echo('
+                  </div>
+                  <div class="mb-3">
+                    <label for="total" class="col-form-label">Total</label>
+                    <input type="text" class="form-control" id="total" value="'. $infoSale[0][5] .'" disabled>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>');
+
+        echo('        
+        <!-- Modal Factura-->
+        <div class="modal fade bd-example-modal-xl" id="generaFactura'. $value[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Generar Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <!-- //* =========================================================================================== -->
+                <!-- //*                 REALIZAR CONEXION CON EL SAT PARA REALIZAR UNA FACTURACION                  -->
+                <!-- //* =========================================================================================== -->
+                <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
+                <!-- //* =========================================================================================== -->
+                <form>
+                  <div class="mb-3">
+                    <label for="rfc" class="col-form-label">Capture su RFC:</label>
+                    <input type="text" class="form-control" id="rfc" maxlength="13">
+                  </div>
+                  <div class="mb-3">
+                    <label for="nombre" class="col-form-label">Nombre Completo:</label>
+                    <input type="text" class="form-control" id="nombre">
+                  </div>
+                  <div class="mb-3">
+                    <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
+                    <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
+                  </div>
+                  <div class="mb-3">
+                    <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
+                    <select name="regimenFiscal" id="regimenFiscal" form="carform">');
+                        $input_from_db = json_decode(POST("Vendedor/services/getTaxRegimen.php",$data), true);
+
+                        foreach($input_from_db as $value){
+                          echo('
+                          <option value="'.$value[0].'">'.$value[1].'</option>
+                          ');
+                        }
+                    echo( '</select>
+                    <div class="mb-3">
+                      <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
+                      <select name="cars" id="cars" form="carform">');
+                        $input_from_db = json_decode(POST("Vendedor/services/getPaymentMethods.php",$data), true);
+
+                        foreach($input_from_db as $value){
+                          echo('
+                          <option value="'.$value[0].'">'.$value[1].'</option>
+                          ');
+                        }
+                        echo('
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="alertFactura()" data-bs-dismiss="modal">Generar</button>
+              </div>
+            </div>
+          </div>
+        </div>        
+      ');
+
+      }      
+    }
+    ?>
 
 </div>

@@ -77,7 +77,7 @@
                   <td>'.$value[2].'</td>
                   <td>$'.$value[3].'</td>
                   <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#mostrarDetalle'.$value[0].'"><i class="fa fa-search-plus"></i></button></td>
-                  <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura"><i class="fa fa-book"></i></button></td>
+                  <td><button type="button" class="btn btn-outline-dark" style="float: center; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#generaFactura'.$value[0].'"><i class="fa fa-book"></i></button></td>
                 </tr>
                 ');
             }
@@ -88,71 +88,6 @@
       </div>
     </div>
   </div>
-
-    <!-- Modal Factura-->
-    <div class="modal fade bd-example-modal-xl" id="generaFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Generar Factura</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- //* =========================================================================================== -->
-            <!-- //*                 REALIZAR CONEXION CON EL SAT PARA REALIZAR UNA FACTURACION                  -->
-            <!-- //* =========================================================================================== -->
-            <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
-            <!-- //* =========================================================================================== -->
-            <form>
-              <div class="mb-3">
-                <label for="rfc" class="col-form-label">Capture su RFC:</label>
-                <input type="text" class="form-control" id="rfc" maxlength="13">
-              </div>
-              <div class="mb-3">
-                <label for="nombre" class="col-form-label">Nombre Completo:</label>
-                <input type="text" class="form-control" id="nombre">
-              </div>
-              <div class="mb-3">
-                <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
-                <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
-              </div>
-              <div class="mb-3">
-                <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
-                <select name="regimenFiscal" id="regimenFiscal" form="carform">
-                  <?php
-                    $input_from_db = json_decode(POST("Vendedor/services/getTaxRegimen.php",$data), true);
-
-                    foreach($input_from_db as $value){
-                      echo('
-                      <option value="'.$value[0].'">'.$value[1].'</option>
-                      ');
-                    }
-                  ?>
-                </select>
-                <div class="mb-3">
-                  <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
-                  <select name="cars" id="cars" form="carform">
-                  <?php
-                    $input_from_db = json_decode(POST("Vendedor/services/getPaymentMethods.php",$data), true);
-
-                    foreach($input_from_db as $value){
-                      echo('
-                      <option value="'.$value[0].'">'.$value[1].'</option>
-                      ');
-                    }
-                  ?>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" onclick="alertFactura()" data-bs-dismiss="modal">Generar</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Modal Corte de Caja -->
     <div class="modal fade" id="corteCaja" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -300,6 +235,71 @@
               </div>
             </div>
           </div>');
+          
+          echo('        
+          <!-- Modal Factura-->
+          <div class="modal fade bd-example-modal-xl" id="generaFactura'. $value[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">Generar Factura</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <!-- //* =========================================================================================== -->
+                  <!-- //*                 REALIZAR CONEXION CON EL SAT PARA REALIZAR UNA FACTURACION                  -->
+                  <!-- //* =========================================================================================== -->
+                  <!-- //*               MODIFICAR LAS PROPIEDADES DEL FORM PARA ESTABLECER LA CONEXION                -->
+                  <!-- //* =========================================================================================== -->
+                  <form>
+                    <div class="mb-3">
+                      <label for="rfc" class="col-form-label">Capture su RFC:</label>
+                      <input type="text" class="form-control" id="rfc" maxlength="13">
+                    </div>
+                    <div class="mb-3">
+                      <label for="nombre" class="col-form-label">Nombre Completo:</label>
+                      <input type="text" class="form-control" id="nombre">
+                    </div>
+                    <div class="mb-3">
+                      <label for="codigopostal" class="col-form-label">C&oacute;digo Postal:</label>
+                      <input type="text" class="form-control" id="codigopostal" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;">
+                    </div>
+                    <div class="mb-3">
+                      <label for="regimenfiscal" class="col-form-label">Régimen Fiscal:</label>
+                      <select name="regimenFiscal" id="regimenFiscal" form="carform">');
+                          $input_from_db = json_decode(POST("Vendedor/services/getTaxRegimen.php",$data), true);
+
+                          foreach($input_from_db as $value){
+                            echo('
+                            <option value="'.$value[0].'">'.$value[1].'</option>
+                            ');
+                          }
+                      echo( '</select>
+                      <div class="mb-3">
+                        <label for="metodopago" class="col-form-label">M&eacute;todo de Pago:</label>
+                        <select name="cars" id="cars" form="carform">');
+                          $input_from_db = json_decode(POST("Vendedor/services/getPaymentMethods.php",$data), true);
+
+                          foreach($input_from_db as $value){
+                            echo('
+                            <option value="'.$value[0].'">'.$value[1].'</option>
+                            ');
+                          }
+                          echo('
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-success" onclick="alertFactura()" data-bs-dismiss="modal">Generar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ');
+        
           }      
     ?>
 
