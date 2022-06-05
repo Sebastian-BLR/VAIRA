@@ -2,6 +2,16 @@
   session_start();
   if( !isset($_SESSION['user']) || $_SESSION['userType'] != 1)
     header("Location: ../index.php");
+
+  
+    include '../services/helper.php';
+    include '../services/connection.php';
+
+    $sucursales = json_decode(POST("SuperAdministrador/services/getSucursales.php", ''), true);
+
+    // ! Asignar una sucursal default
+    if(!isset($_SESSION['id_sucursal']))
+      $_SESSION['id_sucursal'] = $sucursales[0][0];
 ?>
 <!doctype html>
 <html lang="en">
