@@ -2,9 +2,12 @@
 
 require "../services/funciones.php";
 
-if(isset($_POST['idSucursal'])){
-  $_SESSION['id_sucursal'] = $_POST['idSucursal'];
-}
+if(isset($_POST['generaFactura']))
+echo ('
+  <script>
+    alertFactura()
+  </script>
+');
 
 ?>
 
@@ -17,7 +20,7 @@ if(isset($_POST['idSucursal'])){
 </div>
               
 <div style="font-size: 20px;  margin-top: 10px;">
-  Recibos
+  Recibos de <?php echo $_SESSION['nombre_sucursal'] ?>
   <div class="row" style="margin-top: 10px;">
     <div class="col">
       <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">

@@ -163,6 +163,33 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
 DELIMITER ;
 
 DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_productos_super_admin;
+CREATE PROCEDURE obtener_productos_super_admin(IN _jsonA JSON)
+    BEGIN
+        DECLARE _idSucursal INT;
+        DECLARE _json       JSON;
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
+
+        START TRANSACTION ;
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  precio AS TOTAL, c.nombre AS CATEGORIA, fkProveedor, costo FROM producto
+                JOIN existencia e on producto.idProducto = e.fkProducto
+                JOIN sucursal s on e.fkSucursal = s.idSucursal
+                JOIN categoria c on c.idCategoria = producto.fkCategoria
+                JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal;
+        COMMIT ;
+    END //
+DELIMITER ;
+
+
+DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_productos;
 CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
     BEGIN
@@ -179,7 +206,7 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
         SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
 
         START TRANSACTION ;
-            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA, fkProveedor, costo FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
                 JOIN categoria c on c.idCategoria = producto.fkCategoria

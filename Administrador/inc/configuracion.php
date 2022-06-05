@@ -104,12 +104,11 @@
   }
 
   if(isset($_GET["id"])){
-    $id = $_GET["id"];
     $data = [
-      'idUsuario' => $id
+      'idUsuario' => $_GET["id"]
     ];
 
-    var_dump($data);
+    // var_dump($data);
     $eliminar = json_decode(POST("Administrador/services/deleteUser.php",$data), true);
     if($eliminar[0] > 0)
     echo "<script>Swal.fire({

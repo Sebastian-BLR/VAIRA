@@ -1,3 +1,74 @@
+<?php
+
+$data = [
+  'sucursal' => $_SESSION['id_sucursal']
+];
+
+if(isset($_GET["id"])){
+  $data = [
+    'idProducto' => $_GET["id"]
+  ];
+
+  // var_dump($data);
+  $eliminar = json_decode(POST("Administrador/services/deleteProduct.php",$data), true);
+  if($eliminar[0] > 0)
+  echo "<script>Swal.fire({
+    title: 'Usuario eliminado!',
+    icon: 'success',
+      confirmButtonText: 'Ok'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        window.location.href='index.php?configuracion=true';
+      }
+    }) </script>";
+}
+
+if(isset($_POST['edit-product'])){
+  $check = @getimagesize($_FILES['img'.$_POST['idProducto']]['tmp_name']);
+  if($check !== false){
+    $data = [
+      'idProducto' => $_POST['idProducto'],
+      'nombre' => $_POST['nombre'.$_POST['idProducto']],
+      'costo' => $_POST['costo'.$_POST['idProducto']],
+      'precio' => $_POST['precio'.$_POST['idProducto']],
+      'img' => $_FILES['img'.$_POST['idProducto']]['name'],
+      'categoria' => $_POST['categoria'.$_POST['idProducto']],
+      'proveedor' => $_POST['proveedor'.$_POST['idProducto']],
+    ];
+  } else {
+    $data = [
+      'idProducto' => $_POST['idProducto'],
+      'nombre' => $_POST['nombre'.$_POST['idProducto']],
+      'costo' => $_POST['costo'.$_POST['idProducto']],
+      'precio' => $_POST['precio'.$_POST['idProducto']],
+      'img' => "",
+      'categoria' => $_POST['categoria'.$_POST['idProducto']],
+      'proveedor' => $_POST['proveedor'.$_POST['idProducto']],
+    ];
+  }
+            
+  $status = json_decode(POST('SuperAdministrador/services/updateProduct.php', $data), true);
+  if($status[0] == "Success"){
+    if($check !== false){
+      $carpeta_destino = '../src/image/productos/';
+      $archivo_subido = $carpeta_destino . $_FILES['img'.$_POST['idProducto']]['name'];
+      move_uploaded_file($_FILES['img'.$_POST['idProducto']]['tmp_name'], $archivo_subido);
+    }
+    echo '
+    <script>
+      alertActualizarProducto()
+    </script>
+    ';
+  } else {
+    echo '
+    <script>
+      alertErrorActualizarProducto()
+    </script>
+    ';
+  }
+}
+
+?>
 <div class="row" style="margin-top: 5px;font-size: 19px;">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -8,15 +79,16 @@
 </div>               
                 
 <div class="btn-group">
-  <button type="button" class="btn btn-secondary" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-filter"></i>Filtrar</button>
-  <ul class="dropdown-menu">
-    <li><input type="checkbox" id="filtro1" name="filtro1">
-      <label for="filtro1">Menor precio</label></li>
-    <li><input type="checkbox" id="filtro2" name="filtro2">
-      <label for="filtro2">Mayor precio</label></li>
-    <li><input type="checkbox" id="filtro3" name="filtro3">
-      <label for="filtro3">Categoria</label></li>
-  </ul>
+<form action="<?php echo( htmlspecialchars($_SERVER["PHP_SELF"]) ).'?inventario=true' ?>" method="POST">
+    <button type="button" class="btn btn-secondary" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-filter"></i>Filtrar</button>
+    <ul class="dropdown-menu">
+      <?php
+        foreach ($categorias as $categoria) {
+          echo '<li><button type="submit" class="dropdown-item" name="filtro-categoria" value="'.$categoria[0].'">'.$categoria[1].'</button></li>';
+        }
+      ?>
+    </ul>
+  </form>
 </div>
 <button type="button" class="btn btn-outline-dark" style="float: right; margin-top: 10px;" data-bs-toggle="dropdown" aria-expanded="false"></i>Modificar</button>
 <ul class="dropdown-menu">
@@ -24,109 +96,178 @@
   <li><button style="border: none;"  data-bs-toggle="modal" data-bs-target="#agregarVariosProductos">Agregar productos</button></li>
 </ul>
 <div class="btn-group">
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      Sucursal
-    </button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Cuernavaca</a></li>
-      <li><a class="dropdown-item" href="#">Temixco</a></li>
-      <li><a class="dropdown-item" href="#">Xochitepec</a></li>
-    </ul>
-  </div>
+  <form action="<?php echo( htmlspecialchars($_SERVER["PHP_SELF"]) ).'?inventario=true' ?>" method="POST" style="display:inline; float:right;">
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Sucursal
+      </button>
+      <ul class="dropdown-menu">
+        <?php
+          foreach ($sucursales as $sucursal) {
+            echo '<li><button type="submit" class="dropdown-item" name="idSucursal" value="'.$sucursal[0].'">'.$sucursal[1].'</button></li>';
+          }
+        ?>
+      </ul>
+    </div>
+  </form>
 </div>
 <div class="wrapper" style="height:65vh;">
   <div class="row" style="margin: 0 0 5px 0;">
-    <div class="card" style="width: 12rem;">
-      <div class="card-body">
-        <button type="button" class="btn btn-outline-info" style="margin-right: 50px;" data-bs-toggle="modal" data-bs-target="#actualizar"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-        <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" data-bs-target="#eliminar"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-      </div>
-      <img src="../src/image/productos/papas.png" class="card-img-top" alt="...">
-      <h5> Nombre </h5>
-      <h7>SKU: </h7>
-      <div class="card-body">
-        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mostrarDetalleProducto"><i class="fa fa-search-plus"></i></button>
-      </div>
-    </div>
+    <?php
+
+      if(isset($_POST['filtro-categoria'])){
+        $data = [
+          'categoria' => $_POST['categoria'],
+          'sucursal' => $_SESSION['id_sucursal']
+        ];
+        $input_from_db = json_decode(POST('SuperAdministrador/services/getProductsByCategory.php', $data), true);
+      } else {
+        $data = [
+          'sucursal' => $_SESSION['id_sucursal']
+        ];
+        $input_from_db = json_decode(POST('SuperAdministrador/services/getAllProducts.php', $data), true);
+      }
+      // var_dump($input_from_db);
+
+      $index = 0;
+      foreach($input_from_db as $producto){
+        if($index%4==0)
+          echo '<div class="row">';
+        if($producto[4] == null)
+          $producto[4] = "default.jpg";
+          // <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" data-bs-target="#eliminar'.$producto[0].'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+        echo('
+          <div class="card" style="width: 12rem;">
+            <div class="card-body">
+              <button type="button" class="btn btn-outline-info" style="margin-right: 50px;" data-bs-toggle="modal" data-bs-target="#actualizar'.$producto[0].'"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+              <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" id="'.$producto[0].'" onclick="alertElimarProducto(this.id)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+            </div>
+            <img src="../src/image/productos/'.$producto[4].'" class="card-img-top" alt="imagen_'.$producto[1].'">
+            <h5 class="text-center"> '. $producto[1] .'</h5>
+            <h7>SKU: '.$producto[3].' </h7>
+            <div class="card-body">
+              <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mostrarDetalleProducto'.$producto[0].'"><i class="fa fa-search-plus"></i></button>
+            </div>
+          </div>
+        ');
+        $index++;
+        if($index != 0 && $index % 4 == 0)
+          echo '</div>';
+        
+        echo('
+        <!-- Modal Detalle Producto-->
+        <div class="modal fade bd-example-modal-sm" id="mostrarDetalleProducto'. $producto[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel'. $producto[0] .'">Detalle de Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="vendedor" class="col-form-label">Nombre de producto</label>
+                    <input type="text" readonly class="form-control" id="nombreproducto'. $producto[0] .'" value="'. $producto[1] .'">
+                  </div>
+                  <div class="mb-3">
+                    <label for="hora" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
+                    <input type="text" readonly class="form-control" id="precio'. $producto[0] .'" value="'. $producto[5] .'">
+                  </div>
+                  <div class="mb-3">
+                    <label for="productos" class="col-form-label">Categoria</label>
+                    <input type="text" readonly class="form-control" id="categoria'. $producto[0] .'" value="'. $producto[6] .'">
+                  </div>
+                  <div class="mb-3">
+                    <label for="total" class="col-form-label">En existencia</label>
+                    <input type="text" readonly class="form-control" id="existencia'. $producto[0] .'" value="'. $producto[2] .'">
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Actualizar producto-->
+        <div class="modal fade bd-example-modal-sm" id="actualizar'.$producto[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel'.$producto[0].'">Editar producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="'. htmlspecialchars($_SERVER['PHP_SELF']).'?inventario=true" method="POST" enctype = "multipart/form-data" style="display: inline;">
+                <input type="hidden" name="idProducto" value="'. $producto[0] .'">
+                  <div class="mb-3">
+                    <label for="producto" class="col-form-label">Nombre de producto</label>
+                    <input type="text" class="form-control" id="nombreProducto'.$producto[0].'" name="nombre'.$producto[0].'" value="'. $producto[1] .'" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="costo" class="col-form-label">Costo</label>
+                    <input type="text" class="form-control" id="costo'. $producto[0] .'" name="costo'.$producto[0].'" value="'. $producto[8] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="precio" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
+                    <input type="text" class="form-control" id="precioInt'. $producto[0] .'" name="precio'.$producto[0].'" value="'. $producto[5] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="formFile" class="form-label">Imagen producto</label>
+                    <input class="form-control" name="img'.$producto[0].'" type="file" id="formFile'.$producto[0].'" accept="image/png, image/jpeg">
+                  </div>
+                  <div class="mb-3">
+                    <label for="categoria" class="col-form-label">Categoria</label>
+                    <select class="form-control" id="categoria'. $producto[0] .'" name="categoria'.$producto[0].'" required>
+                      <option value="">Seleccione una categoria</option>
+                    ');
+                    foreach($categorias as $categoria){
+                      if($categoria[1] == $producto[6])
+                        echo('<option value="'. $categoria[0] .'" selected>'. $categoria[1] .'</option>');
+                      else
+                        echo('<option value="'. $categoria[0] .'">'. $categoria[1] .'</option>');
+                    }
+                  echo ('
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="proveedor" class="col-form-label">Proveedor</label>
+                    <select class="form-control" id="proveedor'. $producto[0] .'" name="proveedor'.$producto[0].'" required>
+                      <option value="">Seleccione un proveedor</option>
+                    ');
+                    foreach($proveedores as $proveedor){
+                      if($proveedor[0] == $producto[7])
+                        echo('<option value="'. $proveedor[0] .'" selected>'. $proveedor[1] .'</option>');
+                      else
+                        echo('<option value="'. $proveedor[0] .'">'. $proveedor[1] .'</option>');
+                    }
+                  echo ('
+                    </select>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" name="edit-product" class="btn btn-success">Aceptar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      ');
+
+      }
+      if ($input_from_db == null)
+      echo('<p>No se encontraron productos</p>'); 
+  
+    ?>
   </div>
 </div>
                    
                    
-
-      <!-- Modal Detalle Producto-->
-<div class="modal fade bd-example-modal-sm" id="mostrarDetalleProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Detalle de Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="vendedor" class="col-form-label">Nombre de producto</label>
-            <input type="text" readonly class="form-control" id="nombreproducto">
-          </div>
-          <div class="mb-3">
-            <label for="hora" class="col-form-label">Precio</label>
-            <input type="text" readonly class="form-control" id="precio">
-          </div>
-          <div class="mb-3">
-            <label for="productos" class="col-form-label">Categoria</label>
-            <input type="text" readonly class="form-control" id="categoria">
-          </div>
-          <div class="mb-3">
-            <label for="total" class="col-form-label">En existencia</label>
-            <input type="text" readonly class="form-control" id="existencia">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Actualizar producto-->
-<div class="modal fade bd-example-modal-sm" id="actualizar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Editar producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="producto" class="col-form-label">Nombre de producto</label>
-            <input type="text" class="form-control" id="nombreproducto">
-          </div>
-          <div class="mb-3">
-            <label for="precio" class="col-form-label">Precio</label>
-            <input type="text" class="form-control" id="precio">
-          </div>
-          <div class="mb-3">
-            <label for="categoria" class="col-form-label">Categoria</label>
-            <input type="text" class="form-control" id="categoria">
-          </div>
-          <div class="mb-3">
-            <label for="existencia" class="col-form-label">En existencia</label>
-            <input type="text" class="form-control" id="existencia">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Modal Eliminar producto-->
-<div class="modal fade bd-example-modal-sm" id="eliminar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<!-- <div class="modal fade bd-example-modal-sm" id="eliminar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -143,7 +284,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- Modal Agregar un producto-->
 <div class="modal fade bd-example-modal-sm" id="agregarUnProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -157,30 +298,34 @@
         <form>
           <div class="mb-3">
             <label for="producto" class="col-form-label">Nombre de producto</label>
-            <input type="text" class="form-control" id="nombreproducto">
+            <input type="text" class="form-control" id="nombreproducto" name="nombre">
           </div>
           <div class="mb-3">
             <label for="formFile" class="form-label">Imagen producto</label>
-            <input class="form-control" type="file" id="formFile">
+            <input class="form-control" type="file" id="formFile" accept="image/png, image/jpeg" name="img">
           </div>
           <div class="mb-3">
-            <label for="precio" class="col-form-label">Precio</label>
-            <input type="text" class="form-control" id="precio">
+            <label for="costo" class="col-form-label">Costo</label>
+            <input type="text" class="form-control" id="costo" name="costo">
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
+            <input type="text" class="form-control" id="precio" name="precio">
           </div>
           <div class="mb-3">
             <label for="categoria" class="col-form-label">Categoria</label>
-            <input type="text" class="form-control" id="categoria">
+            <input type="text" class="form-control" id="categoria" name="categoria">
           </div>
           <div class="mb-3">
             <label for="servicio" class="col-form-label">Es un servicio:</label>
-            <select name="select servicio" onchange="cambiarVisibiidadExistencia()" id="select_servicio" form="carform">
+            <select name="select servicio" onchange="cambiarVisibiidadExistencia()" id="select_servicio" form="carform" name="servicio">
               <option value="0">No</option>
               <option value="1">Sí</option>
             </select>
           </div>
           <div class="mb-3" id="existeniaDiv">
             <label for="existencia" class="col-form-label">En existencia</label>
-            <input type="text" class="form-control" id="existencia">
+            <input type="text" class="form-control" id="existencia" name="existencia" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
           </div>
           <div class="mb-3">
             <label for="proveedor" class="col-form-label">Proveedor</label>
@@ -196,7 +341,9 @@
   </div>
 </div>
 
-<!-- Modal Agregar varios productos-->
+<!-- //*================================ -->
+<!-- // * Modal Agregar varios productos -->
+<!-- //*================================ -->
 <div class="modal fade bd-example-modal-lg" id="agregarVariosProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">

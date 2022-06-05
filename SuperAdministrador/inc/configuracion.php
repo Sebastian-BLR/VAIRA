@@ -7,8 +7,8 @@
   </nav>
 </div>    
       
-<div style="font-size: 20px;  margin-top: 10px;">
-  <div class="row" style="font-size: 25px;  margin-top: 15px;">
+<div style="font-size: 20px;">
+  <div class="row" style="font-size: 25px;">
     <div class="col">
       Usuarios
     </div>
@@ -20,8 +20,8 @@
     </div>
   </div>
 </div>
-<div class="row-1" style="margin-top: 15px; font-size: 17px;">
-  <div class="wrapper"  style="height:32vh;">
+<div class="row-1" style="margin-top: 5px; font-size: 17px;">
+  <div class="wrapper"  style="height:28vh;">
     <table class="table">
       <thead>
         <tr>
@@ -72,13 +72,14 @@
     </table>
   </div>
 </div>
-<div class="row-1" style="margin-top: 5px; font-size: 25px;">
+<hr>
+<div class="row" style="margin-top: 15px; font-size: 25px;">
   <div class="col">
     Proveedores
   </div>
 </div>
-<div class="row-1" style="margin-top: 15px; font-size: 17px;">
-    <div class="wrapper"  style="height:24vh;">   
+<div class="row-1" style="margin-top: 5px; font-size: 17px;">
+    <div class="wrapper"  style="height:28vh;">   
       <table class="table">
         <thead>
           <tr>

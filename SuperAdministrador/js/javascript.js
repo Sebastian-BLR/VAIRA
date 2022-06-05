@@ -21,6 +21,45 @@ function alertElimarUsuario(){
       })
 }
 
+function alertElimarUsuario(id){
+  Swal.fire({
+      title: 'Alerta',
+      text: "¿Estás seguro que deseas eliminar este usuario?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "index.php?configuracion=true&id="+id;
+      }  
+    })
+  }
+
+
+
+function alertElimarProducto(id){
+  Swal.fire({
+      title: 'Alerta',
+      text: "¿Estás seguro que deseas eliminar este producto?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "index.php?inventario=true&id="+id;
+      }  
+    })
+  }
+
+
 function alertElimarProveedor(){
   Swal.fire({
       title: 'Alerta',
@@ -112,6 +151,30 @@ function alertAgregarUsuario(){
         'Usuario agregado',
         'Se ha agregado satisfactoriamente un nuevo usuario',
         'success',
+      )
+}
+
+function alertActualizarProducto(){
+    Swal.fire(
+        'Producto actualizado',
+        'Se ha actualizado satisfactoriamente el producto',
+        'success',
+      )
+}
+
+function alertActualizarProducto(){
+    Swal.fire(
+        'Producto actualizado',
+        'Se ha actualizado satisfactoriamente el producto',
+        'success',
+      )
+}
+
+function alertErrorActualizarProducto(){
+    Swal.fire(
+        'Error',
+        'No se ha podido actualizar el producto',
+        'error',
       )
 }
 

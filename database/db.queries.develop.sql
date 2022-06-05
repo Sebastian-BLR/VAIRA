@@ -49,7 +49,7 @@ CALL filtrar_ventas_semanal('[{"fkUsuario":1,"fkSucursal":1,"fecha":"2022-05-22"
 # CALL filtrar_ventas_categoria('[{"fkUsuario":2,"fkSucursal":1,"fecha":"2022-05-22","rango":3}]');
 # CALL filtrar_ventas_producto('[{"fkUsuario":2,"fkSucursal":1,"fecha":"2022-05-22","rango":1}]');
 
-CALL insertar_usuario('{"nombre":"Rodrigo Sebastian","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
+CALL insertar_usuario('{"nombre":"Nombre1","apellidoP":"ApellidoP1","apellidoM":"ApellidoM1","usuario":"super-admin","password":"123","correo":"a@a.com","telefono":"1234567890","rol":"1"}');
 CALL insertar_usuario('{"nombre":"Nombre2","apellidoP":"ApellidoP2","apellidoM":"ApellidoM2","usuario":"admin","password":"456","correo":"a@a.com","telefono":"1234567890","rol":"2", "sucursal":1}');
 CALL insertar_usuario('{"nombre":"Nombre3","apellidoP":"ApellidoP3","apellidoM":"ApellidoM3","usuario":"user","password":"789","correo":"a@a.com","telefono":"1234567890","rol":"3", "sucursal":1}');
 

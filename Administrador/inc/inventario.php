@@ -7,9 +7,7 @@ if(isset($_POST['edit-product'])){
     'fkProducto' => $_POST['idProducto'],
     'cantidad' => $_POST['existencia']
   ];
-  // var_dump($data);
   $reponse = json_decode(Post("Administrador/services/updateProductsInventory.php",$data),true);
-  // var_dump($reponse);
   if($reponse[0] == 'SUCCESS')
     echo '
     <script>
@@ -47,16 +45,16 @@ if(isset($_POST['edit-product'])){
   </form>
 </div>
 <?php
-  $data = [
-    "sucursal" => $sucursal
-  ];
   if (isset($_POST['categoria'])) {
     $data = [
       "sucursal" => $sucursal,
       "categoria" => $_POST['categoria']
     ];
-    $input_from_db = json_decode(Post("Vendedor/services/getFilters.php",$data),true);
+    $input_from_db = json_decode(Post("Administrador/services/getFilters.php",$data),true);
   } else {
+    $data = [
+      "sucursal" => $sucursal
+    ];
     $input_from_db = json_decode(POST("Administrador/services/getAllProducts.php", $data), true);
   }
 
