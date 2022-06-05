@@ -467,15 +467,22 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS generar_devolucion;
 CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
     BEGIN
-        DECLARE _idVenta   INT;
-        DECLARE _fkVenta   INT;
-        DECLARE _fkUsuario INT;
+        DECLARE _idVenta    INT;
+        DECLARE _fkSucursal INT;
+        DECLARE _fkUsuario  INT;
+        DECLARE _permitido  INT;
+        DECLARE _fkProducto INT;
+        DECLARE _cantidad   INT;
+        DECLARE _restaurar  INT;
 
-        DECLARE _json      JSON;
+        DECLARE _json       JSON;
+        DECLARE _productos  JSON;
 
-        DECLARE _date      VARCHAR(10);
-        DECLARE _usuario   VARCHAR(50);
-        DECLARE _password  VARCHAR(128);
+        DECLARE _date       DATE;
+        DECLARE _usuario    VARCHAR(50);
+        DECLARE _password   VARCHAR(128);
+
+        DECLARE _index      INT DEFAULT 0;
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -483,22 +490,42 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _date      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.date'));
-        SET _idVenta   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idVenta'));
-        SET _usuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'));
-        SET _password  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'));
-        SET _fkVenta   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkVenta'));
-        SET _fkUsuario = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'));
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _date       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha'     ));
+        SET _idVenta    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idVenta'   ));
+        SET _usuario    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.usuario'   ));
+        SET _password   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.password'  ));
+        SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'));
+        SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
+        SET _restaurar  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.restaurar' ));
+
+        SELECT COUNT(*) INTO _permitido FROM usuario INNER JOIN sucursal_usuario ON usuario.idUsuario = sucursal_usuario.fkUsuario
+            WHERE usuario = _usuario AND password = SHA2(_password,512) AND fkSucursal = _fkSucursal;
 
         START TRANSACTION;
-            IF (SELECT COUNT(*) FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512) AND fkTipo = 2) = 1
+            IF (_permitido = 1)
                 THEN
-                    SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = _usuario and password = SHA2(_password,512);
-                    SELECT idVenta INTO _fkVenta FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario;
-                    DELETE FROM info_venta WHERE fkVenta = _fkVenta;
-                    DELETE FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario;
-                    SELECT 'Devolución autorizada' as 'Status';
+                    SELECT COUNT(*) INTO _permitido FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
+                    IF (_permitido > 0) THEN
+
+                        IF (_restaurar = 1) THEN
+                            SELECT JSON_ARRAYAGG(JSON_OBJECT('idProducto',fkProducto,'cantidad',cantidad)) INTO _productos FROM info_venta WHERE fkVenta = _idVenta;
+                            SET _index = JSON_LENGTH(_productos) - 1;
+                            WHILE _index >= 0 DO
+                                 SET _cantidad = JSON_EXTRACT(_productos, CONCAT('$[',_index,'].cantidad'));
+                                 SET _fkProducto = JSON_EXTRACT(_productos, CONCAT('$[',_index,'].idProducto'));
+
+                                 UPDATE existencia SET cantidad = (cantidad +  _cantidad)
+                                    WHERE fkProducto = _fkProducto AND fkSucursal = _fkSucursal;
+
+                                 SET _index = _index - 1;
+                            END WHILE ;
+                        END IF;
+
+                        DELETE FROM info_venta WHERE fkVenta = _idVenta;
+                        DELETE FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
+                        SELECT 'Devolución autorizada' as 'Status';
+                    END IF;
                 ELSE
                     SELECT 'Devolución no autorizada' as 'Status';
             END IF;
@@ -711,10 +738,11 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
             WHILE _dia <= 7 DO
                 IF(_tipoUsuario = 1) THEN
                     IF ((SELECT COUNT(*) FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha)) > 0) THEN
-                        SELECT COUNT(*) INTO _totalVentas FROM venta
-                            WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+                        SELECT COUNT(*) INTO _totalVentas FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+
                         SELECT JSON_OBJECT('Ventas',_totalVentas,'Total',IFNULL(SUM(total),0)) INTO _tempJson FROM venta
                             WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha);
+
                         SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempJson,JSON)));
 
