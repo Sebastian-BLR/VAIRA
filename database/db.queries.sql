@@ -1176,3 +1176,64 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
 
     END //
 DELIMITER ;
+
+DELIMITER //
+CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1}]');
+DROP PROCEDURE IF EXISTS realizar_corte_caja;
+CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkUsuario   INT;
+        DECLARE _fkSucursal  INT;
+        DECLARE _tipoUsuario INT;
+        DECLARE _limit       INT;
+        DECLARE _json        JSON;
+        DECLARE _resultado   JSON;
+        DECLARE _nombreSucur TEXT;
+        DECLARE _index       INT DEFAULT 0;
+        DECLARE _ingresos    DECIMAL(10,2);
+        DECLARE _egresos     DECIMAL(10,2);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _resultado   = JSON_OBJECT('Resultado',JSON_OBJECT('Fecha/Hora',NOW(),'Info',JSON_ARRAY()));
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'   ));
+        SET _fkSucursal  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'  ));
+
+        START TRANSACTION ;
+            SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
+
+            IF (_tipoUsuario = 1) THEN
+                SELECT JSON_ARRAYAGG(JSON_OBJECT('fkSucursal',idSucursal)) INTO _json FROM sucursal;
+            ELSEIF (_tipoUsuario = 2) THEN
+                SELECT JSON_ARRAYAGG(JSON_OBJECT('fkSucursal',fkSucursal)) INTO _json FROM sucursal_usuario WHERE fkUsuario = _fkUsuario;
+            END IF;
+
+            IF (_tipoUsuario = 3) THEN
+                SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+
+                SET _resultado = JSON_INSERT(_resultado,'$.Resultado.Info[0]',JSON_OBJECT('Ingresos',_ingresos,'Egresos',_egresos,'Total',_ingresos-_egresos));
+            ELSE
+                SET _limit = JSON_LENGTH(_json);
+                WHILE _index < _limit DO
+                    SELECT JSON_EXTRACT(_json,CONCAT('$[',_index,'].fkSucursal')) INTO _fkSucursal;
+                    SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal;
+                    SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal;
+
+                    SELECT nombre INTO _nombreSucur FROM sucursal WHERE idSucursal = _fkSucursal;
+
+                    SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado.Info[',_index,']'),JSON_OBJECT(_fkSucursal,JSON_OBJECT('Sucursal',_nombreSucur,'Ingresos',_ingresos,'Egresos',_egresos,'Total',_ingresos-_egresos)));
+                    SET _index = _index + 1;
+                END WHILE ;
+            END IF;
+
+            SELECT _resultado AS 'Resultado';
+        COMMIT ;
+
+    END //
+DELIMITER ;
