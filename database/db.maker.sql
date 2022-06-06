@@ -32,7 +32,6 @@ DROP TABLE IF EXISTS region_iva;
 DROP TABLE IF EXISTS ciudad;
 DROP TABLE IF EXISTS pais;
 DROP TABLE IF EXISTS sucursal_usuario;
-
 DROP TABLE IF EXISTS motivo_egreso;
 
 CREATE TABLE IF NOT EXISTS permisos(
