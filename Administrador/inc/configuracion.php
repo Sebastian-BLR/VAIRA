@@ -447,7 +447,7 @@
   <!-- Modal Editar Usuario-->
   <?php
     $data = [
-      "sucursal" => $sucursal[0][0]
+      "sucursal" => $sucursal
     ];
 
     $input_from_db = json_decode(POST("Administrador/services/getInfoUsers.php",$data), true);
@@ -547,7 +547,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" name="updatePuntos" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal">Guardar</button>
+            <button type="submit" name="updatePuntos" class="btn btn-success">Guardar</button>
           </div>
           </div>
         </div>

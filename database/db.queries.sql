@@ -899,6 +899,19 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
     END//
 DELIMITER ;
 
+# DELIMITER //
+# DROP PROCEDURE IF EXISTS obtener_usuarios_super_admin;
+# CREATE PROCEDURE obtener_usuarios_super_admin()
+#     BEGIN
+#         SELECT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
+#             LEFT JOIN sucursal_usuario ON fkUsuario = idUsuario
+#             LEFT JOIN sucursal s ON fkSucursal = idSucursal
+#             JOIN tipo t on usuario.fkTipo = t.idTipo
+#             WHERE fkTipo !=3 AND activo = 1;
+#     END //
+# DELIMITER ;
+
+
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
 CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)

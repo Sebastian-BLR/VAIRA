@@ -7,13 +7,15 @@
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
         $bindings = json_decode($bindings[0]);
-        $sql = 'SELECT idSucursal, nombre, fkAdmin FROM sucursal;';
+        $sql = 'SELECT fkSucursal FROM sucursal_usuario WHERE fkUsuario = :fkUsuario;';
         $stmt = $pdo->prepare($sql);
 
-        if($stmt->execute()){
-            while($row = $stmt->fetch(PDO::FETCH_NUM)){
-                $data[] = $row;
-            }
+        if($stmt->execute(array(
+            ':fkUsuario' => $bindings->fkUsuario
+        ))){
+            // while($row = $stmt->fetch(PDO::FETCH_NUM)){
+                $data = $stmt->fetch(PDO::FETCH_NUM);
+            // }
             // $data[] = "Success";
           
         }else{
