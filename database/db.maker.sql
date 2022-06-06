@@ -173,13 +173,13 @@ CREATE TABLE IF NOT EXISTS log_producto(
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS existencia(
-    idExistencia    INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     fkProducto      INT         NOT NULL,
     fkSucursal      INT         NOT NULL,
     cantidad        INT         NOT NULL,
 
     FOREIGN KEY (fkProducto) REFERENCES producto(idProducto)   ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal)   ON UPDATE CASCADE ON DELETE RESTRICT,
+    PRIMARY KEY (fkProducto, fkSucursal)
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS impuesto_extra(

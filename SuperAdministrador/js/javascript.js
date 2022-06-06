@@ -1,26 +1,3 @@
-
-function alertElimarUsuario(){
-    Swal.fire({
-        title: 'Alerta',
-        text: "¿Estás seguro que deseas eliminar este usuario?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Si',
-        cancelButtonText: 'Cancelar',
-        allowOutsideClick: false
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire(
-            'Usuario eliminado',
-            'Se ha eliminado satisfactoriamente el usuario',
-            'success',
-          )
-        }
-      })
-}
-
 function alertElimarUsuario(id){
   Swal.fire({
       title: 'Alerta',
@@ -154,10 +131,10 @@ function alertAgregarUsuario(){
       )
 }
 
-function alertActualizarProducto(){
+function alertAgregarProducto(){
     Swal.fire(
-        'Producto actualizado',
-        'Se ha actualizado satisfactoriamente el producto',
+        'Producto agregado',
+        'El producto se ha agregado satisfactoriamente',
         'success',
       )
 }
@@ -167,6 +144,14 @@ function alertActualizarProducto(){
         'Producto actualizado',
         'Se ha actualizado satisfactoriamente el producto',
         'success',
+      )
+}
+
+function alertError(msg){
+    Swal.fire(
+        'Error',
+        msg,
+        'error',
       )
 }
 
