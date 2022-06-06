@@ -8,7 +8,7 @@
         $bindings[] = file_get_contents('php://input');
         $sql = 'SELECT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
                     LEFT JOIN sucursal_usuario ON fkUsuario = idUsuario
-                    LEFT JOIN sucursal s ON fkSucursal = idSucursal
+                    LEFT JOIN sucursal s ON usuario.idUsuario = s.fkAdmin
                     JOIN tipo t on usuario.fkTipo = t.idTipo
                     WHERE fkTipo !=3 AND activo = 1;';
         $stmt = $pdo->prepare($sql);

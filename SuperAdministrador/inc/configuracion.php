@@ -3,7 +3,19 @@
 $errores = false;
 
 if(isset($_POST['updateSucursal'])){
-  var_dump($_POST);
+  // var_dump($_POST);
+  $data = [
+    'fkUsuario' => $_POST['id_usuario'],
+    'idSucursal' => $_POST['sucursal']
+  ];
+  $status = json_decode(POST('SuperAdministrador/services/updateSucursalUsuario.php', $data), true);
+  if($status[0] == 'Success'){
+    echo ('
+      <script>
+        alertSucursalAsignada()
+      </script>
+    ');
+  }
 }
 
 if (isset($_POST['agregarUsuario'])){

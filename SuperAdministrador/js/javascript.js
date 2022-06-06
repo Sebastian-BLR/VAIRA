@@ -171,6 +171,16 @@ function alertAgregarProveedor(){
     )
 }
 
+function alertSucursalAsignada(){
+  Swal.fire(
+      'Sucursal asignada',
+      'Se ha asignado exitosamente la sucursal',
+      'success',
+    ).then(() => {
+      window.location.href = "index.php?configuracion=true";
+    })
+}
+
 
 function alertDevolucion(){ 
   Swal.fire({
