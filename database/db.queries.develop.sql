@@ -76,10 +76,10 @@ CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Saladas
 CALL insertar_producto('{"categoria":"2","proveedor":"3","nombre":"Modelo Clara 355ml","costo":"12.0","precio":"25.0","imagen":"modeloClara.png" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"4","proveedor":"4","nombre":"Absolute Vodka 1.5L","costo":"366.50","precio":"425.58","imagen":"vodka.png" ,"activo":"1","servicio":"0"}');
 
-INSERT INTO existencia VALUES (0, 1, 1, 15),
-                              (0, 4, 1, 22),
-                              (0, 3, 1, 10),
-                              (0, 6, 1, 15);
+# INSERT INTO existencia VALUES (1, 1, 15),
+#                               (4, 1, 22),
+#                               (3, 1, 10),
+#                               (6, 1, 15);
 
 
 INSERT INTO tipo_pago VALUES (0,'Tarjeta de credito'),

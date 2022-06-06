@@ -109,6 +109,60 @@ CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
     END //
 DELIMITER ;
 
+# DELIMITER //
+# DROP PROCEDURE IF EXISTS insertar_producto;
+# CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
+#     BEGIN
+#         DECLARE _fkCategoria INT;
+#         DECLARE _fkProveedor INT;
+#         DECLARE _idProducto  INT;
+#         DECLARE _cantidad    INT;
+#
+#         DECLARE _json        JSON;
+#
+#         DECLARE _activo      TINYINT;
+#         DECLARE _servicio    TINYINT;
+#
+#         DECLARE _nombre      VARCHAR(50);
+#         DECLARE _sku         VARCHAR(20);
+#         DECLARE _imagen      VARCHAR(50);
+#         DECLARE _proveedor   VARCHAR(50);
+#
+#         DECLARE _costo       DECIMAL(10,2);
+#         DECLARE _precio      DECIMAL(10,2);
+#
+#
+#         DECLARE EXIT HANDLER FOR SQLEXCEPTION
+#         BEGIN
+#             SELECT '¡Error!' as 'Resultado';
+#             ROLLBACK;
+#         END;
+#
+#         SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+#         SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
+#         SET _fkProveedor = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.proveedor'));
+#         SET _nombre      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
+#         SET _costo       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'    ));
+#         SET _precio      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'   ));
+#         SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imagen'   ));
+#         SET _activo      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'   ));
+#         SET _servicio    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio' ));
+#
+#         SELECT nombre INTO _proveedor FROM proveedor WHERE idProveedor = _fkProveedor;
+#
+#         SELECT COUNT(*) INTO _cantidad FROM producto INNER JOIN proveedor p on producto.fkProveedor = p.idProveedor WHERE idProveedor = _fkProveedor;
+#
+#         SET _sku = UPPER(CONCAT(LEFT(_proveedor,3),'-', LEFT(_nombre,3),'-',(100 + _cantidad)));
+#
+#         START TRANSACTION;
+#             INSERT INTO producto VALUES (0, _fkCategoria, _fkProveedor, _nombre, _costo, _precio, _sku, _imagen, _activo, _servicio);
+#             SELECT idProducto INTO _idProducto FROM producto WHERE nombre = _nombre LIMIT 1;
+#             INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
+#         COMMIT;
+#     END //
+# DELIMITER ;
+
+
 DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_producto;
 CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
@@ -130,6 +184,10 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
 
         DECLARE _costo       DECIMAL(10,2);
         DECLARE _precio      DECIMAL(10,2);
+
+        DECLARE _index           INT DEFAULT 0;
+        DECLARE _limite          INT DEFAULT 0;
+        DECLARE _idSucursal      INT;
 
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -158,6 +216,13 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
             INSERT INTO producto VALUES (0, _fkCategoria, _fkProveedor, _nombre, _costo, _precio, _sku, _imagen, _activo, _servicio);
             SELECT idProducto INTO _idProducto FROM producto WHERE nombre = _nombre LIMIT 1;
             INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
+
+            SELECT COUNT(*) INTO _limite FROM sucursal;
+            WHILE _index < _limite DO
+                SELECT idSucursal INTO _idSucursal FROM sucursal ORDER BY idSucursal LIMIT _index, 1;
+                INSERT INTO existencia VALUE (_idProducto, _idSucursal, 0);
+                SET _index = _index + 1;
+            END WHILE ;
         COMMIT;
     END //
 DELIMITER ;
@@ -183,7 +248,7 @@ CREATE PROCEDURE obtener_productos_super_admin(IN _jsonA JSON)
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
                 JOIN categoria c on c.idCategoria = producto.fkCategoria
-                JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal;
+                JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal AND activo = 1;
         COMMIT ;
     END //
 DELIMITER ;
@@ -217,18 +282,24 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_producto;
-CREATE PROCEDURE eliminar_producto(IN id INT)
+CREATE PROCEDURE eliminar_producto(IN _jsonA JSON)
     BEGIN
+        DECLARE _json JSON;
+        DECLARE _idProducto INT;
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
             ROLLBACK;
         END;
-        START TRANSACTION;
-            UPDATE log_producto SET desactivar = 1 WHERE fkProducto = id;
-            UPDATE producto SET activo = 0 WHERE idProducto = id;
 
-            SELECT * FROM usuario WHERE idUsuario = id;
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idProducto = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idProducto'));
+
+        START TRANSACTION;
+            UPDATE log_producto SET desactivar = NOW() WHERE fkProducto = _idProducto;
+            UPDATE producto SET activo = 0 WHERE idProducto = _idProducto;
+
+            SELECT * FROM producto WHERE idProducto = _idProducto;
         COMMIT;
     END //
 DELIMITER ;
@@ -302,6 +373,36 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
 
         START TRANSACTION ;
             SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  TRUNCATE ((precio + (precio * ri.iva)), 2) AS TOTAL, c.nombre AS CATEGORIA FROM producto
+                JOIN existencia e on producto.idProducto = e.fkProducto
+                JOIN sucursal s on e.fkSucursal = s.idSucursal
+                JOIN region_iva ri on s.fkRegion = ri.idRegion
+                JOIN categoria c on producto.fkCategoria = c.idCategoria
+                WHERE fkSucursal = _idSucursal AND fkCategoria = _categoria;
+        COMMIT ;
+    END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS obtener_filtro_super_admin;
+CREATE PROCEDURE obtener_filtro_super_admin(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json       JSON;
+        DECLARE _idSucursal JSON;
+
+        DECLARE _categoria  VARCHAR(50);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal' ));
+        SET _categoria   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
+
+        START TRANSACTION ;
+            SELECT idProducto, producto.nombre, e.cantidad, sku, imagen,  precio AS TOTAL, c.nombre AS CATEGORIA, fkProveedor, costo FROM producto
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
                 JOIN region_iva ri on s.fkRegion = ri.idRegion
@@ -1183,7 +1284,7 @@ CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
                 ELSE
                     SELECT idProducto INTO _idProducto FROM existencia INNER JOIN producto p2 on existencia.fkProducto = p2.idProducto
                         WHERE fkSucursal = _fkSucursal
-                        ORDER BY idExistencia
+                        ORDER BY fkProducto, fkSucursal
                         LIMIT _index,1;
                 END IF;
 
@@ -1265,7 +1366,7 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
             SELECT costo INTO _costo FROM producto WHERE idProducto = _fkProducto;
             IF(_cantidad > 0) THEN
                 SELECT _costo * _cantidad INTO _total;
-                IF((SELECT idExistencia FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) IS NOT NULL) THEN
+                IF((SELECT fkSucursal, fkProducto FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) IS NOT NULL) THEN
                     IF((SELECT cantidad FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) < _cantidad) THEN
                         UPDATE existencia SET cantidad = _cantidad WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto;
                         INSERT INTO egresos VALUE (0, 1, _fkUsuario, _fkSucursal, _total, NOW());
