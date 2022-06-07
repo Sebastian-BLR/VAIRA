@@ -1623,8 +1623,40 @@ CREATE PROCEDURE insertar_proveedor(IN _jsonA JSON)
             INSERT INTO proveedor VALUES (0, _nombre, _telefono, _correo, 1);
             SELECT idProveedor AS 'IDENTIFICADOR' FROM proveedor WHERE nombre = _nombre;
         COMMIT ;
+    END //
+DELIMITER ;
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS h_insertar_sucursal;
+CREATE PROCEDURE h_insertar_sucursal(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _tempJson JSON;
+        DECLARE _fkSucursal INT;
+        DECLARE _fkProducto INT;
+        DECLARE _index INT DEFAULT 0;
+        DECLARE _limit INT;
 
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡ErrorDDD!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idSucursal'    ));
+
+        START TRANSACTION ;
+            SELECT JSON_ARRAYAGG(JSON_OBJECT('idProducto',idProducto)) INTO _tempJson FROM producto;
+            SET _limit = JSON_LENGTH(_tempJson);
+            WHILE _index < _limit DO
+                SELECT JSON_EXTRACT(_tempJson,CONCAT('$[',_index,'].idProducto')) INTO _fkProducto;
+
+                INSERT INTO existencia VALUES (_fkProducto,_fkSucursal,0);
+
+                SET _index = _index + 1;
+            END WHILE ;
+        COMMIT ;
     END //
 DELIMITER ;
 
@@ -1638,7 +1670,8 @@ CREATE PROCEDURE insertar_sucursal(IN _jsonA JSON)
         DECLARE _colonia VARCHAR(50);
         DECLARE _cp VARCHAR(50);
         DECLARE _telefono VARCHAR(50);
-        DECLARE _region VARCHAR(50);
+        DECLARE _region INT;
+        DECLARE _idSucursal INT;
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -1656,18 +1689,14 @@ CREATE PROCEDURE insertar_sucursal(IN _jsonA JSON)
 
         START TRANSACTION ;
             INSERT INTO sucursal VALUES (0, _region, null, _nombre, _calle, _colonia, _cp, _telefono);
-            SELECT idSucursal AS 'IDENTIFICADOR' FROM sucursal WHERE nombre = _nombre AND calle = _calle AND CP = _cp;
+            SELECT idSucursal INTO _idSucursal FROM sucursal WHERE nombre = _nombre AND calle = _calle AND CP = _cp ORDER BY idSucursal DESC LIMIT 1;
+            CALL h_insertar_sucursal(CONCAT('[{"idSucursal":',_idSucursal,'}]'));
+            SELECT 'Sucursal agregada' as 'Resultado';
         COMMIT ;
-
-
     END //
 DELIMITER ;
 
 DELIMITER //
-SELECT * FROM VENTA;
-CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
-# SELECT * FROM info_venta INNER JOIN producto p on info_venta.fkProducto = p.idProducto;
-# CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
 DROP PROCEDURE IF EXISTS realizar_corte_caja;
 CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
     BEGIN
