@@ -1767,3 +1767,39 @@ CREATE PROCEDURE actualizar_sucursal_admin(IN _jsonA JSON)
     END //
 
 DELIMITER ;
+
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS agregar_categoria;
+CREATE PROCEDURE agregar_categoria(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json           JSON;
+        DECLARE _nombre         VARCHAR(25);
+        DECLARE _impuesto_iva   TINYINT;
+        DECLARE _descripcion    TEXT;
+        DECLARE _ieps           DECIMAL(10,8);
+        DECLARE _isr            DECIMAL(10,8);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json           = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _nombre         = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'       ));
+        SET _impuesto_iva   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.impuestoIVA'  ));
+        SET _descripcion    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.descripcion'  ));
+        SET _ieps           = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.ieps'         ));
+        SET _isr            = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.isr'          ));
+
+        START TRANSACTION ;
+            INSERT INTO categoria VALUES (0, _nombre, _descripcion, _impuesto_iva, _ieps, _isr);
+            SELECT idCategoria FROM categoria WHERE nombre = _nombre;
+        COMMIT ;
+
+
+    END //
+
+DELIMITER ;

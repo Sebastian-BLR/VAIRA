@@ -4,6 +4,14 @@ $data = [
   'sucursal' => $_SESSION['id_sucursal']
 ];
 
+if(isset($_POST['addCategoria'])){
+  var_dump($_POST);
+  $data = [
+    'nombre' => $_POST['nombre'],
+    'iva' => $_POST['iva'],
+  ];
+}
+
 if(isset($_POST['addProduct'])){
   $check = @getimagesize($_FILES['img'.$_POST['idProducto']]['tmp_name']);
   if($check !== false){
@@ -154,7 +162,7 @@ if(isset($_POST['edit-product'])){
   <li><button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#agregarVariosProductos">Agregar productos</button></li>
 </ul>
 <button type="button" class="btn btn-outline-dark" style="float: right; margin-top:10px; margin-right:5px;" data-bs-toggle="modal"
-        data-bs-target="#agregarProveedor"></i>Agregar proveedor</button>
+        data-bs-target="#agregarCategoria"></i>Agregar categoria</button>
 <div class="btn-group">
   <form action="<?php echo( htmlspecialchars($_SERVER["PHP_SELF"]) ).'?inventario=true' ?>" method="POST" style="display:inline; float:right;">
     <div class="btn-group">
@@ -387,6 +395,57 @@ if(isset($_POST['edit-product'])){
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
         <button type="submit" name="addProduct" class="btn btn-success">Aceptar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agregar Proveedor-->
+<div class="modal fade bd-example-modal-xl" id="agregarCategoria" data-bs-backdrop="static"
+  data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Agregar categoria</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?inventario=true'?>" method="POST">
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="nombre" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="iva" class="col-form-label">Tiene iva:</label>
+              <select name="iva" class="form-control" id="iva" required>
+                <option value="">Seleccione una opcion</option>
+                <option value="0">No</option>
+                <option value="1">Si</option>
+              </select>
+            </div>
+            <div class="mb-3 col">
+              <label for="ieps" class="col-form-label">IEPS:</label>
+              <input type="text" class="form-control" id="ieps" name="ieps">
+            </div>
+            <div class="mb-3 col">
+              <label for="isr" class="col-form-label">ISR:</label>
+              <input type="text" class="form-control" id="isr" name="isr">
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="descripcion" class="form-label">Descripcion:</label>
+              <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success" name="addCategoria">Agregar</button>
         </form>
       </div>
     </div>
