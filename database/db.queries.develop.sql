@@ -64,10 +64,10 @@ INSERT INTO categoria VALUES (0, 'Abarrotes', 'Conjunto de artículos comerciale
                              (0, 'Bebidas alc. 14°-20°', 'Bebidas que contienen etanol en su composición', 1, 0.3, 0.0),
                              (0, 'Bebidas alc. +20°', 'Bebidas que contienen etanol en su composición', 1, 0.53, 0.0);
 
-INSERT INTO proveedor VALUES (0, 'Coca-Cola', '1234567890', 'coca@cola.mx'),
-                             (0, 'Barcel', '0987654321', 'barcel@bimbo.mx'),
-                             (0, 'Modelo', '5432109876', 'modelo@cervecera.mx'),
-                             (0, 'Vinomex SA de CV', '6789012345', 'contacto@vinomex.mx');
+INSERT INTO proveedor VALUES (0, 'Coca-Cola', '1234567890', 'coca@cola.mx', 1),
+                             (0, 'Barcel', '0987654321', 'barcel@bimbo.mx', 1),
+                             (0, 'Modelo', '5432109876', 'modelo@cervecera.mx', 1),
+                             (0, 'Vinomex SA de CV', '6789012345', 'contacto@vinomex.mx', 1);
 
 CALL insertar_producto('{"categoria":"1","proveedor":"1","nombre":"Chaparrita Piña 255ml","costo":"15.0","precio":"18.0","imagen":"chaparrita.jpg" ,"activo":"1","servicio":"0"}');
 CALL insertar_producto('{"categoria":"1","proveedor":"2","nombre":"Papas Jalapeño 350g","costo":"18.0","precio":"22.0","imagen":"jalapeño.jpg" ,"activo":"1","servicio":"0"}');

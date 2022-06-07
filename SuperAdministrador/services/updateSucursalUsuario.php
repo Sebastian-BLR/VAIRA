@@ -12,7 +12,8 @@
             // while($row = $stmt->fetch(PDO::FETCH_NUM)){
             //     $data[] = $row;
             // }
-            $data[] = "Success";
+            $data = $stmt->fetch(PDO::FETCH_NUM);
+            // $data[] = "Success";
           
         }else{
             $data[] = "Error";

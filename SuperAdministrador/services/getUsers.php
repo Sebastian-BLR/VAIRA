@@ -10,7 +10,8 @@
                     LEFT JOIN sucursal_usuario ON fkUsuario = idUsuario
                     LEFT JOIN sucursal s ON usuario.idUsuario = s.fkAdmin
                     JOIN tipo t on usuario.fkTipo = t.idTipo
-                    WHERE fkTipo !=3 AND activo = 1;';
+                    WHERE fkTipo !=3 AND activo = 1 
+                    ORDER BY fkTipo;';
         $stmt = $pdo->prepare($sql);
         if($stmt->execute()){
             while($row = $stmt->fetch(PDO::FETCH_NUM)){
