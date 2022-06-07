@@ -29,9 +29,12 @@ INSERT INTO ciudad VALUES (0, 1, 'Cuernavaca'),
                           (0, 1, 'Temixco'),
                           (0, 1, 'Tijuana');
 
+SELECT * FROM ciudad;
+SELECT * FROM region_iva;
+
 INSERT INTO region_iva VALUES (0, 1, 0.16),
-                              (0, 1, 0.16),
-                              (0, 1, 0.16),
+                              (0, 2, 0.16),
+                              (0, 3, 0.16),
                               (0, 4, 0.08);
 
 INSERT INTO motivo_egreso VALUES (0, 'Compra producto'),
