@@ -7,6 +7,44 @@
         alertFactura()
       </script>
     ');
+
+  if(isset($_POST['generar_corte'])){
+    $data = [
+      "fkUsuario"=>$id_usuario,
+      "fkSucursal"=>$sucursal,
+      "fecha_inicio"=>$_POST['date_init'],
+      "fecha_final"=>$_POST['date_final']
+    ];
+    $json_corte_caja = json_decode(Post("Vendedor/services/doCorteCaja.php",$data),true);
+    echo ('
+        <script>
+          alertGeneraDocCorteCajaAdmin()
+        </script>
+      ');
+  }
+
+  if(isset($_POST['generar_devolucion'])){
+    $restaurar = 0;
+    if(isset($_POST['restaurar']))
+      $restaurar = 1;
+
+    $data = [
+      "fecha"=>$_POST['fechaDeCompra'],
+      "idVenta"=>$_POST['noCompra'],
+      "usuario"=>$_POST['user'],
+      "password"=>$_POST['password'],
+      "restaurar"=>$restaurar,
+      "fkUsuario"=>$id_usuario,
+      "fkSucursal"=>$sucursal
+    ];
+    $status_devolucion = json_decode(Post("Vendedor/services/doRefund.php",$data),true);
+    if($status_devolucion[0] == 'Devolución autorizada')
+      echo ('
+        <script>
+          alertDevolucion()
+        </script>
+      ');
+  }
 ?>
 
 <div class="row" style="margin-top: 5px;font-size: 19px;">
@@ -28,7 +66,7 @@
       </div>
       <div class="col">
         <button type="button" class="btn btn-outline-dark" style="float: right; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#corteCaja">Hacer corte de caja</button>
-        <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#hacerDevolucion">Hacer devoluci&oacute;n</button>
+        <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal" data-bs-target="#llaveAdmin">Hacer devoluci&oacute;n</button>
       </div>
     </div>
     <div class="row-1" style="margin-top: 10px;">
@@ -98,54 +136,39 @@
 
     <!-- Modal Corte de Caja -->
     <div class="modal fade" id="corteCaja" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Corte de caja</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-          ¿Deseas realizar el corte de caja?
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-success" onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal">Si</button>
+      <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Corte de caja</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="d-flex justify-content-center">
+                <div class="col-6 mb-4 me-3">
+                  <div class="text-center">
+                    <label for="">Fecha de Inicio</label>
+                  </div>
+                  <input type="datetime-local" id="date_init" name="date_init">
+                </div>
+                <div class="col-6">
+                  <div class="text-center">
+                    <label for="">Fecha de Fin</label>
+                  </div>
+                  <input type="datetime-local" id="date_final" name="date_final">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+              <button type="submit" class="btn btn-success" name="generar_corte">Si</button>
+              <!-- onclick="alertGeneraDocCorteCajaAdmin()" data-bs-dismiss="modal" -->
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
 
-    <!-- Modal Hacer una devolución -->
-    <div class="modal fade bd-example-modal-xl" id="hacerDevolucion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Devoluci&oacute;n</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="mb-3">
-                <label for="fechaCompra" class="col-form-label">Fecha de compra</label>
-                <br>
-                <input type="date" id="fechaDeCompra" name="fechaDeCompra">
-              </div>
-              <div class="mb-3">
-                <label for="noCompra" class="col-form-label">N&uacute;mero de compra</label>
-                <br>
-                <input type="text" id="noCompra" name="noCompra">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#llaveAdmin" data-bs-dismiss="modal">Aceptar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  
     <!-- Modal llave administrador-->
     <div class="modal fade" id="llaveAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -155,24 +178,34 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-          <div class="form-group">
-              <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
-              <input id="user" type="text" class="form-control"  name="user" value="">
-          </div>
-          <div class="form-group">
-              <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
-              <input id="password" type="password" class="form-control" name="password"  maxlength="16">
-            </div>   
-          <div class="d-flex justify-content-center">
-            <input id="showPass" type="checkbox" style = "margin: 10px 5px 0 0" onclick="myFunction()">
-            <label for="showPass">Mostrar contrase&ntilde;a</label>
-            <!-- <button type="button" class="btn btn-outline-dark" onclick="mostrarPass()" style="margin-left: 10px;">Mostrar contraseña</button> -->
-          </div>
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" onclick="alertDevolucion()" data-bs-dismiss="modal">Hacer devolución</button>
-          </div>
+            <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?recibos=true'?>" method="POST" style="display: inline;">
+              <div class="form-group">
+                  <label for="user"><i class="fa fa-fw fa-user"></i>Usuario</label>
+                  <input id="user" type="text" class="form-control"  name="user" value="">
+              </div>
+              <div class="form-group">
+                  <label for="password"><i class="fa fa-fw fa-key"></i>Contrase&ntilde;a</label>
+                  <input id="password" type="password" class="form-control" name="password"  maxlength="16">
+              </div>
+              <div class="mt-3">
+                  <label for="fechaCompra" class="col-form-label">Fecha de compra</label>
+                  <input type="date" id="fechaDeCompra" name="fechaDeCompra">
+              </div>
+              <div class="">
+                  <label for="noCompra" class="col-form-label">N&uacute;mero de compra</label>
+                  <input type="text" id="noCompra" name="noCompra">
+              </div>
+              <div class="">
+                <label for="restaurar" class="col-form-label">¿Desea regresar productos?</label>
+                <input type="checkbox" id="restaurar" name="restaurar">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="summit" class="btn btn-success" data-bs-toggle="modal" name="generar_devolucion">Hacer devolución</button>
+              <!-- onclick="alertDevolucion()" data-bs-dismiss="modal" -->
+            </div>
+          </form>
         </div>
       </div>
     </div>

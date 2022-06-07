@@ -608,7 +608,7 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
         DECLARE _cantidad   INT;
         DECLARE _restaurar  INT;
         DECLARE _total      DECIMAL(12,2);
-
+        DECLARE _tipoUser   INT;
         DECLARE _json       JSON;
         DECLARE _productos  JSON;
 
@@ -633,15 +633,18 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
         SET _fkUsuario  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario' ));
         SET _restaurar  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.restaurar' ));
 
-        SELECT COUNT(*) INTO _permitido FROM usuario INNER JOIN sucursal_usuario ON usuario.idUsuario = sucursal_usuario.fkUsuario
-            WHERE usuario = _usuario AND password = SHA2(_password,512) AND fkSucursal = _fkSucursal;
+        SELECT COUNT(*) INTO _permitido FROM usuario INNER JOIN sucursal s on usuario.idUsuario = s.fkAdmin
+            WHERE usuario = _usuario AND password = SHA2(_password,512) AND idSucursal = _fkSucursal AND fkTipo = 2;
 
         START TRANSACTION;
             IF (_permitido = 1)
                 THEN
-                    SELECT COUNT(*) INTO _permitido FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
+                    SELECT COUNT(*) INTO _permitido FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta WHERE DATE(fecha) = DATE(_date) AND idVenta = _idVenta;
                     IF (_permitido > 0) THEN
-
+                        SELECT fkTipo INTO _tipoUser FROM usuario WHERE idUsuario = _fkUsuario;
+                        IF(_tipoUser = 2) THEN
+                            SELECT fkUsuario INTO _fkUsuario FROM venta WHERE DATE(fecha) = DATE(_date) AND idVenta = _idVenta;
+                        END IF;
                         SELECT total INTO _total FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
 
                         IF (_restaurar = 1) THEN
@@ -662,6 +665,8 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
                         DELETE FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
                         INSERT INTO egresos VALUES (0,2,_fkUsuario,_fkSucursal,_total,NOW());
                         SELECT 'Devolución autorizada' as 'Status';
+                    ELSE
+                        SELECT 'La venta no existe' as 'Status';
                     END IF;
                 ELSE
                     SELECT 'Devolución no autorizada' as 'Status';
@@ -669,6 +674,7 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
         COMMIT;
     END //
 DELIMITER ;
+CALL generar_devolucion('[{"fecha":"2022-05-24 13:04:13","idVenta":4,"usuario":"admin","password":456,"fkUsuario":2,"restaurar":1,"fkSucursal":1}]');
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_puntos_venta;
@@ -1594,8 +1600,8 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
 DELIMITER ;
 
 DELIMITER //
-SELECT * FROM VENTA;
-CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
+# SELECT * FROM info_venta INNER JOIN producto p on info_venta.fkProducto = p.idProducto;
+# CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
 DROP PROCEDURE IF EXISTS realizar_corte_caja;
 CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
     BEGIN
