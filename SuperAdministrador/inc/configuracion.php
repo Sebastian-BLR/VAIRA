@@ -2,14 +2,32 @@
 
 $errores = false;
 
-if(isset($_POST['updateSucursal'])){
+// * ==========================================================================================================================
+// *                                                PROVEEDORES CRUD                                                          |
+// * ==========================================================================================================================
+
+if(isset($_POST['editProveedor'])){
   // var_dump($_POST);
+  $data = [
+    'idProveedor' => $_POST['id_proveedor'],
+    'nombre' => $_POST['nombre'],
+    'telefono' => $_POST['telefono'],
+    'correo' => $_POST['correo']
+  ];
+  
+}
+
+// * ==========================================================================================================================
+// *                                                SUCURSALES CRUD                                                           |
+// * ==========================================================================================================================
+
+if(isset($_POST['updateSucursal'])){
   $data = [
     'fkUsuario' => $_POST['id_usuario'],
     'idSucursal' => $_POST['sucursal']
   ];
   $status = json_decode(POST('SuperAdministrador/services/updateSucursalUsuario.php', $data), true);
-  if($status[0] == 'Success'){
+  if($status[0] != '¡Error!'){
     echo ('
       <script>
         alertSucursalAsignada()
@@ -17,6 +35,11 @@ if(isset($_POST['updateSucursal'])){
     ');
   }
 }
+
+
+// * ==========================================================================================================================
+// *                                                  USUARIOS CRUD                                                           |
+// * ==========================================================================================================================
 
 if (isset($_POST['agregarUsuario'])){
   $nombre = $_POST['nombre'];
@@ -28,7 +51,6 @@ if (isset($_POST['agregarUsuario'])){
   $pass = $_POST['password'];
   $pass2 = $_POST['password2'];
   $rol = $_POST['rol'];
-  $_sucursal = $sucursal;
 
   if(empty($nombre) || empty($apellidoP) || empty($apellidoM) || empty($usuario) || empty($correo) 
       || empty($telefono) || empty($pass) || empty($pass2) || empty($rol))
@@ -70,20 +92,43 @@ if (isset($_POST['agregarUsuario'])){
           'telefono' => $telefono,
           'password' => $pass,
           'rol' => $rol,
-          'sucursal' => $_sucursal
         ];
 
         $insertarUsuario = json_decode(POST("SuperAdministrador/services/addUser.php",$data), true);
-        if($insertarUsuario[0] == "Success")
+        if($insertarUsuario[0] != "¡Error!")
           echo('
             <script>
               alertAgregarUsuario()
             </script>
           ');
+          else
+            echo('
+              <script>
+                $msg = "Error al agregar el usuario"
+                alertError($msg)
+              </script>
+            ');
       }
   }
 }
 
+if(isset($_GET["id_usuario"])){
+  $data = [
+    'idUsuario' => $_GET["id_usuario"]
+  ];
+
+  $eliminar = json_decode(POST("SuperAdministrador/services/deleteUser.php",$data), true);
+  if($eliminar[0] = 'Success')
+  echo "<script>Swal.fire({
+    title: 'Usuario eliminado!',
+    icon: 'success',
+      confirmButtonText: 'Ok'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        window.location.href='index.php?configuracion=true';
+      }
+    }) </script>";
+}
 ?>
 
 <div class="row" style="margin-top: 5px;font-size: 19px;">
@@ -168,31 +213,21 @@ if (isset($_POST['agregarUsuario'])){
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Proveedor 1</td>
-            <td>1234567890</td>
-            <td>admin1@gmail.com</td>
-            <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
-              <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-          </tr>
-          <td>Proveedor 2</td>
-            <td>1234567890</td>
-            <td>admin2@gmail.com</td>
-            <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
-              <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-          </tr>
-          <td>Proveedor 3</td>
-            <td>1234567890</td>
-            <td>admin3@gmail.com</td>
-            <td><button type="button" class="btn btn-danger" onclick="alertElimarProveedor()"
-                style="float: center; margin-left: 12px;"><i class="fa fa-minus-circle"></i></button></td>
-            <td><button type="button" class="btn btn-success" style="float: center; margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#editarProveedor">
-              <i class="fa fa-pencil" aria-hidden="true"></i></button></td>
-          </tr>
+          <?php
+            $input_from_db = json_decode(POST("SuperAdministrador/services/getProveedores.php",''), true);
+            foreach($input_from_db as $value){
+              echo('
+              <tr>
+                <th scope="row">'.$value[1].'</th>
+                <td>'.$value[2].'</td>
+                <td>'.$value[3].'</td>
+                <td><button type="button" class="btn btn-danger" id="'.$value[0].'" onclick="alertEliminarProveedor(this.id)" style="float: center;"><i class="fa fa-minus-circle"></i></button></td>
+                <td><button type="button" class="btn btn-success" style="float: center;" data-bs-toggle="modal" data-bs-target="#editarProveedor'.$value[0].'"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
+              </tr>
+              ');
+            }
+          
+          ?>
         </tbody>
       </table>
     </div>
@@ -208,41 +243,113 @@ if (isset($_POST['agregarUsuario'])){
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="rfc" class="col-form-label">Nombre:</label>
-            <input type="text" class="form-control" id="nombre">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?configuracion=true'?>" method="POST">
+        <?php
+          if($errores){
+            echo('        
+            <div class="mb-3">
+              <label for="nombre" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" value="'. $nombre .'" required>
+            </div>
+            <div class="mb-3">
+              <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
+              <input type="text" class="form-control" id="apellidoP" name="apellidoP" value="'. $apellidoP .'" required>
+            </div>
+            <div class="mb-3">
+              <label for="apellidoM" class="col-form-label">Apellido materno:</label>
+              <input type="text" class="form-control" id="apellidoM" name="apellidoM" value="'. $apellidoM .'" required>
+            </div>
+            <div class="mb-3">
+              <label for="usuario" class="col-form-label">Usuario:</label>
+              <input type="text" class="form-control" id="usuario" name="usuario" value="'. $usuario .'" required>
+            </div>
+            <div class="mb-3">
+              <label for="correo" class="col-form-label">Correo:</label>
+              <input type="email" class="form-control" id="correo" name="correo" value="'. $correo .'" required>
+            </div>
+            <div class="mb-3">
+              <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
+              <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $telefono .'" minlength="10" maxlength="10" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena" class="col-form-label">Contraseña:</label>
+              <input type="password" class="form-control" id="contrasena" name="password" minlength="8" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena2" class="col-form-label">Confirmar contraseña:</label>
+              <input type="password" class="form-control" id="contrasena2" name="password2" minlength="8" required>
+            </div>
+            <div class="mb-3">
+              <label for="rol" class="col-form-label">Rol:</label>
+              <select name="rol" id="rol">');
+                $input_from_db = json_decode(POST("SuperAdministrador/services/getRoles.php",''), true);
+
+                foreach($input_from_db as $value){
+                  echo('
+                      <option value="'.$value[0].'">'.strtolower($value[1]).'</option>
+                  ');
+                }
+            echo('
+              </select>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="nombre" class="col-form-label">Correo:</label>
-            <input type="email" class="form-control" id="correo">
+        ');
+      } else{
+          echo('        
+            <div class="mb-3">
+              <label for="nombre" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="apellidoP" class="col-form-label">Apellido paterno:</label>
+              <input type="text" class="form-control" id="apellidoP" name="apellidoP" required>
+            </div>
+            <div class="mb-3">
+              <label for="apellidoM" class="col-form-label">Apellido materno:</label>
+              <input type="text" class="form-control" id="apellidoM" name="apellidoM" required>
+            </div>
+            <div class="mb-3">
+              <label for="usuario" class="col-form-label">Usuario:</label>
+              <input type="text" class="form-control" id="usuario" name="usuario" required>
+            </div>
+            <div class="mb-3">
+              <label for="correo" class="col-form-label">Correo:</label>
+              <input type="email" class="form-control" id="correo" name="correo" required>
+            </div>
+            <div class="mb-3">
+              <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
+              <input type="text" class="form-control" id="teleforno" name="telefono" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena" class="col-form-label">Contraseña:</label>
+              <input type="password" class="form-control" id="contrasena" name="password" minlength="8" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena2" class="col-form-label">Confirmar contraseña:</label>
+              <input type="password" class="form-control" id="contrasena2" name="password2" minlength="8" required>
+            </div>
+            <div class="mb-3">
+              <label for="rol" class="col-form-label">Rol:</label>
+              <select name="rol" id="rol">');
+                $input_from_db = json_decode(POST("SuperAdministrador/services/getRoles.php",''), true);
+
+                foreach($input_from_db as $value){
+                  echo('
+                      <option value="'.$value[0].'">'.strtolower($value[1]).'</option>
+                  ');
+                }
+            echo('
+              </select>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="nombre" class="col-form-label">Usuario:</label>
-            <input type="text" class="form-control" id="usuario">
-          </div>
-          <div class="mb-3">
-            <label for="codigopostal" class="col-form-label">Contraseña:</label>
-            <input type="password" class="form-control" id="contraseña">
-          </div>
-          <div class="mb-3">
-                  <label for="password2" class="col-form-label">Confirmar contraseña:</label>
-                  <input type="password2" class="form-control" id="contrasena">
-                </div>
-          <div class="mb-3">
-            <label for="regimenfiscal" class="col-form-label">Rol:</label>
-            <select name="rol" id="rol" form="carform">
-              <option value="opcionadmin">Administrador</option>
-              <option value="opcionvendedor">Vendedor</option>
-            </select>
-          </div>
-        </form>
-      </div>
+        ');
+      }
+      ?>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
-          onclick="alertAgregarUsuario()">Agregar</button>
+        <button type="submit" class="btn btn-success" name="agregarUsuario">Agregar</button>
       </div>
+      </form>
     </div>
   </div>
 </div>
@@ -402,90 +509,43 @@ if (isset($_POST['agregarUsuario'])){
     }
   ?>
 
-<!-- Editar Usuario-->
-<div class="modal fade bd-example-modal-xl" id="editarUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Editar usuario</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Nombre:</label>
-            <input type="text" class="form-control" id="nombre">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Apellido paterno:</label>
-            <input type="text" class="form-control" id="apellidoP">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Apellido materno:</label>
-            <input type="text" class="form-control" id="apellidoM">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Usuario:</label>
-            <input type="text" class="form-control" id="usuario">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Rol:</label>
-            <input type="text" class="form-control" id="rol">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Correo:</label>
-            <input type="text" class="form-control" id="correo">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Telefono:</label>
-            <input type="text" class="form-control" id="telefono">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Contraseña:</label>
-            <input type="text" class="form-control" id="contrasena">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Confirmar Contraseña:</label>
-            <input type="text" class="form-control" id="contrasena">
-        </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertEditarUsuario()">Editar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Editar Proveedor-->
-<div class="modal fade bd-example-modal-xl" id="editarProveedor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Editar proveedor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Nombre:</label>
-            <input type="text" class="form-control" id="nombre">
+<?php
+  $input_from_db = json_decode(POST("SuperAdministrador/services/getProveedores.php", ''), true);
+  foreach($input_from_db as $value){
+    echo('
+      <div class="modal fade bd-example-modal-xl" id="editarProveedor'.$value[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Editar proveedor</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="'. htmlspecialchars($_SERVER['PHP_SELF']). '?configuracion=true" method="POST">
+              <input type="hidden" name="id_proveedor" value="'.$value[0].'">
+              <div class="mb-3">
+                  <label for="nombre" class="col-form-label">Nombre:</label>
+                  <input type="text" class="form-control" name="nombre" id="nombre'.$value[0].'" value="'.$value[1].'" required>
+              </div>
+              <div class="mb-3">
+                  <label for="nombre" class="col-form-label">Telefono:</label>
+                  <input type="text" class="form-control" id="telefono'.$value[0].'" name="telefono" value="'.$value[2].'">
+              </div>
+              <div class="mb-3">
+                  <label for="nombre" class="col-form-label">Correo:</label>
+                  <input type="text" class="form-control" id="correo'.$value[0].'" name="correo" value="'.$value[3].'">
+              </div>        
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success" name="editProveedor">Aceptar</button>
+              </form>
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Telefono:</label>
-            <input type="text" class="form-control" id="telefono">
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="col-form-label">Correo:</label>
-            <input type="text" class="form-control" id="correo">
-        </div>        
-        </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="alertEditarProveedor()">Editar</button>
-      </div>
-    </div>
-  </div>
-</div>
+    ');
+  }
+
+?>

@@ -142,7 +142,8 @@ CREATE TABLE IF NOT EXISTS proveedor(
     idProveedor  INT          NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
     nombre       VARCHAR(50)  NOT NULL,
     telefono     VARCHAR(50)  NOT NULL,
-    correo       VARCHAR(50)  NOT NULL
+    correo       VARCHAR(50)  NOT NULL,
+    activo       TINYINT      NOT NULL
 )ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS producto (

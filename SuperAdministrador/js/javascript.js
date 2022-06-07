@@ -1,4 +1,4 @@
-function alertElimarUsuario(id){
+function alertEliminarUsuario(id){
   Swal.fire({
       title: 'Alerta',
       text: "¿Estás seguro que deseas eliminar este usuario?",
@@ -11,14 +11,38 @@ function alertElimarUsuario(id){
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = "index.php?configuracion=true&id="+id;
+        window.location.href = "index.php?configuracion=true&id_usuario="+id;
       }  
     })
   }
 
 
+  function alertCamposVacios(){
+    Swal.fire(
+        'Error',
+        'Por favor llena todos los campos',
+        'error',
+      )
+  }
+  
+  function alertUsuarioExistente(){
+    Swal.fire(
+        'Error',
+        'El nombre de usuario ya existe, intenta con otro',
+        'error',
+      )
+  }
+  
+  function alertPassDiferente(){
+    Swal.fire(
+        'Error',
+        'Las constraseñas no coinciden',
+        'error',
+      )
+  }
 
-function alertElimarProducto(id){
+
+function alertEliminarProducto(id){
   Swal.fire({
       title: 'Alerta',
       text: "¿Estás seguro que deseas eliminar este producto?",
@@ -37,7 +61,7 @@ function alertElimarProducto(id){
   }
 
 
-function alertElimarProveedor(){
+function alertEliminarProveedor(id){
   Swal.fire({
       title: 'Alerta',
       text: "¿Estás seguro que deseas eliminar este proveedor?",
@@ -50,11 +74,7 @@ function alertElimarProveedor(){
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire(
-          'Proveedor eliminado',
-          'Se ha eliminado satisfactoriamente el proveedor',
-          'success',
-        )
+        window.location.href = "index.php?inventario=true&id_proveedor="+id;
       }
     })
 }

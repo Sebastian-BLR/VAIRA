@@ -195,7 +195,7 @@ if(isset($_POST['edit-product'])){
           <div class="card" style="width: 12rem;">
             <div class="card-body">
               <button type="button" class="btn btn-outline-info" style="margin-right: 50px;" data-bs-toggle="modal" data-bs-target="#actualizar'.$producto[0].'"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-              <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" id="'.$producto[0].'" onclick="alertElimarProducto(this.id)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+              <button type="button" class="btn btn-outline-info" style="margin: -65px 0 0 120px;" data-bs-toggle="modal" id="'.$producto[0].'" onclick="alertEliminarProducto(this.id)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
             </div>
             <img src="../src/image/productos/'.$producto[4].'" class="card-img-top" alt="imagen_'.$producto[1].'">
             <h5 class="text-center"> '. $producto[1] .'</h5>

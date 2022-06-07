@@ -49,7 +49,7 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
             SELECT idUsuario INTO _fkUsuario FROM usuario WHERE usuario = _usuario;
             INSERT INTO log_usuario VALUES (0, _fkUsuario, NOW(), NOW(), NULL);
 
-            IF (_fkTipo != 1) THEN
+            IF (_fkTipo = 3) THEN
                 SET _fkSucursal = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.sucursal'));
                 INSERT INTO sucursal_usuario VALUES(_fkUsuario, _fkSucursal);
                 SELECT 'Usuario agregado' as 'Resultado';
@@ -66,6 +66,7 @@ CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
         DECLARE _idUsuario VARCHAR(5);
+
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             SELECT '¡Error!' as 'Resultado';
@@ -77,10 +78,17 @@ CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
 
 
         START TRANSACTION;
+            IF ((SELECT fkTipo FROM usuario WHERE idUsuario = _idUsuario) = 2) THEN
+                IF ((SELECT idSucursal FROM sucursal WHERE fkAdmin = _idUsuario)) THEN
+                    UPDATE sucursal SET fkAdmin = NULL WHERE fkAdmin = _idUsuario;
+                END IF ;
+            END IF ;
+
             UPDATE log_usuario SET desactivar = NOW() WHERE fkUsuario = _idUsuario;
             UPDATE usuario SET activo = 0 WHERE idUsuario = _idUsuario;
+            DELETE FROM sucursal_usuario WHERE fkUsuario = _idUsuario;
 
-            SELECT * FROM usuario WHERE idUsuario = _idUsuario;
+            SELECT 'Success' AS 'RESULTADO';
         COMMIT;
     END //
 DELIMITER ;
@@ -105,6 +113,30 @@ CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
             DELETE FROM log_usuario WHERE fkUsuario = _idUsuario;
             DELETE FROM usuario WHERE idUsuario = _idUsuario;
             SELECT * FROM usuario WHERE idUsuario = _idUsuario;
+        COMMIT;
+    END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS eliminar_proveedor;
+CREATE PROCEDURE eliminar_proveedor(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _idProveedor VARCHAR(5);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json      = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _idProveedor    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.idProveedor'));
+
+
+        START TRANSACTION;
+            UPDATE proveedor SET activo = 0 WHERE idProveedor = _idProveedor;
+            SELECT 'Success' AS 'RESULTADO';
         COMMIT;
     END //
 DELIMITER ;
@@ -1651,9 +1683,14 @@ CREATE PROCEDURE actualizar_sucursal_admin(IN _jsonA JSON)
                 SELECT idSucursal INTO _sucursalActual FROM sucursal WHERE fkAdmin = _fkUsuario;
                 UPDATE sucursal SET fkAdmin = NULL WHERE idSucursal = _sucursalActual;
             END IF;
-            UPDATE sucursal SET fkAdmin = _fkUsuario WHERE idSucursal = _idSucursal;
-            UPDATE sucursal_usuario SET fkSucursal = _idSucursal WHERE fkUsuario = _fkUsuario;
+            IF((SELECT fkSucursal FROM sucursal_usuario WHERE fkUsuario = _fkUsuario) IS NOT NULL) THEN
+                UPDATE sucursal_usuario SET fkSucursal = _idSucursal WHERE fkUsuario = _fkUsuario;
+            ELSE
+                INSERT INTO sucursal_usuario VALUE (_fkUsuario, _idSucursal);
+            END IF;
 
+            UPDATE sucursal SET fkAdmin = _fkUsuario WHERE idSucursal = _idSucursal;
+            SELECT fkAdmin FROM sucursal WHERE idSucursal = _idSucursal;
         COMMIT ;
     END //
 

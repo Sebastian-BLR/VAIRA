@@ -6,8 +6,7 @@
     if($pdo!=null){
         error_log("Connection is not null");
         $bindings[] = file_get_contents('php://input');
-        $bindings = json_decode($bindings[0]);
-        $sql = 'SELECT * FROM proveedor WHERE activo = 1;';
+        $sql = 'SELECT idTipo, tipo FROM tipo WHERE idTipo != 3;';
         $stmt = $pdo->prepare($sql);
 
         if($stmt->execute()){
