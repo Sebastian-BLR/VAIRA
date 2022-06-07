@@ -54,6 +54,59 @@ if(isset($_GET['id_proveedor'])){
     ");
 }
 
+if(isset($_POST['addProveedor'])){
+  $nombre = $_POST['nombre'];
+  $telefono = $_POST['telefono'];
+  $correo = $_POST['correo'];
+
+  if(empty($nombre) || empty($telefono) || empty($correo))
+    echo('
+      <script>
+        alertCamposVacios()
+      </script>
+    ');
+  else {
+    $stmt = $pdo->prepare('SELECT * FROM proveedor WHERE nombre = :nombre LIMIT 1;');
+    $stmt->execute(array(':nombre' => $_POST['nombre']));
+    $resultado = $stmt->fetch(); 
+  
+    if($resultado != false){
+      echo('
+        <script>
+          $msg = "El proveedor ya existe"
+          alertError($msg)
+        </script>
+      ');
+      $errores = true;
+    }
+    
+    if($errores == false){
+      $data = [
+        'nombre' => $nombre,
+        'telefono' => $telefono,
+        'correo' => $correo
+      ];
+
+      $status = json_decode(POST('SuperAdministrador/services/addProveedor.php', $data),true);
+      if($status[0] != "¡Error!")
+        echo ('
+          <script>
+            $title = "Proveedor agregado";
+            $msg = "El proveedor se ha agregado correctamente";
+            alertSuccess($title, $msg);
+          </script>'
+        );
+      else
+        echo ('
+          <script>
+            $msg = "El proveedor no se ha podido agregar";
+            alertError($msg);
+          </script>
+        ');
+    }
+  }
+}
+
 // * ==========================================================================================================================
 // *                                                SUCURSALES CRUD                                                           |
 // * ==========================================================================================================================
@@ -70,6 +123,70 @@ if(isset($_POST['updateSucursal'])){
         alertSucursalAsignada()
       </script>
     ');
+  }
+}
+
+if(isset($_POST['addSucursal'])){
+  $nombre = $_POST['nombre'];
+  $calle = $_POST['calle'];
+  $colonia = $_POST['colonia'];
+  $cp = $_POST['cp'];
+  $telefono = $_POST['telefono'];
+  $region = $_POST['region'];
+
+  if(empty($nombre) || empty($calle) || empty($colonia) || empty($cp) || empty($telefono) || empty($region))
+    echo('
+      <script>
+        alertCamposVacios()
+      </script>
+    ');
+  else {
+    $stmt = $pdo->prepare('SELECT * FROM sucursal WHERE nombre = :nombre AND calle = :calle AND colonia = :colonia AND CP = :cp LIMIT 1;');
+    $stmt->execute(array(
+      ':nombre' => $nombre,
+      ':calle' => $calle,
+      ':colonia' => $colonia,
+      ':cp' => $cp
+    ));
+    $resultado = $stmt->fetch(); 
+  
+    if($resultado != false){
+      echo('
+        <script>
+          $msg = "La sucursal ya existe"
+          alertError($msg)
+        </script>
+      ');
+      $errores = true;
+    }
+    
+    if($errores == false){
+      $data = [
+        'nombre' => $nombre,
+        'calle' => $calle,
+        'colonia' => $colonia,
+        'cp' => $cp,
+        'telefono' => $telefono,
+        'region' => $region
+      ];
+
+      $status = json_decode(POST('SuperAdministrador/services/addSucursal.php', $data),true);
+      if($status[0] != "¡Error!")
+        echo ('
+          <script>
+            $title = "Sucursal agregada"
+            $msg = "La sucursal se ha agregado correctamente"
+            alertSuccess($title, $msg)
+          </script>'
+        );
+      else
+        echo ('
+          <script>
+            $msg = "No se ha podido agregar la sucursal"
+            alertError($msg);
+          </script>
+        ');
+    }
   }
 }
 
@@ -223,6 +340,8 @@ if(isset($_POST['updateUser'])){
       Usuarios
     </div>
     <div class="col">
+      <button type="button" class="btn btn-outline-dark" style="float: right; margin-left:5px" data-bs-toggle="modal"
+        data-bs-target="#agregarSucursal"></i>Agregar sucursal</button>
       <button type="button" class="btn btn-outline-dark" style="float: right; margin-left:5px" data-bs-toggle="modal"
         data-bs-target="#agregarProveedor"></i>Agregar proveedor</button>
       <button type="button" class="btn btn-outline-dark" style="float: right;" data-bs-toggle="modal"
@@ -441,25 +560,87 @@ if(isset($_POST['updateUser'])){
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?configuracion=true'?>" method="POST">
           <div class="mb-3">
-            <label for="rfc" class="col-form-label">Nombre:</label>
-            <input type="text" class="form-control" id="nombre">
+            <label for="nombre" class="col-form-label">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
           </div>
           <div class="mb-3">
-            <label for="nombre" class="col-form-label">Telefono:</label>
-            <input type="text" class="form-control" id="usuario">
+            <label for="telefono" class="col-form-label">Telefono:</label>
+            <input type="text" class="form-control" id="telefono" name="telefono" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
           </div>
           <div class="mb-3">
-            <label for="nombre" class="col-form-label">Correo:</label>
-            <input type="email" class="form-control" id="correo">
+            <label for="correo" class="col-form-label">Correo:</label>
+            <input type="email" class="form-control" id="correo" name="correo" required>
           </div>
-        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
-          onclick="alertAgregarProveedor()">Agregar</button>
+        <button type="submit" class="btn btn-success" name="addProveedor">Agregar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agregar Sucursal-->
+<div class="modal fade bd-example-modal-xl" id="agregarSucursal" data-bs-backdrop="static"
+  data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Agregar sucursal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']).'?configuracion=true'?>" method="POST">
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="nombre" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="nombre" class="col-form-label">Calle:</label>
+              <input type="text" class="form-control" id="calle" name="calle" required>
+            </div>
+            <div class="mb-3 col">
+              <label for="nombre" class="col-form-label">Colonia:</label>
+              <input type="text" class="form-control" id="colonia" name="colonia" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col">
+              <label for="correo" class="col-form-label">Codigo Postal:</label>
+              <input type="text" class="form-control" id="cp" name="cp" minlength="5" maxlength="5" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
+            </div>
+            <div class="mb-3 col">
+              <label for="telefono" class="col-form-label">Telefono:</label>
+              <input type="text" class="form-control" id="telefono" name="telefono" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col">
+              <!-- <label for="nombre" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required> -->
+              <label for="region" class="col-form-label">Region IVA:</label>
+              <select class="form-control" id="region" name="region" required>
+                <option value="">Seleccione una region</option>
+                <?php
+                  $data_from_db = json_decode(POST('SuperAdministrador/services/getRegions.php', ''), true);
+                  foreach ($data_from_db as $key => $value) {
+                    echo '<option value="'.$value[0].'">'.$value[2].'</option>';
+                  }
+                ?>
+              </select>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success" name="addSucursal">Agregar</button>
+        </form>
       </div>
     </div>
   </div>
@@ -511,7 +692,7 @@ if(isset($_POST['updateUser'])){
                     </div>
                     <div class="mb-3 col">
                       <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-                      <input type="text" class="form-control" id="telefono'.$value[0].'" name="telefono" value="'. $value[7] .'" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required">
+                      <input type="text" class="form-control" id="telefono'.$value[0].'" name="telefono" value="'. $value[7] .'" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
                     </div>
                   </div>
                   <div class="row">

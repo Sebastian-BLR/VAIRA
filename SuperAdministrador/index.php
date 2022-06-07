@@ -31,7 +31,6 @@
 
     $categorias = json_decode(POST("SuperAdministrador/services/getCategories.php", ''), true);
     $proveedores = json_decode(POST("SuperAdministrador/services/getProveedores.php", ''), true);
-    // var_dump($proveedores);
 ?>
 <!doctype html>
 <html lang="en">

@@ -1594,6 +1594,70 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
 DELIMITER ;
 
 DELIMITER //
+DROP PROCEDURE IF EXISTS insertar_proveedor;
+CREATE PROCEDURE insertar_proveedor(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _nombre VARCHAR(50);
+        DECLARE _telefono VARCHAR(50);
+        DECLARE _correo VARCHAR(50);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _nombre     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'     ));
+        SET _telefono   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono'   ));
+        SET _correo     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.correo'     ));
+
+        START TRANSACTION ;
+            INSERT INTO proveedor VALUES (0, _nombre, _telefono, _correo, 1);
+            SELECT idProveedor AS 'IDENTIFICADOR' FROM proveedor WHERE nombre = _nombre;
+        COMMIT ;
+
+
+    END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS insertar_sucursal;
+CREATE PROCEDURE insertar_sucursal(IN _jsonA JSON)
+    BEGIN
+        DECLARE _json JSON;
+        DECLARE _nombre VARCHAR(50);
+        DECLARE _calle VARCHAR(50);
+        DECLARE _colonia VARCHAR(50);
+        DECLARE _cp VARCHAR(50);
+        DECLARE _telefono VARCHAR(50);
+        DECLARE _region VARCHAR(50);
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json       = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _nombre     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'    ));
+        SET _calle      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.calle'     ));
+        SET _colonia    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.colonia'   ));
+        SET _cp         = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.cp'        ));
+        SET _telefono   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.telefono'  ));
+        SET _region     = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.region'    ));
+
+        START TRANSACTION ;
+            INSERT INTO sucursal VALUES (0, _region, null, _nombre, _calle, _colonia, _cp, _telefono);
+            SELECT idSucursal AS 'IDENTIFICADOR' FROM sucursal WHERE nombre = _nombre AND calle = _calle AND CP = _cp;
+        COMMIT ;
+
+
+    END //
+DELIMITER ;
+
+DELIMITER //
 SELECT * FROM VENTA;
 CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
 DROP PROCEDURE IF EXISTS realizar_corte_caja;

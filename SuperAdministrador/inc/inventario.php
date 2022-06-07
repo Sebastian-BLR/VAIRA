@@ -153,6 +153,8 @@ if(isset($_POST['edit-product'])){
   <li><button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#agregarUnProducto">Agregar un producto</button></li>
   <li><button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#agregarVariosProductos">Agregar productos</button></li>
 </ul>
+<button type="button" class="btn btn-outline-dark" style="float: right; margin-top:10px; margin-right:5px;" data-bs-toggle="modal"
+        data-bs-target="#agregarProveedor"></i>Agregar proveedor</button>
 <div class="btn-group">
   <form action="<?php echo( htmlspecialchars($_SERVER["PHP_SELF"]) ).'?inventario=true' ?>" method="POST" style="display:inline; float:right;">
     <div class="btn-group">
