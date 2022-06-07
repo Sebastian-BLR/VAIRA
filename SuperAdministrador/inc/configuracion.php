@@ -7,14 +7,51 @@ $errores = false;
 // * ==========================================================================================================================
 
 if(isset($_POST['editProveedor'])){
-  // var_dump($_POST);
   $data = [
     'idProveedor' => $_POST['id_proveedor'],
     'nombre' => $_POST['nombre'],
     'telefono' => $_POST['telefono'],
     'correo' => $_POST['correo']
   ];
-  
+  // var_dump($data);
+  $status = json_decode(POST('SuperAdministrador/services/editProveedor.php', $data),true);
+  if($status == "Success")
+    echo ('
+      <script>
+        $title = "Proveedor editado";
+        $msg = "El proveedor se ha editado correctamente";
+        alertSuccess($title, $msg);
+      </script>
+      ');
+    else
+      echo ('
+        <script>
+          $msg = "El proveedor no se ha podido editar";
+          alertError($msg);
+        </script>
+        ');
+
+}
+
+if(isset($_GET['id_proveedor'])){
+  $data = [
+    'idProveedor' => $_GET['id_proveedor']
+  ];
+  $eliminar = json_decode(POST('SuperAdministrador/services/deleteProveedor.php', $data),true);
+  if($eliminar[0] = 'Success')
+  echo ("
+    <script>
+      Swal.fire({
+        title: 'Proveedor eliminado!',
+        icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then((result)=>{
+          if(result.isConfirmed){
+            window.location.href='index.php?configuracion=true';
+          }
+        }) 
+    </script>
+    ");
 }
 
 // * ==========================================================================================================================
@@ -128,6 +165,46 @@ if(isset($_GET["id_usuario"])){
         window.location.href='index.php?configuracion=true';
       }
     }) </script>";
+}
+
+if(isset($_POST['updateUser'])){
+  $idUsuario = $_POST['id_usuario'];
+  $correo = $_POST['correo'];
+  $telefono = $_POST['telefono'];
+  $pass = $_POST['pass'];
+  $pass2 = $_POST['pass2'];
+
+  if($pass != $pass2){
+    echo('
+      <script>
+        alertPassDiferente()
+      </script>
+    ');
+  } else {
+    $data = [
+      'idUsuario' => $idUsuario,
+      'correo' => $correo,
+      'telefono' => $telefono,
+      'password' => $pass
+    ];
+    $actualizar = json_decode(POST("SuperAdministrador/services/updateUser.php",$data), true);
+    if($actualizar[0] == 'Success')
+      echo('
+        <script>
+          $title = "Usuario actualizado"
+          $msg = "El usuario ha sido actualizado correctamente"
+          alertSuccess($title, $msg)
+        </script>
+      ');
+    else
+      echo('
+        <script>
+          $msg = "No se pudo actualizar el usuario"
+          alertError($msg)
+        </script>
+      ');
+
+  }
 }
 ?>
 
@@ -269,7 +346,7 @@ if(isset($_GET["id_usuario"])){
             </div>
             <div class="mb-3">
               <label for="telefono" class="col-form-label">Tel&eacutefono:</label>
-              <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $telefono .'" minlength="10" maxlength="10" required>
+              <input type="text" class="form-control" id="teleforno" name="telefono" value="'. $telefono .'" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
             </div>
             <div class="mb-3">
               <label for="contrasena" class="col-form-label">Contraseña:</label>
@@ -530,7 +607,7 @@ if(isset($_GET["id_usuario"])){
               </div>
               <div class="mb-3">
                   <label for="nombre" class="col-form-label">Telefono:</label>
-                  <input type="text" class="form-control" id="telefono'.$value[0].'" name="telefono" value="'.$value[2].'">
+                  <input type="text" class="form-control" id="telefono'.$value[0].'" name="telefono" value="'.$value[2].'" minlength="10" maxlength="10" onKeypress="if (event.keyCode < 48 || event.keyCode > 57) event.returnValue = false;" required>
               </div>
               <div class="mb-3">
                   <label for="nombre" class="col-form-label">Correo:</label>

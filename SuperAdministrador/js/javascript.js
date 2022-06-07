@@ -42,6 +42,7 @@ function alertEliminarUsuario(id){
   }
 
 
+
 function alertEliminarProducto(id){
   Swal.fire({
       title: 'Alerta',
@@ -74,7 +75,7 @@ function alertEliminarProveedor(id){
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = "index.php?inventario=true&id_proveedor="+id;
+        window.location.href = "index.php?configuracion=true&id_proveedor="+id;
       }
     })
 }
@@ -173,6 +174,14 @@ function alertError(msg){
         msg,
         'error',
       )
+}
+
+function alertSuccess(title, msg){
+  Swal.fire(
+      title,
+      msg,
+      'success',
+    )
 }
 
 function alertErrorActualizarProducto(){
