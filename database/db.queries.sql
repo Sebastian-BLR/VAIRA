@@ -575,6 +575,7 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
         DECLARE _fkProducto INT;
         DECLARE _cantidad   INT;
         DECLARE _restaurar  INT;
+        DECLARE _total      DECIMAL(12,2);
 
         DECLARE _json       JSON;
         DECLARE _productos  JSON;
@@ -609,6 +610,8 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
                     SELECT COUNT(*) INTO _permitido FROM venta INNER JOIN info_venta iv on venta.idVenta = iv.fkVenta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
                     IF (_permitido > 0) THEN
 
+                        SELECT total INTO _total FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
+
                         IF (_restaurar = 1) THEN
                             SELECT JSON_ARRAYAGG(JSON_OBJECT('idProducto',fkProducto,'cantidad',cantidad)) INTO _productos FROM info_venta WHERE fkVenta = _idVenta;
                             SET _index = JSON_LENGTH(_productos) - 1;
@@ -625,6 +628,7 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
 
                         DELETE FROM info_venta WHERE fkVenta = _idVenta;
                         DELETE FROM venta WHERE DATE(fecha) = DATE(_date) AND fkUsuario = _fkUsuario AND idVenta = _idVenta;
+                        INSERT INTO egresos VALUES (0,2,_fkUsuario,_fkSucursal,_total,NOW());
                         SELECT 'Devolución autorizada' as 'Status';
                     END IF;
                 ELSE
@@ -1558,20 +1562,23 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
 DELIMITER ;
 
 DELIMITER //
-CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1}]');
+SELECT * FROM VENTA;
+CALL realizar_corte_caja('[{"fkUsuario":3,"fkSucursal":1,"fecha_inicio": "2022-05-22 14:00:00","fecha_final": "2022-05-23 17:00:00"}]');
 DROP PROCEDURE IF EXISTS realizar_corte_caja;
 CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
     BEGIN
-        DECLARE _fkUsuario   INT;
-        DECLARE _fkSucursal  INT;
-        DECLARE _tipoUsuario INT;
-        DECLARE _limit       INT;
-        DECLARE _json        JSON;
-        DECLARE _resultado   JSON;
-        DECLARE _nombreSucur TEXT;
-        DECLARE _index       INT DEFAULT 0;
-        DECLARE _ingresos    DECIMAL(10,2);
-        DECLARE _egresos     DECIMAL(10,2);
+        DECLARE _fkUsuario    INT;
+        DECLARE _fkSucursal   INT;
+        DECLARE _tipoUsuario  INT;
+        DECLARE _limit        INT;
+        DECLARE _json         JSON;
+        DECLARE _resultado    JSON;
+        DECLARE _nombreSucur  TEXT;
+        DECLARE _index        INT DEFAULT 0;
+        DECLARE _ingresos     DECIMAL(10,2);
+        DECLARE _egresos      DECIMAL(10,2);
+        DECLARE _fecha_inicio DATETIME;
+        DECLARE _fecha_final  DATETIME;
 
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
@@ -1579,10 +1586,12 @@ CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
             ROLLBACK;
         END;
 
-        SET _resultado   = JSON_OBJECT('Resultado',JSON_OBJECT('Fecha/Hora',NOW(),'Info',JSON_ARRAY()));
-        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-        SET _fkUsuario   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'   ));
-        SET _fkSucursal  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'  ));
+        SET _json         = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _fkUsuario    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkUsuario'   ));
+        SET _fkSucursal   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fkSucursal'  ));
+        SET _fecha_inicio = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha_inicio'));
+        SET _fecha_final  = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.fecha_final' ));
+        SET _resultado    = JSON_OBJECT('Resultado',JSON_OBJECT('Fecha/Hora Inicio',_fecha_inicio,'Fecha/Hora Final',_fecha_final,'Info',JSON_ARRAY()));
 
         START TRANSACTION ;
             SELECT fkTipo INTO _tipoUsuario FROM usuario WHERE idUsuario = _fkUsuario;
@@ -1594,16 +1603,16 @@ CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
             END IF;
 
             IF (_tipoUsuario = 3) THEN
-                SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
-                SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE fecha >= _fecha_inicio AND fecha <= _fecha_final AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
+                SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE fecha >= _fecha_inicio AND fecha <= _fecha_final AND fkSucursal = _fkSucursal AND fkUsuario = _fkUsuario;
 
                 SET _resultado = JSON_INSERT(_resultado,'$.Resultado.Info[0]',JSON_OBJECT('Ingresos',_ingresos,'Egresos',_egresos,'Total',_ingresos-_egresos));
             ELSE
                 SET _limit = JSON_LENGTH(_json);
                 WHILE _index < _limit DO
                     SELECT JSON_EXTRACT(_json,CONCAT('$[',_index,'].fkSucursal')) INTO _fkSucursal;
-                    SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal;
-                    SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE DATE(fecha) = DATE(NOW()) AND fkSucursal = _fkSucursal;
+                    SELECT IFNULL(SUM(total),0) INTO _ingresos FROM venta WHERE fecha >= _fecha_inicio AND fecha <= _fecha_final AND fkSucursal = _fkSucursal;
+                    SELECT IFNULL(SUM(total),0) INTO _egresos FROM egresos WHERE fecha >= _fecha_inicio AND fecha <= _fecha_final AND fkSucursal = _fkSucursal;
 
                     SELECT nombre INTO _nombreSucur FROM sucursal WHERE idSucursal = _fkSucursal;
 
