@@ -234,7 +234,7 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
         SET _nombre      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
         SET _costo       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'    ));
         SET _precio      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'   ));
-        SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imagen'   ));
+        SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imgen'   ));
         SET _activo      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'   ));
         SET _servicio    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio' ));
 
@@ -1186,7 +1186,7 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
                     SET _tempResult = @jsonResult;
 
                     IF ((SELECT COUNT(*) FROM venta WHERE fkUsuario = _fkUsuario AND DAYOFWEEK(fecha) = _dia AND WEEK(fecha) = WEEK(_fecha) AND fkSucursal = _fkSucursal) > 0) THEN
-                        SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE WEEK(fecha) = _dia LIMIT 1;
+                        SELECT DAYNAME(fecha) INTO _dayName FROM venta WHERE WEEK(fecha) = WEEK(_fecha) LIMIT 1;
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),JSON_OBJECT(_dayName,CONVERT(_tempResult,JSON)));
                     ELSE
                         SET _resultado = JSON_INSERT(_resultado,CONCAT('$.Resultado[',_dia-1,']'),'Sin registros');
@@ -1580,7 +1580,7 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
             SELECT costo INTO _costo FROM producto WHERE idProducto = _fkProducto;
             IF(_cantidad > 0) THEN
                 SELECT _costo * _cantidad INTO _total;
-                IF((SELECT fkSucursal, fkProducto FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) IS NOT NULL) THEN
+                IF((SELECT COUNT(*) FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) > 0) THEN
                     IF((SELECT cantidad FROM existencia WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto) < _cantidad) THEN
                         UPDATE existencia SET cantidad = _cantidad WHERE fkSucursal = _fkSucursal AND fkProducto = _fkProducto;
                         INSERT INTO egresos VALUE (0, 1, _fkUsuario, _fkSucursal, _total, NOW());

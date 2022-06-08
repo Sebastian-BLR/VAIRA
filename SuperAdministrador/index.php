@@ -10,6 +10,7 @@
     $id_usuario = $_SESSION['user'];
     $sucursales = json_decode(POST("SuperAdministrador/services/getSucursales.php", ''), true);
 
+    if($sucursales != null){
     // ! Asignar una sucursal default
     if(!isset($_SESSION['id_sucursal'])){
       $data = [
@@ -28,7 +29,7 @@
       $nombre_sucursal = json_decode(POST("SuperAdministrador/services/getNameSucursal.php", $data), true);
       $_SESSION['nombre_sucursal'] = $nombre_sucursal[0];
     }
-
+}
     $categorias = json_decode(POST("SuperAdministrador/services/getCategories.php", ''), true);
     $proveedores = json_decode(POST("SuperAdministrador/services/getProveedores.php", ''), true);
 ?>

@@ -7,7 +7,9 @@ if(isset($_POST['edit-product'])){
     'fkProducto' => $_POST['idProducto'],
     'cantidad' => $_POST['existencia']
   ];
+  // var_dump($data);
   $reponse = json_decode(Post("Administrador/services/updateProductsInventory.php",$data),true);
+  // var_dump($reponse);
   if($reponse[0] == 'SUCCESS')
     echo '
     <script>
