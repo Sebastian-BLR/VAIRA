@@ -131,3 +131,5 @@ INSERT INTO regimen_fiscal VALUES (0, 'Régimen Simplificado de Confianza'),
 # INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (7, 4, 4, 3, 0.16, 0.00, 0.00, 52.20);
 # INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (8, 1, 4, 4, 0.16, 0.00, 0.00, 83.52);
 # INSERT INTO info_venta (idInfo, fkProducto, fkVenta, cantidad, iva, ieps, isr, subtotal) VALUES (9, 3, 4, 1, 0.16, 0.00, 0.00, 17.40);
+
+SELECT * FROM producto;

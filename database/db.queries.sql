@@ -141,59 +141,82 @@ CREATE PROCEDURE eliminar_proveedor(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-# DELIMITER //
-# DROP PROCEDURE IF EXISTS insertar_producto;
-# CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
-#     BEGIN
-#         DECLARE _fkCategoria INT;
-#         DECLARE _fkProveedor INT;
-#         DECLARE _idProducto  INT;
-#         DECLARE _cantidad    INT;
-#
-#         DECLARE _json        JSON;
-#
-#         DECLARE _activo      TINYINT;
-#         DECLARE _servicio    TINYINT;
-#
-#         DECLARE _nombre      VARCHAR(50);
-#         DECLARE _sku         VARCHAR(20);
-#         DECLARE _imagen      VARCHAR(50);
-#         DECLARE _proveedor   VARCHAR(50);
-#
-#         DECLARE _costo       DECIMAL(10,2);
-#         DECLARE _precio      DECIMAL(10,2);
-#
-#
-#         DECLARE EXIT HANDLER FOR SQLEXCEPTION
-#         BEGIN
-#             SELECT '¡Error!' as 'Resultado';
-#             ROLLBACK;
-#         END;
-#
-#         SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
-#         SET _fkCategoria = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
-#         SET _fkProveedor = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.proveedor'));
-#         SET _nombre      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
-#         SET _costo       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'    ));
-#         SET _precio      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'   ));
-#         SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imagen'   ));
-#         SET _activo      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'   ));
-#         SET _servicio    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio' ));
-#
-#         SELECT nombre INTO _proveedor FROM proveedor WHERE idProveedor = _fkProveedor;
-#
-#         SELECT COUNT(*) INTO _cantidad FROM producto INNER JOIN proveedor p on producto.fkProveedor = p.idProveedor WHERE idProveedor = _fkProveedor;
-#
-#         SET _sku = UPPER(CONCAT(LEFT(_proveedor,3),'-', LEFT(_nombre,3),'-',(100 + _cantidad)));
-#
-#         START TRANSACTION;
-#             INSERT INTO producto VALUES (0, _fkCategoria, _fkProveedor, _nombre, _costo, _precio, _sku, _imagen, _activo, _servicio);
-#             SELECT idProducto INTO _idProducto FROM producto WHERE nombre = _nombre LIMIT 1;
-#             INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
-#         COMMIT;
-#     END //
-# DELIMITER ;
+DELIMITER //
+DROP PROCEDURE IF EXISTS insertar_multiple_productos;
+CREATE PROCEDURE insertar_multiple_productos(IN _jsonA JSON)
+    BEGIN
+        DECLARE _fkCategoria INT;
+        DECLARE _fkProveedor INT;
+        DECLARE _idProducto  INT;
+        DECLARE _cantidad    INT;
 
+        DECLARE _json        JSON;
+
+        DECLARE _activo      TINYINT;
+        DECLARE _servicio    TINYINT;
+
+        DECLARE _nombre      VARCHAR(50);
+        DECLARE _sku         VARCHAR(20);
+        DECLARE _imagen      VARCHAR(50);
+        DECLARE _categoria   VARCHAR(50);
+        DECLARE _proveedor   VARCHAR(50);
+
+        DECLARE _costo       DECIMAL(10,2);
+        DECLARE _precio      DECIMAL(10,2);
+
+        DECLARE _index           INT DEFAULT 0;
+        DECLARE _limite          INT DEFAULT 0;
+        DECLARE _idSucursal      INT;
+
+
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            SELECT '¡Error!' as 'Resultado';
+            ROLLBACK;
+        END;
+
+        SET _json        = JSON_EXTRACT(_jsonA, '$[0]');
+        SET _categoria   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.categoria'));
+        SET _proveedor   = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.proveedor'));
+        SET _nombre      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.nombre'   ));
+        SET _costo       = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.costo'    ));
+        SET _precio      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.precio'   ));
+        SET _imagen      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.imgen'   ));
+        SET _activo      = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.activo'   ));
+        SET _servicio    = JSON_UNQUOTE(JSON_EXTRACT(_json, '$.servicio' ));
+
+        START TRANSACTION;
+
+            IF((SELECT COUNT(*) FROM categoria WHERE nombre = _categoria) = 0) THEN
+                SELECT CONCAT('No existe la categoria: ',_categoria) as 'Status';
+                ROLLBACK;
+            ELSE
+                SELECT idCategoria INTO _fkCategoria FROM categoria WHERE nombre = _categoria;
+                IF((SELECT COUNT(*) FROM proveedor WHERE nombre = _proveedor) = 0) THEN
+                    SELECT CONCAT('No existe el proveedor: ',_proveedor) as 'Status';
+                    ROLLBACK;
+                ELSE
+                    SELECT idProveedor INTO _fkProveedor FROM proveedor WHERE nombre = _proveedor;
+                    SELECT COUNT(*) INTO _cantidad FROM producto INNER JOIN proveedor p on producto.fkProveedor = p.idProveedor WHERE idProveedor = _fkProveedor;
+
+                    SET _sku = UPPER(CONCAT(LEFT(_proveedor,3),'-', LEFT(_nombre,3),'-',(100 + _cantidad)));
+
+                    INSERT INTO producto VALUES (0, _fkCategoria, _fkProveedor, _nombre, _costo, _precio, _sku, _imagen, _activo, _servicio);
+                    SELECT idProducto INTO _idProducto FROM producto WHERE nombre = _nombre LIMIT 1;
+                    INSERT INTO log_producto VALUES (0, _idProducto, NOW(), NULL, NULL);
+
+                    SELECT COUNT(*) INTO _limite FROM sucursal;
+                    WHILE _index < _limite DO
+                        SELECT idSucursal INTO _idSucursal FROM sucursal ORDER BY idSucursal LIMIT _index, 1;
+                        INSERT INTO existencia VALUE (_idProducto, _idSucursal, 0);
+                        SET _index = _index + 1;
+                    END WHILE ;
+                    SELECT 'Producto agregado correctamente' as 'Status';
+                    COMMIT;
+                END IF;
+            END IF;
+    END //
+DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_producto;

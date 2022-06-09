@@ -9,6 +9,7 @@ function process_csv($file) {
     }
    
     fclose($file);
+    unset($data[0]);
     return $data;
    }
 ?>

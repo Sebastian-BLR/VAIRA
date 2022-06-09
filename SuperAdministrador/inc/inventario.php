@@ -114,18 +114,28 @@ if(isset($_GET["id"])){
 }
 
 if(isset($_POST['cargar_csv'])){
-  // echo'
-  //   <script>
-  //     leer_csv(\'perro\')
-  //   </script>
-  //   ';
   require "load_csv.php";
   $carpeta_destino = "./temp_csv/";      
   $archivo_subido = $carpeta_destino . $_FILES['adjunto']['name'];
   move_uploaded_file($_FILES['adjunto']['tmp_name'], $archivo_subido);
   $resultado = process_csv($archivo_subido);
-  // var_dump($_FILES);
-  var_dump($resultado);
+  foreach ($resultado as $linea){
+      $info_producto = explode(",", $linea[0]);
+      $data = [
+        'categoria' => $info_producto[0],
+        'proveedor' => $info_producto[1],
+        'nombre'    => $info_producto[2],
+        'costo'     => $info_producto[3],
+        'precio'    => $info_producto[4],
+        'servicio'  => $info_producto[5],
+        'imagen'    => "",
+        'activo'    => 1
+      ];
+
+      $status = json_decode(POST('SuperAdministrador/services/addMultipleProducts.php', $data), true);
+  }
+
+  // unlink($archivo_subido);
 }
 
 if(isset($_POST['edit-product'])){
