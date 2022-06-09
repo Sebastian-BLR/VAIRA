@@ -5,11 +5,36 @@ $data = [
 ];
 
 if(isset($_POST['addCategoria'])){
-  var_dump($_POST);
+  // var_dump($_POST);
   $data = [
     'nombre' => $_POST['nombre'],
-    'iva' => $_POST['iva'],
+    'impuestoIVA' => $_POST['iva'],
+    'descripcion' => $_POST['descripcion'],
   ];
+
+  if($_POST['isr'] == '')
+    $data['isr'] = 0.0;
+  else
+    $data['isr'] = $_POST['isr'];
+    
+  if($_POST['ieps'] == '')
+    $data['ieps'] = 0.0;
+  else
+    $data['ieps'] = $_POST['ieps'];
+
+
+  // var_dump($data);
+  $status = json_decode(POST('SuperAdministrador/services/addCategorie.php', $data),true);
+  // var_dump($data);
+  if($status == 'Success')
+    echo ('
+      <script>
+        $title = "Categoria agregada"
+        $msg = "La categoria se ha agregado correctamente"
+        alertSuccess($title, $msg)
+      </script>
+    ');
+
 }
 
 if(isset($_POST['addProduct'])){
@@ -19,7 +44,7 @@ if(isset($_POST['addProduct'])){
       'nombre' => $_POST['nombre'],
       'costo' => $_POST['costo'],
       'precio' => $_POST['precio'],
-      'img' => $_FILES['img']['name'],
+      'imagen' => $_FILES['img']['name'],
       'categoria' => $_POST['categoria'],
       'proveedor' => $_POST['proveedor'],
       'activo' => 1,
@@ -30,7 +55,7 @@ if(isset($_POST['addProduct'])){
       'nombre' => $_POST['nombre'],
       'costo' => $_POST['costo'],
       'precio' => $_POST['precio'],
-      'img' => "",
+      'imagen' => "",
       'categoria' => $_POST['categoria'],
       'proveedor' => $_POST['proveedor'],
       'activo' => 1,
@@ -42,8 +67,8 @@ if(isset($_POST['addProduct'])){
   if($status == "Success"){
     if($check !== false){
       $carpeta_destino = '../src/image/productos/';
-      $archivo_subido = $carpeta_destino . $_FILES['img'.$_POST['idProducto']]['name'];
-      move_uploaded_file($_FILES['img'.$_POST['idProducto']]['tmp_name'], $archivo_subido);
+      $archivo_subido = $carpeta_destino . $_FILES['img']['name'];
+      move_uploaded_file($_FILES['img']['tmp_name'], $archivo_subido);
     }
     echo '
     <script>
@@ -194,7 +219,6 @@ if(isset($_POST['edit-product'])){
 <div class="wrapper" style="height:65vh;">
   <div class="row" style="margin: 0 0 5px 0;">
     <?php
-
       if(isset($_POST['filtro-categoria'])){
         $data = [
           'categoria' => $_POST['filtro-categoria'],
@@ -209,8 +233,8 @@ if(isset($_POST['edit-product'])){
       }
       $index = 0;
       foreach($input_from_db as $producto){
-        if($index != 0 && $index%4==0)
-          echo '<div class="row">';
+        if($index != 0 && $index% 5==0)
+          echo '<div class="row" style="margin: 0 0 5px 0;">';
         if($producto[4] == null)
           $producto[4] = "default.jpg";
         echo('
@@ -227,111 +251,9 @@ if(isset($_POST['edit-product'])){
             </div>
           </div>
         ');
-        if($index != 0 && $index % 4 == 0)
-          echo '</div>';
-        
         $index++;
-        echo('
-        <!-- Modal Detalle Producto-->
-        <div class="modal fade bd-example-modal-sm" id="mostrarDetalleProducto'. $producto[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel'. $producto[0] .'">Detalle de Producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div class="mb-3">
-                    <label for="vendedor" class="col-form-label">Nombre de producto</label>
-                    <input type="text" readonly class="form-control" id="nombreproducto'. $producto[0] .'" value="'. $producto[1] .'">
-                  </div>
-                  <div class="mb-3">
-                    <label for="hora" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
-                    <input type="text" readonly class="form-control" id="precio'. $producto[0] .'" value="'. $producto[5] .'">
-                  </div>
-                  <div class="mb-3">
-                    <label for="productos" class="col-form-label">Categoria</label>
-                    <input type="text" readonly class="form-control" id="categoria'. $producto[0] .'" value="'. $producto[6] .'">
-                  </div>
-                  <div class="mb-3">
-                    <label for="total" class="col-form-label">En existencia</label>
-                    <input type="text" readonly class="form-control" id="existencia'. $producto[0] .'" value="'. $producto[2] .'">
-                  </div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Modal Actualizar producto-->
-        <div class="modal fade bd-example-modal-sm" id="actualizar'.$producto[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel'.$producto[0].'">Editar producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form action="'. htmlspecialchars($_SERVER['PHP_SELF']).'?inventario=true" method="POST" enctype = "multipart/form-data" style="display: inline;">
-                <input type="hidden" name="idProducto" value="'. $producto[0] .'">
-                  <div class="mb-3">
-                    <label for="producto" class="col-form-label">Nombre de producto</label>
-                    <input type="text" class="form-control" id="nombreProducto'.$producto[0].'" name="nombre'.$producto[0].'" value="'. $producto[1] .'" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="costo" class="col-form-label">Costo</label>
-                    <input type="text" class="form-control" id="costo'. $producto[0] .'" name="costo'.$producto[0].'" value="'. $producto[8] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="precio" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
-                    <input type="text" class="form-control" id="precio'. $producto[0] .'" name="precio'.$producto[0].'" value="'. $producto[5] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="formFile" class="form-label">Imagen producto</label>
-                    <input class="form-control" name="img'.$producto[0].'" type="file" id="formFile'.$producto[0].'" accept="image/png, image/jpeg">
-                  </div>
-                  <div class="mb-3">
-                    <label for="categoria" class="col-form-label">Categoria</label>
-                    <select class="form-control" id="categoria'. $producto[0] .'" name="categoria'.$producto[0].'" required>
-                      <option value="">Seleccione una categoria</option>
-                    ');
-                    foreach($categorias as $categoria){
-                      if($categoria[1] == $producto[6])
-                        echo('<option value="'. $categoria[0] .'" selected>'. $categoria[1] .'</option>');
-                      else
-                        echo('<option value="'. $categoria[0] .'">'. $categoria[1] .'</option>');
-                    }
-                  echo ('
-                    </select>
-                  </div>
-                  <div class="mb-3">
-                    <label for="proveedor" class="col-form-label">Proveedor</label>
-                    <select class="form-control" id="proveedor'. $producto[0] .'" name="proveedor'.$producto[0].'" required>
-                      <option value="">Seleccione un proveedor</option>
-                    ');
-                    foreach($proveedores as $proveedor){
-                      if($proveedor[0] == $producto[7])
-                        echo('<option value="'. $proveedor[0] .'" selected>'. $proveedor[1] .'</option>');
-                      else
-                        echo('<option value="'. $proveedor[0] .'">'. $proveedor[1] .'</option>');
-                    }
-                  echo ('
-                    </select>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" name="edit-product" class="btn btn-success">Aceptar</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      ');
+        if($index != 0 && $index % 5 == 0)
+          echo '</div>';
 
       }
       if ($input_from_db == null)
@@ -340,6 +262,113 @@ if(isset($_POST['edit-product'])){
     ?>
   </div>
 </div>
+  <?php
+  
+  foreach($input_from_db as $producto){
+    echo('
+    <!-- Modal Detalle Producto-->
+    <div class="modal fade bd-example-modal-sm" id="mostrarDetalleProducto'. $producto[0] .'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel'. $producto[0] .'">Detalle de Producto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="vendedor" class="col-form-label">Nombre de producto</label>
+                <input type="text" readonly class="form-control" id="nombreproducto'. $producto[0] .'" value="'. $producto[1] .'">
+              </div>
+              <div class="mb-3">
+                <label for="hora" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
+                <input type="text" readonly class="form-control" id="precio'. $producto[0] .'" value="'. $producto[5] .'">
+              </div>
+              <div class="mb-3">
+                <label for="productos" class="col-form-label">Categoria</label>
+                <input type="text" readonly class="form-control" id="categoria'. $producto[0] .'" value="'. $producto[6] .'">
+              </div>
+              <div class="mb-3">
+                <label for="total" class="col-form-label">En existencia</label>
+                <input type="text" readonly class="form-control" id="existencia'. $producto[0] .'" value="'. $producto[2] .'">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Actualizar producto-->
+    <div class="modal fade bd-example-modal-sm" id="actualizar'.$producto[0].'" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel'.$producto[0].'">Editar producto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="'. htmlspecialchars($_SERVER['PHP_SELF']).'?inventario=true" method="POST" enctype = "multipart/form-data" style="display: inline;">
+            <input type="hidden" name="idProducto" value="'. $producto[0] .'">
+              <div class="mb-3">
+                <label for="producto" class="col-form-label">Nombre de producto</label>
+                <input type="text" class="form-control" id="nombreProducto'.$producto[0].'" name="nombre'.$producto[0].'" value="'. $producto[1] .'" required>
+              </div>
+              <div class="mb-3">
+                <label for="costo" class="col-form-label">Costo</label>
+                <input type="text" class="form-control" id="costo'. $producto[0] .'" name="costo'.$producto[0].'" value="'. $producto[8] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
+              </div>
+              <div class="mb-3">
+                <label for="precio" class="col-form-label">Precio <b>(SIN IVA*)</b></label>
+                <input type="text" class="form-control" id="precio'. $producto[0] .'" name="precio'.$producto[0].'" value="'. $producto[5] .'" onKeypress="if ((event.keyCode < 48 || event.keyCode > 57) && event.keyCode != 46) event.returnValue = false;" required>
+              </div>
+              <div class="mb-3">
+                <label for="formFile" class="form-label">Imagen producto</label>
+                <input class="form-control" name="img'.$producto[0].'" type="file" id="formFile'.$producto[0].'" accept="image/png, image/jpeg">
+              </div>
+              <div class="mb-3">
+                <label for="categoria" class="col-form-label">Categoria</label>
+                <select class="form-control" id="categoria'. $producto[0] .'" name="categoria'.$producto[0].'" required>
+                  <option value="">Seleccione una categoria</option>
+                ');
+                foreach($categorias as $categoria){
+                  if($categoria[1] == $producto[6])
+                    echo('<option value="'. $categoria[0] .'" selected>'. $categoria[1] .'</option>');
+                  else
+                    echo('<option value="'. $categoria[0] .'">'. $categoria[1] .'</option>');
+                }
+              echo ('
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="proveedor" class="col-form-label">Proveedor</label>
+                <select class="form-control" id="proveedor'. $producto[0] .'" name="proveedor'.$producto[0].'" required>
+                  <option value="">Seleccione un proveedor</option>
+                ');
+                foreach($proveedores as $proveedor){
+                  if($proveedor[0] == $producto[7])
+                    echo('<option value="'. $proveedor[0] .'" selected>'. $proveedor[1] .'</option>');
+                  else
+                    echo('<option value="'. $proveedor[0] .'">'. $proveedor[1] .'</option>');
+                }
+              echo ('
+                </select>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" name="edit-product" class="btn btn-success">Aceptar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  ');
+  }
+  
+  ?>
         
 <!-- Modal Agregar un producto-->
 <div class="modal fade bd-example-modal-sm" id="agregarUnProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -451,7 +480,7 @@ if(isset($_POST['edit-product'])){
           <div class="row">
             <div class="mb-3 col">
               <label for="descripcion" class="form-label">Descripcion:</label>
-              <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+              <textarea class="form-control" id="descripcion" rows="3" name="descripcion"></textarea>
             </div>
           </div>
       </div>
