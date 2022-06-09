@@ -5,7 +5,6 @@ $data = [
 ];
 
 if(isset($_POST['addCategoria'])){
-  // var_dump($_POST);
   $data = [
     'nombre' => $_POST['nombre'],
     'impuestoIVA' => $_POST['iva'],
@@ -22,10 +21,7 @@ if(isset($_POST['addCategoria'])){
   else
     $data['ieps'] = $_POST['ieps'];
 
-
-  // var_dump($data);
   $status = json_decode(POST('SuperAdministrador/services/addCategorie.php', $data),true);
-  // var_dump($data);
   if($status == 'Success')
     echo ('
       <script>
@@ -120,22 +116,33 @@ if(isset($_POST['cargar_csv'])){
   move_uploaded_file($_FILES['adjunto']['tmp_name'], $archivo_subido);
   $resultado = process_csv($archivo_subido);
   foreach ($resultado as $linea){
+    if($linea){
       $info_producto = explode(",", $linea[0]);
-      $data = [
-        'categoria' => $info_producto[0],
-        'proveedor' => $info_producto[1],
-        'nombre'    => $info_producto[2],
-        'costo'     => $info_producto[3],
-        'precio'    => $info_producto[4],
-        'servicio'  => $info_producto[5],
-        'imagen'    => "",
-        'activo'    => 1
-      ];
-
+      if($info_producto[0] != ''){
+        $data = [
+          'categoria' => $info_producto[0],
+          'proveedor' => $info_producto[1],
+          'nombre'    => $info_producto[2],
+          'costo'     => $info_producto[3],
+          'precio'    => $info_producto[4],
+          'servicio'  => $info_producto[5],
+          'imagen'    => "",
+          'activo'    => 1
+        ];  
+      }
       $status = json_decode(POST('SuperAdministrador/services/addMultipleProducts.php', $data), true);
+    }
   }
+  if($status[0] != '¡Error!')
+    echo ('
+      <script>
+        $title = "Exito!"
+        $msg = "Productos agregados correctamente"
+        alertSuccess($msg)
+      </script>
+    ');
 
-  // unlink($archivo_subido);
+  unlink($archivo_subido);
 }
 
 if(isset($_POST['edit-product'])){
@@ -528,13 +535,3 @@ if(isset($_POST['edit-product'])){
     </div>
   </form>
 </div>
-<script>
-  function cambiarVisibiidadExistencia(newStatus){
-    var selectedValue = document.getElementById("select_servicio").value;
-    // var newStatus = selectedValue ==1? "block":"none";
-    // document.getElementById("existeniaDiv").style.display = newStatus;
-    var newStatus = selectedValue ==1? "hidden":"visible";
-    document.getElementById("existeniaDiv").style.visibility = newStatus;
-  }
-</script>
-

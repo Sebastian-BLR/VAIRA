@@ -53,9 +53,9 @@
     }
     $index = 0;
       foreach($input_from_db as $value){
-        if($index % 4 == 0){
+        if($index % 3 == 0){
           echo('
-            <div class="row">
+            <div class="row" style="margin: 0 0 5px 0;">
           ');
         }
         if($value[4]==null)
@@ -84,13 +84,13 @@
             </div>
         ');
         $index++;
-        if($index != 0 && $index % 4 == 0){
+        if($index != 0 && $index % 3 == 0){
           echo('
             </div>
           ');
         }
       }
-      if($index % 4 != 0){
+      if($index % 3 != 0){
         echo('
           </div>
         ');

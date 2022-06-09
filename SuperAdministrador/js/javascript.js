@@ -177,7 +177,11 @@ function alertSuccess(title, msg){
       title,
       msg,
       'success',
-    )
+    ).then((result) => {
+      if (result.isConfirmed) {
+        location.reload()
+      }
+    })
 }
 
 function alertErrorActualizarProducto(){

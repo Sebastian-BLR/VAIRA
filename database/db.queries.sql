@@ -432,7 +432,7 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
                 JOIN region_iva ri on s.fkRegion = ri.idRegion
                 JOIN categoria c on producto.fkCategoria = c.idCategoria
-                WHERE fkSucursal = _idSucursal AND fkCategoria = _categoria;
+                WHERE fkSucursal = _idSucursal AND fkCategoria = _categoria AND activo = 1;
         COMMIT ;
     END //
 DELIMITER ;
@@ -697,7 +697,6 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
         COMMIT;
     END //
 DELIMITER ;
-CALL generar_devolucion('[{"fecha":"2022-05-24 13:04:13","idVenta":4,"usuario":"admin","password":456,"fkUsuario":2,"restaurar":1,"fkSucursal":1}]');
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_puntos_venta;
@@ -1229,19 +1228,6 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
         END IF;
     END//
 DELIMITER ;
-
-# DELIMITER //
-# DROP PROCEDURE IF EXISTS obtener_usuarios_super_admin;
-# CREATE PROCEDURE obtener_usuarios_super_admin()
-#     BEGIN
-#         SELECT idUsuario, usuario.nombre, correo, usuario.telefono, usuario, s.nombre, tipo FROM usuario
-#             LEFT JOIN sucursal_usuario ON fkUsuario = idUsuario
-#             LEFT JOIN sucursal s ON fkSucursal = idSucursal
-#             JOIN tipo t on usuario.fkTipo = t.idTipo
-#             WHERE fkTipo !=3 AND activo = 1;
-#     END //
-# DELIMITER ;
-
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
