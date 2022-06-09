@@ -88,6 +88,18 @@ if(isset($_GET["id"])){
       }) </script>";
 }
 
+if(isset($_POST['cargar_csv'])){
+  // echo'
+  //   <script>
+  //     leer_csv(\'perro\')
+  //   </script>
+  //   ';
+  require "load_csv.php";
+  $resultado = process_csv($_FILES['adjunto']['tmp_name']);
+  var_dump($_FILES);
+  // var_dump($resultado);
+}
+
 if(isset($_POST['edit-product'])){
   $check = @getimagesize($_FILES['img'.$_POST['idProducto']]['tmp_name']);
   if($check !== false){
@@ -456,22 +468,23 @@ if(isset($_POST['edit-product'])){
 <!-- // * Modal Agregar varios productos -->
 <!-- //*================================ -->
 <div class="modal fade bd-example-modal-lg" id="agregarVariosProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Validar conexión con lector de códigos</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          Esperando conexión ...
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+  <form action="<?php echo( htmlspecialchars($_SERVER["PHP_SELF"]) ).'?inventario=true' ?>" enctype = "multipart/form-data" method="POST">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Seleccionar archivo .CSV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="file" name="adjunto" accept=".csv"/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+          <button type="summit" class="btn btn-success" name="cargar_csv">Cargar</button>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>
 <script>
   function cambiarVisibiidadExistencia(newStatus){

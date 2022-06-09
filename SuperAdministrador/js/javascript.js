@@ -14,24 +14,23 @@ function alertEliminarUsuario(id){
         window.location.href = "index.php?configuracion=true&id_usuario="+id;
       }  
     })
-  }
+}
 
-
-  function alertCamposVacios(){
+function alertCamposVacios(){
     Swal.fire(
         'Error',
         'Por favor llena todos los campos',
         'error',
       )
-  }
+}
   
-  function alertUsuarioExistente(){
+function alertUsuarioExistente(){
     Swal.fire(
         'Error',
         'El nombre de usuario ya existe, intenta con otro',
         'error',
       )
-  }
+}
   
   function alertPassDiferente(){
     Swal.fire(
@@ -39,9 +38,7 @@ function alertEliminarUsuario(id){
         'Las constraseñas no coinciden',
         'error',
       )
-  }
-
-
+}
 
 function alertEliminarProducto(id){
   Swal.fire({
@@ -59,8 +56,7 @@ function alertEliminarProducto(id){
         window.location.href = "index.php?inventario=true&id="+id;
       }  
     })
-  }
-
+}
 
 function alertEliminarProveedor(id){
   Swal.fire({
@@ -210,7 +206,6 @@ function alertSucursalAsignada(){
     })
 }
 
-
 function alertDevolucion(){ 
   Swal.fire({
     icon: 'success',
@@ -248,7 +243,7 @@ function myFunction() {
     }
   } 
 
-  function mostrarPass() {
+function mostrarPass() {
   var show = document.getElementById("showPass");
   if(show.checked == false){
     show.checked = true;
