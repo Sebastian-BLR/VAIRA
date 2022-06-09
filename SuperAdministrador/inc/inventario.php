@@ -120,9 +120,12 @@ if(isset($_POST['cargar_csv'])){
   //   </script>
   //   ';
   require "load_csv.php";
-  $resultado = process_csv($_FILES['adjunto']['tmp_name']);
-  var_dump($_FILES);
-  // var_dump($resultado);
+  $carpeta_destino = "./temp_csv/";      
+  $archivo_subido = $carpeta_destino . $_FILES['adjunto']['name'];
+  move_uploaded_file($_FILES['adjunto']['tmp_name'], $archivo_subido);
+  $resultado = process_csv($archivo_subido);
+  // var_dump($_FILES);
+  var_dump($resultado);
 }
 
 if(isset($_POST['edit-product'])){
