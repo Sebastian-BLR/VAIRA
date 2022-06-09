@@ -307,7 +307,7 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
                 JOIN existencia e on producto.idProducto = e.fkProducto
                 JOIN sucursal s on e.fkSucursal = s.idSucursal
                 JOIN categoria c on c.idCategoria = producto.fkCategoria
-                JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal;
+                JOIN region_iva ri on s.fkRegion = ri.idRegion WHERE fkSucursal = _idSucursal AND activo = 1;
         COMMIT ;
     END //
 DELIMITER ;
