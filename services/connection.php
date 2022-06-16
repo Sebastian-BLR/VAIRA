@@ -1,10 +1,10 @@
 <?php 
 // ? LOCAL STORAGE
     $servername = "localhost";
-    $username = "root";
+    $username = "naatika1_VARIA_150622";
     //$password = "root";
-    $password = "";
-    $dbname = "db_vaira";
+    $password = "Ekq3l#pE6qYr";
+    $dbname = "naatika1_db_vaira";
     
 // ! DEVELOPMENT DB
     // $servername = "db-vaira-2022.cgupkyny0avi.us-west-1.rds.amazonaws.com";

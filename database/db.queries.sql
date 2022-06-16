@@ -776,7 +776,7 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-USE db_vaira;
+USE naatika1_db_vaira;
 DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vmensual_user;
 CREATE PROCEDURE h_filtrar_vmensual_user(IN _jsonA JSON, OUT _salida TEXT)

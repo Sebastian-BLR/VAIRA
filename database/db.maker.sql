@@ -65,14 +65,6 @@ CREATE TABLE IF NOT EXISTS usuario(
     FOREIGN KEY (fkTipo) REFERENCES tipo(idTipo)   ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
 
-CREATE TABLE IF NOT EXISTS sucursal_usuario(
-    fkUsuario   INT     NOT NULL ,
-    fkSucursal  INT     NOT NULL ,
-
-    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
-    PRIMARY KEY (fkUsuario, fkSucursal)
-);
 
 CREATE TABLE IF NOT EXISTS log_usuario(
     idLog       INT         NOT NULL        PRIMARY KEY     AUTO_INCREMENT,
@@ -263,3 +255,12 @@ CREATE TABLE IF NOT EXISTS egresos(
     FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT
 )ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS sucursal_usuario(
+    fkUsuario   INT     NOT NULL ,
+    fkSucursal  INT     NOT NULL ,
+
+    FOREIGN KEY (fkSucursal) REFERENCES sucursal(idSucursal) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario) ON UPDATE CASCADE ON DELETE RESTRICT,
+    PRIMARY KEY (fkUsuario, fkSucursal)
+);
