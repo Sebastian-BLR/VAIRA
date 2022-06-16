@@ -7,7 +7,7 @@
 -- | consultas a la base de datos | --
 -- ================================ --
 
-USE db_vaira;
+USE naatika1_db_vaira;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_usuario;
