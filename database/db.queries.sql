@@ -9,8 +9,8 @@
 
 USE naatika1_db_vaira;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_usuario;
+DELIMITER //
 CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario  INT;
@@ -60,8 +60,8 @@ CREATE PROCEDURE insertar_usuario(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_usuario;
+DELIMITER //
 CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -93,8 +93,8 @@ CREATE PROCEDURE eliminar_usuario(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_usuario_fisico;
+DELIMITER //
 CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -117,8 +117,8 @@ CREATE PROCEDURE eliminar_usuario_fisico(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_proveedor;
+DELIMITER //
 CREATE PROCEDURE eliminar_proveedor(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -141,8 +141,8 @@ CREATE PROCEDURE eliminar_proveedor(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_multiple_productos;
+DELIMITER //
 CREATE PROCEDURE insertar_multiple_productos(IN _jsonA JSON)
     BEGIN
         DECLARE _fkCategoria INT;
@@ -218,8 +218,8 @@ CREATE PROCEDURE insertar_multiple_productos(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_producto;
+DELIMITER //
 CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
     BEGIN
         DECLARE _fkCategoria INT;
@@ -282,8 +282,8 @@ CREATE PROCEDURE insertar_producto(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_productos_super_admin;
+DELIMITER //
 CREATE PROCEDURE obtener_productos_super_admin(IN _jsonA JSON)
     BEGIN
         DECLARE _idSucursal INT;
@@ -308,9 +308,8 @@ CREATE PROCEDURE obtener_productos_super_admin(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_productos;
+DELIMITER //
 CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
     BEGIN
         DECLARE _idSucursal INT;
@@ -335,8 +334,8 @@ CREATE PROCEDURE obtener_productos(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_producto;
+DELIMITER //
 CREATE PROCEDURE eliminar_producto(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -359,8 +358,8 @@ CREATE PROCEDURE eliminar_producto(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS eliminar_producto_fisico;
+DELIMITER //
 CREATE PROCEDURE eliminar_producto_fisico(IN id INT)
     BEGIN
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -376,8 +375,8 @@ CREATE PROCEDURE eliminar_producto_fisico(IN id INT)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_busqueda;
+DELIMITER //
 CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
     BEGIN
         DECLARE _json       JSON;
@@ -407,8 +406,8 @@ CREATE PROCEDURE obtener_busqueda(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_filtro;
+DELIMITER //
 CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
     BEGIN
         DECLARE _json       JSON;
@@ -437,8 +436,8 @@ CREATE PROCEDURE obtener_filtro(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_filtro_super_admin;
+DELIMITER //
 CREATE PROCEDURE obtener_filtro_super_admin(IN _jsonA JSON)
     BEGIN
         DECLARE _json       JSON;
@@ -467,8 +466,8 @@ CREATE PROCEDURE obtener_filtro_super_admin(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS realizar_venta;
+DELIMITER //
 CREATE PROCEDURE realizar_venta(IN _jsonA JSON)
 BEGIN
     DECLARE _fkPunto        INT;
@@ -555,8 +554,8 @@ BEGIN
 END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_detalles_compra;
+DELIMITER //
 CREATE PROCEDURE obtener_detalles_compra(_jsonA JSON)
 BEGIN
     DECLARE _idVenta INT;
@@ -581,8 +580,8 @@ BEGIN
 END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS generar_factura;
+DELIMITER //
 CREATE PROCEDURE generar_factura(IN _jsonA JSON)
     BEGIN
         DECLARE _fkVenta       INT;
@@ -619,8 +618,8 @@ CREATE PROCEDURE generar_factura(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS generar_devolucion;
+DELIMITER //
 CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
     BEGIN
         DECLARE _idVenta    INT;
@@ -698,8 +697,8 @@ CREATE PROCEDURE generar_devolucion(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_puntos_venta;
+DELIMITER //
 CREATE PROCEDURE obtener_puntos_venta(IN _jsonA JSON)
     BEGIN
        DECLARE _idUsuario INT;
@@ -712,8 +711,8 @@ CREATE PROCEDURE obtener_puntos_venta(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_sucursal;
+DELIMITER //
 CREATE PROCEDURE obtener_sucursal(IN _jsonA JSON)
     BEGIN
        DECLARE _idUsuario  INT;
@@ -734,8 +733,9 @@ DELIMITER ;
 # 2.- Semana
 # 3.- Mensual
 # 4.- Anual
-DELIMITER //
+
 DROP PROCEDURE IF EXISTS filtrar_ventas;
+DELIMITER //
 CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
     BEGIN
        DECLARE _rango       INT;
@@ -777,8 +777,9 @@ CREATE PROCEDURE filtrar_ventas(IN _jsonA JSON)
 DELIMITER ;
 
 USE naatika1_db_vaira;
-DELIMITER //
+
 DROP PROCEDURE IF EXISTS h_filtrar_vmensual_user;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vmensual_user(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -822,8 +823,8 @@ CREATE PROCEDURE h_filtrar_vmensual_user(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vmensual_admin;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vmensual_admin(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkSucursal  INT;
@@ -865,8 +866,8 @@ CREATE PROCEDURE h_filtrar_vmensual_admin(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vmensual_sadmin;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vmensual_sadmin(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkSucursal  INT;
@@ -923,8 +924,8 @@ CREATE PROCEDURE h_filtrar_vmensual_sadmin(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_mensuales;
+DELIMITER //
 CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -990,8 +991,8 @@ CREATE PROCEDURE filtrar_ventas_mensuales(IN _jsonA JSON)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vsemanal_user;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vsemanal_user(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -1040,8 +1041,8 @@ CREATE PROCEDURE h_filtrar_vsemanal_user(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vsemanal_admin;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vsemanal_admin(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkSucursal  INT;
@@ -1088,8 +1089,8 @@ CREATE PROCEDURE h_filtrar_vsemanal_admin(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_filtrar_vsemanal_sadmin;
+DELIMITER //
 CREATE PROCEDURE h_filtrar_vsemanal_sadmin(IN _jsonA JSON, OUT _salida TEXT)
     BEGIN
         DECLARE _fkSucursal  INT;
@@ -1149,8 +1150,8 @@ CREATE PROCEDURE h_filtrar_vsemanal_sadmin(IN _jsonA JSON, OUT _salida TEXT)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS filtrar_ventas_semanal;
+DELIMITER //
 CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -1229,8 +1230,8 @@ CREATE PROCEDURE filtrar_ventas_semanal(IN _jsonA JSON)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS obtener_usuarios_admin;
+DELIMITER //
 CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
     BEGIN
         DECLARE _idAdmin INT;
@@ -1247,9 +1248,8 @@ CREATE PROCEDURE obtener_usuarios_admin(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
-
 DROP PROCEDURE IF EXISTS actualizar_usuario;
+DELIMITER //
 CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -1290,8 +1290,8 @@ CREATE PROCEDURE actualizar_usuario(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS actualizar_puntos_usuario;
+DELIMITER //
 CREATE PROCEDURE actualizar_puntos_usuario(IN _jsonA JSON)
         BEGIN
             DECLARE _json JSON;
@@ -1344,8 +1344,9 @@ DELIMITER ;
 # 2.- Semana
 # 3.- Mensual
 # 4.- Anual
-DELIMITER //
+
 DROP PROCEDURE IF EXISTS filtrar_ventas_categoria;
+DELIMITER //
 CREATE PROCEDURE filtrar_ventas_categoria(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -1456,8 +1457,9 @@ DELIMITER ;
 # 2.- Semana
 # 3.- Mensual
 # 4.- Anual
-DELIMITER //
+
 DROP PROCEDURE IF EXISTS filtrar_ventas_producto;
+DELIMITER //
 CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario   INT;
@@ -1559,8 +1561,8 @@ CREATE PROCEDURE filtrar_ventas_producto(IN _jsonA JSON)
     END//
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS actualizar_producto_inventario;
+DELIMITER //
 CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
     BEGIN
         DECLARE _json       JSON;
@@ -1608,8 +1610,8 @@ CREATE PROCEDURE actualizar_producto_inventario(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_proveedor;
+DELIMITER //
 CREATE PROCEDURE insertar_proveedor(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -1635,8 +1637,8 @@ CREATE PROCEDURE insertar_proveedor(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS h_insertar_sucursal;
+DELIMITER //
 CREATE PROCEDURE h_insertar_sucursal(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -1669,8 +1671,8 @@ CREATE PROCEDURE h_insertar_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS insertar_sucursal;
+DELIMITER //
 CREATE PROCEDURE insertar_sucursal(IN _jsonA JSON)
     BEGIN
         DECLARE _json JSON;
@@ -1705,8 +1707,8 @@ CREATE PROCEDURE insertar_sucursal(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS realizar_corte_caja;
+DELIMITER //
 CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
     BEGIN
         DECLARE _fkUsuario    INT;
@@ -1769,8 +1771,8 @@ CREATE PROCEDURE realizar_corte_caja(IN _jsonA JSON)
     END //
 DELIMITER ;
 
-DELIMITER //
 DROP PROCEDURE IF EXISTS actualizar_sucursal_admin;
+DELIMITER //
 CREATE PROCEDURE actualizar_sucursal_admin(IN _jsonA JSON)
     BEGIN
         DECLARE _json            JSON;
@@ -1806,10 +1808,8 @@ CREATE PROCEDURE actualizar_sucursal_admin(IN _jsonA JSON)
 
 DELIMITER ;
 
-
-DELIMITER //
-
 DROP PROCEDURE IF EXISTS agregar_categoria;
+DELIMITER //
 CREATE PROCEDURE agregar_categoria(IN _jsonA JSON)
     BEGIN
         DECLARE _json           JSON;
